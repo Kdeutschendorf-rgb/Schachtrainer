@@ -184,10 +184,10 @@ function createPlayer(el, { queue, seconds = 0, standalone = false, onEnd }) {
     timerSlot.append(timer.el);
   }
 
-  nav.append(
-    standalone ? h('a.btn', { href: '#/endspiele' }, 'Übersicht') : null,
-    standalone ? null : h('button', { onclick: () => finishAll() }, 'Block beenden'),
-  );
+  // append() würde null als Text „null“ einfügen, darum nur das Passende anhängen
+  nav.append(standalone
+    ? h('a.btn', { href: '#/endspiele' }, 'Übersicht')
+    : h('button', { onclick: () => finishAll() }, 'Block beenden'));
 
   function onKey(e) {
     if (e.target.matches?.('input, select, textarea')) return;

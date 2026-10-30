@@ -34,7 +34,7 @@ def parse(pgn):
             idx = str(len(moves) - 1)
             notes[idx] = (notes[idx] + " " + text) if idx in notes else text
         else:
-            moves.append(tok)
+            moves.append(tok.rstrip("?!"))  # Bewertungszeichen (?, !, ?!) nur in der Quelle
     return moves, notes
 
 

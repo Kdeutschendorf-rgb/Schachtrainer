@@ -49,7 +49,7 @@ function renderOverview(el) {
       h('div.small', ex.levelText(st.level)),
       progressBar((st.level - 1) / (ex.maxLevel - 1 || 1)),
       h('div.row.small.muted',
-        h('span', `${(st.history || []).length} gelöst`),
+        h('span', `${(st.history || []).length} ${(st.history || []).length === 1 ? 'Aufgabe' : 'Aufgaben'}`),
         rate != null ? h('span', `· zuletzt ${Math.round(rate * 100)} % richtig`) : null,
         todayCount ? h('span', `· heute ${todayCount}`) : null),
       h('div.row', h('a.btn.primary', { href: `#/rechnen?ex=${kind}` }, 'Starten')));
@@ -118,6 +118,7 @@ function createSession(el, { mode, seconds, standalone, onEnd }) {
   const timeouts = new Set();
   let primary = null;
   let selectFn = null;
+  let idle = false;         // zwischen zwei Aufgaben (wartet auf „Weiter“)
 
   // Gerüst
   const boardHost = h('div');
@@ -172,13 +173,21 @@ function createSession(el, { mode, seconds, standalone, onEnd }) {
   }
   document.addEventListener('keydown', onKey);
 
-  nav.append(
+  // append() würde null als Text „null“ einfügen, darum filtern
+  nav.append(...[
     standalone ? h('a.btn', { href: '#/rechnen' }, 'Übersicht') : null,
     h('button', { onclick: () => finish() }, standalone ? 'Beenden' : 'Block beenden'),
-  );
+  ].filter(Boolean));
 
   if (seconds) {
-    timer = countdown(seconds, { onEnd: () => { timeUp = true; toast('Zeit um. Die laufende Aufgabe darfst du noch fertig machen.'); } });
+    timer = countdown(seconds, {
+      onEnd: () => {
+        timeUp = true;
+        // Zwischen zwei Aufgaben sofort abschließen, sonst darf die laufende Aufgabe fertig werden
+        if (idle) finish();
+        else toast('Zeit um. Die laufende Aufgabe darfst du noch fertig machen.');
+      },
+    });
     timerSlot.append(timer.el);
   }
 
@@ -234,8 +243,9 @@ function createSession(el, { mode, seconds, standalone, onEnd }) {
   }
 
   function waitNext(label) {
+    idle = true;
     return new Promise(resolve => {
-      const b = h('button.primary', { onclick: () => resolve() }, label + ' ⏎');
+      const b = h('button.primary', { onclick: () => { idle = false; resolve(); } }, label + ' ⏎');
       primary = b;
       controls.prepend(b);
     });

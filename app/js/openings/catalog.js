@@ -145,7 +145,7 @@ export function createCatalog(el, { catalog, focusId, onSelect, onQuiz }) {
     ArrowRight: () => goto(cursor + 1),
     Home: () => goto(0),
     End: () => goto(seq.length),
-  });
+  }, el);
 
   renderList();
   if (current) showMain(); else renderDetail();

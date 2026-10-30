@@ -8,8 +8,11 @@ export const orientationOf = s => (s === 'w' ? 'white' : 'black');
 
 // Tastenkürzel. map: {' ': fn, Enter: fn, h: fn, ArrowLeft: fn, ...} → Funktion zum Abmelden.
 // Leertaste/Enter auf einem fokussierten Knopf bleiben beim Knopf (sonst doppelt ausgelöst).
-export function onKeys(map) {
+// scope: Element der Komponente. Hängt es nicht (mehr) im Dokument, werden Tasten ignoriert,
+// damit eine nicht aufgeräumte Ansicht (z. B. nach schnellem Routenwechsel) nichts mehr auslöst.
+export function onKeys(map, scope = null) {
   const handler = e => {
+    if (scope && !scope.isConnected) return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     const t = e.target;
     if (t && (t.tagName === 'INPUT' || t.tagName === 'SELECT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;

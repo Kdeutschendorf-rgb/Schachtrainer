@@ -84,7 +84,7 @@ export async function runCalc(ctx, level) {
   board.setMovable('none');
 
   ctx.prompt.replaceChildren(
-    h('div', `Das Brett bleibt stehen. Stell dir die nächsten ${n === 1 ? 'Halbzug' : n + ' Halbzüge'} vor:`),
+    h('div', `Das Brett bleibt stehen. Stell dir ${n === 1 ? 'den nächsten Halbzug' : `die nächsten ${n} Halbzüge`} vor:`),
   );
   const lineEl = h('div.vision-line.moves');
   const after = h('div.vision-after.muted');
@@ -445,9 +445,10 @@ export async function runLoose(ctx, level) {
   const why = t => t.reason === 'hängt'
     ? `hängt: angegriffen von ${t.attackers.join(', ')}${t.defenders.length ? `, gedeckt nur von ${t.defenders.join(', ')}` : ', ungedeckt'}`
     : `ungedeckt${t.attackers.length ? ` und angegriffen von ${t.attackers.join(', ')}` : ''}`;
-  ctx.body.replaceChildren(h('ul.vision-loose', pos.targets.map(t =>
-    h('li', { class: g.missed.includes(t.square) ? 'miss' : 'hit' }, h('strong', name(t)), ' ', why(t)))),
-  g.extra.length ? h('div.small.muted', `Zu viel markiert (blau): ${g.extra.join(', ')}. Diese Steine sind ausreichend gedeckt.`) : null);
+  ctx.body.replaceChildren(h('div.vision-solution',
+    h('ul.vision-loose', pos.targets.map(t =>
+      h('li', { class: g.missed.includes(t.square) ? 'miss' : 'hit' }, h('strong', name(t)), ' ', why(t)))),
+    g.extra.length ? h('div.small.muted', `Zu viel markiert (blau): ${g.extra.join(', ')}. Diese Steine sind ausreichend gedeckt.`) : null));
   ctx.feedback(g.ok ? `Alles richtig in ${sec} s.` : `${g.hit.length} von ${pos.targets.length} richtig.`, g.ok ? 'good' : 'bad');
   ctx.controls.replaceChildren(h('div.small.muted', 'Grün = richtig, Rot = übersehen, Blau = zu viel.'));
   return { ok: g.ok, hint, id: pos.id, level, seconds: sec, details: { hit: g.hit.length, missed: g.missed.length, extra: g.extra.length } };

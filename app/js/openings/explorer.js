@@ -4,7 +4,8 @@
 // const x = createExplorer(el, { model, side, moves, chapterId, onLearn(line), onPractice(line), onSpar(line|null, moves, side), onSide(side) });
 
 import { createBoard } from '../board.js';
-import { h, clear, figurine, formatLine } from '../ui.js';
+import { Chess } from '../../vendor/chess.js';
+import { h, clear, figurine, formatLine, toast } from '../ui.js';
 import * as engine from '../engine.js';
 import { treeNode, fenKey, lineStatus, openingNameFor } from './logic.js';
 import { progress, loadNameIndex } from './data.js';
@@ -13,6 +14,16 @@ import { onKeys, moveList, moveLabel, sideName, orientationOf, button, priorityB
 function userScore(score, side) {
   if (side === 'w') return score;
   return score.mate != null ? { mate: -score.mate } : { cp: -score.cp };
+}
+
+// Nur den legalen Anfang einer Zugfolge behalten (z. B. aus der URL), sonst wirft board.loadLine.
+function legalPrefix(moves) {
+  const chess = new Chess();
+  const out = [];
+  for (const mv of moves) {
+    try { out.push(chess.move(mv).san); } catch { break; }
+  }
+  return out;
 }
 
 // Gemeinsamer Anfang aller Linien eines Kapitels (Startpunkt beim Kapitelwechsel)
@@ -27,7 +38,8 @@ function commonPrefix(lines) {
 }
 
 export function createExplorer(el, { model, side = 'w', moves = [], chapterId, onLearn, onPractice, onSpar, onSide }) {
-  let path = moves.slice();
+  let path = legalPrefix(moves);
+  if (path.length < moves.length) toast(`Zug ${path.length + 1} („${moves[path.length]}“) ist nicht legal. Der Explorer zeigt die Stellung davor.`, 'bad');
   let cursor = path.length;
   let alive = true;
   let token = 0;
@@ -202,6 +214,10 @@ export function createExplorer(el, { model, side = 'w', moves = [], chapterId, o
 
   async function runEngine(fen, box) {
     const my = token;
+    // Kurz warten: Beim schnellen Blättern nicht jede Zwischenstellung rechnen lassen
+    // (der Server rechnet Anfragen nacheinander ab).
+    await new Promise(r => setTimeout(r, 300));
+    if (!alive || my !== token) return;
     try {
       const res = await engine.analyse(fen, { depth: 18 });
       if (!alive || my !== token) return;
@@ -229,7 +245,7 @@ export function createExplorer(el, { model, side = 'w', moves = [], chapterId, o
     ArrowLeft: () => goto(cursor - 1),
     ArrowRight: () => goto(cursor + 1),
     Home: () => goto(0),
-  });
+  }, el);
 
   renderHead();
   goto(cursor);

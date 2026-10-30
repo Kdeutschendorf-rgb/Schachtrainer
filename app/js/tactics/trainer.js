@@ -71,7 +71,7 @@ export function createTrainer(el, opts = {}) {
   let puzzle = null, run = null;
   let token = 0;             // pro Aufgabe; veraltete Rückrufe ignorieren
   let timers = [];
-  let graded = false, failed = false, hintLevel = 0, t0 = 0, lastRes = null;
+  let graded = false, failed = false, hintLevel = 0, hintPly = -1, t0 = 0, lastRes = null;
   let sol = null, replayIdx = null;
   let destroyed = false;
 
@@ -113,7 +113,7 @@ export function createTrainer(el, opts = {}) {
     clearTimers();
     puzzle = p;
     run = new PuzzleRun(p);
-    graded = false; failed = false; hintLevel = 0; lastRes = null; sol = null; replayIdx = null;
+    graded = false; failed = false; hintLevel = 0; hintPly = -1; lastRes = null; sol = null; replayIdx = null;
     resultCard.hidden = true;
     taskCard.hidden = false;
     clear(analysisEl);
@@ -251,6 +251,8 @@ export function createTrainer(el, opts = {}) {
     if (phase !== 'solving') return;
     const exp = run.expected;
     if (!exp) return;
+    // Hinweisstufe gilt pro Zug: beim nächsten eigenen Zug wieder mit der Figur beginnen
+    if (hintPly !== run.ply) { hintPly = run.ply; hintLevel = 0; }
     hintLevel++;
     markFailed();
     if (hintLevel === 1) {

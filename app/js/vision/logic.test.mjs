@@ -135,4 +135,36 @@ const list = [{ id: 'a', level: 1 }, { id: 'b', level: 1 }, { id: 'c', level: 2 
 const cards = { a: { due: '2026-10-29', interval: 1 }, b: { due: '2026-11-05', interval: 7 } };
 eq('Reihenfolge fällig → neu', E.queue(list, cards, '2026-10-30').map(x => x.id), ['a', 'c', 'b']);
 
+// Figur für den Bauern gegeben zählt wie die Umwandlung (until 'promote')
+const sac = new Chess('8/8/8/8/8/1k6/8/K6R w - - 0 1');
+eq('materialEdge', E.materialEdge(sac, 'w'), 5);
+eq('judge Figur für Bauer', E.judgeAfterUser({ goal: 'win', until: 'promote', side: 'w', maxMoves: 20 }, sac, { score: { cp: 2000 }, userMoves: 4 }).status, 'won');
+eq('judge Figur, aber Matt-Ziel', E.judgeAfterUser({ goal: 'win', until: 'mate', side: 'w', maxMoves: 20 }, sac, { score: { cp: 2000 }, userMoves: 4 }).status, 'continue');
+// lostCp pro Stellung
+eq('remis lostCp', E.judgeAfterUser({ goal: 'draw', side: 'b', maxMoves: 8, lostCp: -800 }, dpos, { score: { cp: 700 }, userMoves: 3 }).status, 'continue');
+eq('remis drawMargin', E.judgeAfterUser({ goal: 'draw', side: 'b', maxMoves: 8, drawMargin: 300 }, dpos, { score: { cp: 250 }, userMoves: 8 }).status, 'won');
+
+// --- endgames.json: Format und Regeln (Engine-Prüfung: data/test/eg_check.py) ---
+let egText = null;
+for (const path of ['app/data/endgames.json', '../../data/endgames.json', 'data/endgames.json']) {
+  try { egText = read(path); break; } catch { /* nächster Pfad */ }
+}
+if (!egText) { fails++; print('FEHLER endgames.json nicht gefunden (Test aus dem Projektordner starten)'); }
+else {
+  const eg = JSON.parse(egText);
+  ok('endgames mindestens 18', eg.length >= 18);
+  eq('endgames ids eindeutig', new Set(eg.map(p => p.id)).size, eg.length);
+  for (const pos of eg) {
+    const missing = ['id', 'title', 'level', 'fen', 'side', 'goal', 'maxMoves', 'intro', 'hints', 'technique'].filter(k => pos[k] == null);
+    eq(`${pos.id} Felder`, missing, []);
+    let g = null;
+    try { g = new Chess(pos.fen); } catch (e) { print(`FEHLER ${pos.id}: ${e.message}`); fails++; continue; }
+    eq(`${pos.id} Seite am Zug`, g.turn(), pos.side);
+    ok(`${pos.id} nicht vorbei`, !g.isGameOver());
+    ok(`${pos.id} Ziel`, (pos.goal === 'win' || pos.goal === 'draw') && pos.hints.length >= 2 && pos.maxMoves > 0);
+    ok(`${pos.id} until`, pos.goal === 'draw' || ['mate', 'promote', 'material'].includes(E.untilOf(pos)));
+  }
+  eq('Reihenfolge neu nach Stufe', E.queue(eg, {}, '2026-10-30')[0].level, 1);
+}
+
 print(`${passes} ok, ${fails} Fehler`);

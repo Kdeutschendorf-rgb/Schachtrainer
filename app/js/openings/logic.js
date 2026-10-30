@@ -256,12 +256,13 @@ export function newLineQueue(model, prog, filter = {}) {
     .map(x => x.l);
 }
 
-// Darf diese Linie heute noch gelernt werden? Die erste Linie des Tages geht immer.
+// Darf diese Linie heute noch gelernt werden? Die erste Linie des Tages geht immer
+// (auch wenn sie mehr neue Züge hat als das Limit), außer das Limit steht auf 0.
 export function canLearn(line, prog, day = todayStr()) {
   const limit = prog.settings?.newPerDay ?? DEFAULT_NEW_PER_DAY;
   const used = newCountToday(prog, day);
   const newCards = line.ownKeys.filter(k => !prog.cards?.[k]).length;
-  return { ok: newCards === 0 || used === 0 || used + newCards <= limit, newCards, used, limit, left: Math.max(0, limit - used) };
+  return { ok: newCards === 0 || (used === 0 && limit > 0) || used + newCards <= limit, newCards, used, limit, left: Math.max(0, limit - used) };
 }
 
 export function pickNewLine(model, prog, day = todayStr(), filter = {}) {

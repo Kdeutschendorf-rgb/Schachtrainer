@@ -4,6 +4,7 @@
 // const s = createSparring(el, { moves: [SAN], side: 'w'|'b', title, plan, onExit });  s.destroy()
 
 import { createBoard } from '../board.js';
+import { Chess } from '../../vendor/chess.js';
 import { h, clear, formatLine } from '../ui.js';
 import * as engine from '../engine.js';
 import { progress, setSetting } from './data.js';
@@ -17,11 +18,17 @@ function userScore(score, side) {
 }
 
 export function createSparring(el, { moves, side, title, plan, onExit }) {
+  // Zugfolge vorab prüfen, damit bei Fehlern nichts halb aufgebaut liegen bleibt
+  const check = new Chess();
+  moves.forEach((mv, i) => {
+    try { check.move(mv); } catch { throw new Error(`Halbzug ${i + 1} („${mv}“) ist nicht legal.`); }
+  });
   const orient = orientationOf(side);
   let elo = progress().settings.sparringElo || 1300;
   let alive = true;
   let token = 0;           // verwirft veraltete Engine-Antworten
   let startEval = null;
+  let evalToken = 0;       // nur die jüngste Bewertung zählt
   let timers = [];
   const later = (fn, ms) => timers.push(setTimeout(fn, ms));
 
@@ -116,6 +123,7 @@ export function createSparring(el, { moves, side, title, plan, onExit }) {
 
   function restart() {
     token++;
+    evalToken++;
     board.loadLine(moves);
     board.setShapes([]);
     board.setMovable(orient);
@@ -125,6 +133,7 @@ export function createSparring(el, { moves, side, title, plan, onExit }) {
   }
 
   async function evaluate() {
+    const my = ++evalToken;
     const fen = board.fen();
     const ply = board.history().length;
     clear(evalEl).append(h('div.muted', 'Engine bewertet …'));
@@ -133,7 +142,9 @@ export function createSparring(el, { moves, side, title, plan, onExit }) {
         engine.analyse(fen, { depth: 16 }),
         startEval || (startEval = engine.analyse(startFen, { depth: 14 }).catch(e => { startEval = null; throw e; })),
       ]);
-      if (!alive || board.fen() !== fen) return;
+      if (!alive || my !== evalToken) return;
+      // Inzwischen weitergezogen: alte Bewertung verwerfen, „bewertet …“ nicht stehen lassen
+      if (board.fen() !== fen) { clear(evalEl); return; }
       const line = res.lines[0];
       const s0 = start.lines[0];
       clear(evalEl);
@@ -156,7 +167,7 @@ export function createSparring(el, { moves, side, title, plan, onExit }) {
       if (line.pv?.[0]) board.setShapes([{ orig: line.pv[0].slice(0, 2), dest: line.pv[0].slice(2, 4), brush: 'blue' }]);
       evalEl.append(...items);
     } catch (err) {
-      if (alive) clear(evalEl).append(h('div.feedback.bad', 'Engine nicht erreichbar: ' + err.message));
+      if (alive && my === evalToken) clear(evalEl).append(h('div.feedback.bad', 'Engine nicht erreichbar: ' + err.message));
     }
   }
 
@@ -165,7 +176,7 @@ export function createSparring(el, { moves, side, title, plan, onExit }) {
   const startFen = board.fen();
   restart();
 
-  const offKeys = onKeys({ ArrowLeft: takeBack });
+  const offKeys = onKeys({ ArrowLeft: takeBack }, el);
 
   return {
     board,   // für Tests und Fehlersuche

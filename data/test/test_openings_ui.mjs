@@ -136,7 +136,7 @@ ok(el.textContent.includes('Mein Zug hier'), 'Explorer: Mein Zug hier');
 noJunk(el); cleanup(); el.remove();
 el = container();
 cleanup = await view.mount(el, { tab: 'explorer', moves: 'e4 c5' });
-await tick(20);
+await tick(350);   // Engine startet entprellt nach 300 ms
 ok(el.textContent.includes('Nicht im Repertoire'), 'Explorer: Abweichung erkannt');
 ok(el.textContent.includes('Beste Antwort'), 'Explorer: Engine-Antwort: ' + el.textContent.slice(-300));
 noJunk(el); cleanup(); el.remove();

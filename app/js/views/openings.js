@@ -97,7 +97,9 @@ export async function mount(el, params = {}) {
         } else if (queue.length) {
           const c = canLearn(queue[0], progress());
           content.append(emptyState('Tageslimit erreicht',
-            `Du hast heute schon ${c.used} neue Züge gelernt (Limit ${c.limit}). Wiederholen bringt jetzt mehr als Neues.`,
+            c.limit > 0
+              ? `Du hast heute schon ${c.used} neue Züge gelernt (Limit ${c.limit}). Wiederholen bringt jetzt mehr als Neues.`
+              : 'Dein Limit für neue Züge pro Tag steht auf 0 (einstellbar in der Übersicht).',
             h('div.row',
               button({ label: 'Wiederholen', primary: true, onClick: () => go('wiederholen') }),
               button({ label: 'Trotzdem eine Linie lernen', onClick: () => startLearn(queue[0]) }))));
@@ -297,7 +299,7 @@ export function runBlock(el, { minutes = 10, mode = 'review', onDone } = {}) {
   const setSub = s => { sub?.destroy?.(); sub = s; };
 
   function finish() {
-    if (finished) return;
+    if (finished || !alive) return;   // nach dem Aufräumen kein onDone mehr
     finished = true;
     busy = false;
     timer.stop();
@@ -345,7 +347,7 @@ export function runBlock(el, { minutes = 10, mode = 'review', onDone } = {}) {
         stats.moves += r.total;
         stats.correct += r.correct;
       },
-      actions: () => [{ label: timeUp ? 'Block abschließen ⏎' : 'Weiter ⏎', primary: true, onClick: next }],
+      actions: () => [{ label: timeUp ? 'Block abschließen ⏎' : 'Weiter ⏎', primary: true, onClick: step }],
     }));
   }
 
@@ -355,7 +357,7 @@ export function runBlock(el, { minutes = 10, mode = 'review', onDone } = {}) {
     clear(stage);
     if (!pool) {
       stage.append(h('div.feedback.warn', 'Heute gibt es keine fälligen Eröffnungszüge, und die Quiz-Daten fehlen noch. Der Block endet gleich.'));
-      setTimeout(() => alive && finish(), 3000);
+      setTimeout(finish, 3000);
       return;
     }
     phaseEl.textContent = 'Eröffnungen · Quiz';
@@ -365,7 +367,7 @@ export function runBlock(el, { minutes = 10, mode = 'review', onDone } = {}) {
       pool,
       // Neue Frage nur, solange Zeit übrig ist
       onQuestion: () => {
-        if (timeUp) { setTimeout(finish, 0); return false; }
+        if (timeUp) { setTimeout(finish, 0); return false; }   // finish prüft alive selbst
         busy = true;
         return true;
       },
@@ -374,16 +376,24 @@ export function runBlock(el, { minutes = 10, mode = 'review', onDone } = {}) {
         if (right) stats.quizRight++;
         busy = false;
         // Bei abgelaufener Zeit die Auflösung kurz zeigen, dann beenden.
-        if (timeUp) setTimeout(() => alive && finish(), 1800);
+        if (timeUp) setTimeout(finish, 1800);
       },
+      // Keine brauchbare Frage: nichts mehr zu tun, Block endet
+      onEmpty: () => { busy = false; setTimeout(finish, 3000); },
     }));
   }
 
-  next().catch(err => {
-    console.error(err);
-    clear(stage).append(h('div.feedback.bad', 'Eröffnungsblock konnte nicht starten: ' + err.message));
-    setTimeout(() => alive && finish(), 3000);
-  });
+  // Jeder Schritt mit Fehlerbehandlung: Ein Fehler beendet den Block sauber (onDone kommt trotzdem).
+  function step() {
+    next().catch(err => {
+      console.error(err);
+      if (!alive || finished) return;
+      busy = false;
+      clear(stage).append(h('div.feedback.bad', 'Eröffnungsblock: ' + err.message));
+      setTimeout(finish, 3000);
+    });
+  }
+  step();
 
   return () => {
     alive = false;

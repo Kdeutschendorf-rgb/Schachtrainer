@@ -141,6 +141,18 @@ function listDe(items) {
   return items.slice(0, -1).join(', ') + ' und ' + items[items.length - 1];
 }
 
+// Figuren im Akkusativ aufzählen, gleiche Typen zusammengefasst: „deinen König und deine beiden Türme“
+const PLURAL = { p: 'Bauern', n: 'Springer', b: 'Läufer', r: 'Türme', q: 'Damen', k: 'Könige' };
+const PLURAL_ART = { der: 'die', dein: 'deine', sein: 'seine', ein: '' };
+function pieceList(pieces, art) {
+  const types = [];
+  for (const p of pieces) if (!types.includes(p.type)) types.push(p.type);
+  return listDe(types.map(t => {
+    const n = pieces.filter(p => p.type === t).length;
+    return n > 1 ? `${PLURAL_ART[art]} ${n === 2 ? 'beiden' : 'drei'} ${PLURAL[t]}`.trim() : pieceName(t, 'acc', art);
+  }));
+}
+
 // Material in Worten (Bauerneinheiten), Akkusativ: „eine Figur“, „die Qualität“
 function materialWords(units, exchange = false) {
   if (units >= 9) return 'Material im Wert einer Dame';
@@ -235,22 +247,32 @@ function mateThreat(chess, color) {
 }
 
 // Spielt eine Zugfolge und gibt zurück, ob sie im Matt endet und was sich am Material ändert.
-function playLine(fen, moves, color, maxPlies = 8) {
+// pre: Züge, die vorher gespielt, aber nicht angezeigt werden (z. B. der eigene Fehlerzug),
+// damit der Materialvergleich bei der Stellung davor ansetzt.
+function playLine(fen, moves, color, { maxPlies = 8, pre = [] } = {}) {
   const c = new Chess(fen);
   const before = materialBalance(c, color);
   const lost = { me: [], opp: [] };
   const played = [];
-  for (const mv of moves.slice(0, maxPlies)) {
+  const bal = [];          // Materialbilanz nach jedem angezeigten Zug
+  let last = null;
+  const all = [...pre.map(m => [m, false]), ...moves.slice(0, maxPlies).map(m => [m, true])];
+  for (const [mv, shown] of all) {
     const m = tryMove(c, mv);
     if (!m) break;
-    played.push(m.san);
+    if (shown) played.push(m.san);
     if (m.captured) (m.color === color ? lost.opp : lost.me).push(m.captured);
+    if (shown) { bal.push(materialBalance(c, color) - before); last = m; }
   }
+  // Endet die (abgeschnittene) Zeile mit einem Schlagzug von `color`, kann die Gegenseite meist
+  // zurückschlagen: dann vorsichtshalber den Stand vor diesem Zug nehmen.
+  let gain = bal.length ? bal[bal.length - 1] : materialBalance(c, color) - before;
+  if (last?.captured && last.color === color && bal.length >= 2 && !c.isCheckmate()) gain = Math.min(gain, bal[bal.length - 2]);
   return {
     sans: played,
     mate: c.isCheckmate(),
     winner: c.isCheckmate() ? (c.turn() === 'w' ? 'b' : 'w') : null,
-    gain: materialBalance(c, color) - before,
+    gain,
     // Qualität: die Gegenseite verliert einen Turm, `color` dafür eine Leichtfigur
     exchange: lost.opp.includes('r') && lost.me.some(t => t === 'n' || t === 'b') && !lost.opp.includes('q'),
   };
@@ -314,11 +336,14 @@ export function explainMove(args = {}) {
       const r = new Chess(after.fen());
       r.move(reply.san);
       const rDe = sanDe(reply.san);
+      let mentioned = false;     // Antwortzug schon in einem Satz genannt?
       if (r.isCheckmate()) {
         out.push(`Danach setzt dich der Gegner mit ${rDe} sofort matt.`);
         explained = true;
       } else {
+        // Material ab der Stellung vor deinem Zug zählen (was dein Zug geschlagen hat, zählt mit)
         const line = playLine(after.fen(), refMoves, opp);
+        const lost = playLine(fen, refMoves, opp, { pre: [playedMove.san] });
         if (line.mate && line.winner === opp) {
           const n = Math.ceil(line.sans.length / 2);
           out.push(`Danach erzwingt der Gegner Matt in ${n} Zügen: ${lineDe(line.sans, after.fen())}.`);
@@ -326,30 +351,34 @@ export function explainMove(args = {}) {
         }
         if (!explained && reply.captured) {
           const victim = pieceName(reply.captured, 'acc', 'dein', after.attackers(reply.to, me).length ? '' : 'ungedeckt');
-          out.push(`Der Gegner antwortet mit ${rDe}${r.inCheck() ? ' (mit Schach)' : ''} und schlägt ${victim} auf ${reply.to}.`);
-          explained = true;
+          out.push(`Der Gegner antwortet mit ${rDe}${r.inCheck() ? ' (mit Schach)' : ''} und schlägt ${victim} auf ${reply.flags.includes('e') ? reply.to + ' en passant' : reply.to}.`);
+          explained = mentioned = true;
         } else if (!explained && r.inCheck()) {
           out.push(`Der Gegner antwortet mit ${rDe} und gibt Schach.`);
+          mentioned = true;
         }
         // Gabel durch die antwortende Figur
         const targets = forkTargets(r, reply.to, me);
         if (!line.mate && targets.length >= 2) {
           const mover = pieceName(r.get(reply.to).type, 'nom', 'der');
-          const names = targets.slice(0, 3).map(p => pieceName(p.type, 'acc', 'dein'));
-          out.push(`Das ist eine Gabel: ${cap(mover)} auf ${reply.to} greift ${listDe(names)} gleichzeitig an.`);
-          explained = true;
+          if (!mentioned) out.push(`Der Gegner antwortet mit ${rDe}.`);
+          out.push(`Das ist eine Gabel: ${cap(mover)} auf ${reply.to} greift ${pieceList(targets.slice(0, 3), 'dein')} gleichzeitig an.`);
+          explained = mentioned = true;
         } else if (!line.mate) {
           // Abzug: andere Figuren greifen nach dem Zug neu an
           const disc = discovered(after, r, reply, me);
           if (disc) {
-            out.push(`Dadurch greift ${disc.attacker} auf ${disc.from} ${disc.victim} an (Abzugsangriff).`);
-            explained = true;
+            if (!mentioned) out.push(`Der Gegner antwortet mit ${rDe}.`);
+            out.push(disc.check
+              ? `Dadurch gibt ${disc.attacker} auf ${disc.from} Abzugsschach.`
+              : `Dadurch greift ${disc.attacker} auf ${disc.from} ${disc.victim} an (Abzugsangriff).`);
+            explained = mentioned = true;
           }
         }
         if (!explained && !reply.captured && !r.inCheck()) {
           const threat = mateThreat(r, opp);
           if (threat) {
-            out.push(`Der Gegner antwortet mit ${rDe} und droht ${sanDe(threat)} mit Matt.`);
+            out.push(`Der Gegner antwortet mit ${rDe} und droht ${sanDe(threat).replace('#', '')} matt.`);
             explained = true;
           } else {
             const newly = squares(r, me).filter(p => isHanging(r, p.square, me) && !hangingBefore.has(p.square))
@@ -360,9 +389,11 @@ export function explainMove(args = {}) {
             }
           }
         }
-        if (!line.mate && line.gain >= 1 && (line.sans.length > 1 || !reply.captured)) {
-          const lossText = materialWords(Math.round(line.gain), line.exchange);
-          out.push(`Nach ${lineDe(line.sans, after.fen())} hast du ${lossText} weniger.`);
+        if (!line.mate && lost.gain >= 1 && (line.sans.length > 1 || !reply.captured)) {
+          const units = Math.round(lost.gain);
+          out.push(units === 2 && lost.exchange
+            ? `Nach ${lineDe(line.sans, after.fen())} hast du die Qualität verloren.`
+            : `Nach ${lineDe(line.sans, after.fen())} hast du ${materialWords(units)} weniger.`);
           explained = true;
         }
       }
@@ -381,7 +412,7 @@ export function explainMove(args = {}) {
       out.push(`Danach hängt ${pieceName(after.get(sq).type, 'nom', 'dein')} auf ${sq}.`);
     } else {
       const threat = mateThreat(after, opp);
-      if (threat) out.push(`Danach droht der Gegner ${sanDe(threat)} mit Matt.`);
+      if (threat) out.push(`Danach droht der Gegner ${sanDe(threat).replace('#', '')} matt.`);
     }
   }
 
@@ -406,7 +437,7 @@ function discovered(before, after, reply, victimColor) {
     if (!fresh) continue;
     const atk = after.get(fresh);
     if (p.type !== 'k' && VALUE[atk.type] >= VALUE[p.type] && after.attackers(p.square, victimColor).length) continue;
-    return { attacker: pieceName(atk.type, 'nom', 'der'), from: fresh, victim: pieceName(p.type, 'acc', 'dein') };
+    return { attacker: pieceName(atk.type, 'nom', 'der'), from: fresh, victim: pieceName(p.type, 'acc', 'dein'), check: p.type === 'k' };
   }
   return null;
 }
@@ -429,18 +460,18 @@ function explainBest(fen, bestMove, bestLine, me) {
   const out = [];
   const targets = forkTargets(b, bestMove.to, opp);
   if (bestMove.captured) {
-    const victim = pieceName(bestMove.captured, 'acc', 'sein', undefendedTarget ? 'ungedeckt' : '');
-    out.push(`Besser war ${bDe}${b.inCheck() ? ' mit Schach' : ''}: Das schlägt ${victim} auf ${bestMove.to}.`);
+    const victim = pieceName(bestMove.captured, 'acc', 'der', undefendedTarget ? 'ungedeckt' : '');
+    out.push(`Besser war ${bDe}: Damit schlägst du ${b.inCheck() ? 'mit Schach ' : ''}${victim} auf ${bestMove.to}.`);
   } else if (targets.length >= 2) {
-    const names = targets.slice(0, 3).map(p => pieceName(p.type, 'acc', 'sein'));
-    out.push(`Besser war ${bDe}: eine Gabel gegen ${listDe(names)}.`);
+    out.push(`Besser war ${bDe}: eine Gabel gegen ${pieceList(targets.slice(0, 3), 'der')}.`);
   } else if (b.inCheck()) {
-    out.push(`Besser war ${bDe} mit Schach.`);
+    out.push(`Besser war das Schach ${bDe}.`);
   } else {
     out.push(`Besser war ${bDe}.`);
   }
   if (line.sans.length > 1 && line.gain >= 2) {
-    out.push(`Nach ${lineDe(line.sans, fen)} gewinnst du ${materialWords(Math.round(line.gain))}.`);
+    const units = Math.round(line.gain);
+    out.push(`Nach ${lineDe(line.sans, fen)} gewinnst du ${units === 2 && line.exchange ? 'die Qualität' : materialWords(units)}.`);
   }
   return out;
 }

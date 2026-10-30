@@ -1,0 +1,354 @@
+[
+  {
+    "id": "kqk-mate",
+    "title": "Dame gegen König: Matt setzen",
+    "level": 1,
+    "fen": "8/8/8/4k3/8/8/8/3QK3 w - - 0 1",
+    "side": "w",
+    "goal": "win",
+    "until": "mate",
+    "maxMoves": 15,
+    "par": 10,
+    "intro": "Das wichtigste Grundmatt. Mit Dame und König setzt du den einsamen König in höchstens zehn Zügen matt. Die eigentliche Gefahr ist nicht, dass es nicht klappt, sondern das Patt.",
+    "hints": [
+      "Stell die Dame einen Springerzug vom gegnerischen König entfernt auf. Dann wird sein Käfig mit jedem Zug kleiner.",
+      "Folge dem König mit der Dame im Springerabstand, bis er am Rand steht.",
+      "Steht er am Rand, lass die Dame stehen und hol deinen König heran. Vorsicht Patt: Solange du nicht mattsetzt, braucht der König immer ein freies Feld.",
+      "Matt setzt die Dame auf der Randreihe, gedeckt von deinem König oder während dein König dem gegnerischen gegenübersteht."
+    ],
+    "technique": "1. Dame im Springerabstand zum König, so wird der Käfig kleiner. 2. Am Rand: König heranholen, der gegnerische König pendelt nur noch zwischen zwei Feldern. 3. Matt auf der Randreihe. Vor jedem Damenzug fragen: Hat er noch einen Zug? Sonst ist es Patt."
+  },
+  {
+    "id": "krk-mate",
+    "title": "Turm gegen König: Matt setzen",
+    "level": 1,
+    "fen": "8/8/8/4k3/8/8/8/R3K3 w - - 0 1",
+    "side": "w",
+    "goal": "win",
+    "until": "mate",
+    "maxMoves": 25,
+    "par": 18,
+    "intro": "Der Turm allein kann nicht mattsetzen, dein König muss mithelfen. Du drängst den König Reihe für Reihe an den Rand. Dafür hast du 25 Züge.",
+    "hints": [
+      "Sperr den König mit dem Turm hinter einer Reihe oder Linie ein. Diese Grenze darf er nicht mehr überschreiten.",
+      "Bring deinen König heran, bis er dem gegnerischen König mit einem Feld Abstand gegenübersteht (Opposition). Dann gibt der Turm Schach und der König muss eine Reihe zurück.",
+      "Stehen die Könige nicht gegenüber, mach mit dem Turm einen Wartezug entlang der Grenze, weit weg vom gegnerischen König.",
+      "Greift der König deinen Turm an, zieh den Turm ans andere Ende derselben Reihe."
+    ],
+    "technique": "Der Turm baut eine Mauer, der König schiebt. Schach gibst du nur, wenn sich die Könige gegenüberstehen: Dann muss der König eine Reihe zurück. Sonst stellst du mit dem König die Opposition her oder machst einen Wartezug mit dem Turm. Am Rand folgt das Matt mit Schach auf der Randreihe."
+  },
+  {
+    "id": "two-rooks-mate",
+    "title": "Treppenmatt mit zwei Türmen",
+    "level": 1,
+    "fen": "8/8/3k4/8/8/8/8/RR4K1 w - - 0 1",
+    "side": "w",
+    "goal": "win",
+    "until": "mate",
+    "maxMoves": 10,
+    "par": 7,
+    "intro": "Zwei Türme brauchen deinen König nicht. Sie geben abwechselnd Schach und schieben den König wie auf einer Treppe an den Rand.",
+    "hints": [
+      "Ein Turm sperrt eine Reihe, der andere gibt auf der nächsten Reihe Schach.",
+      "Danach überholt der erste Turm und gibt eine Reihe weiter Schach. So geht es Stufe für Stufe.",
+      "Kommt der König einem Turm zu nahe, zieh diesen Turm weit weg ans andere Ende der Reihe und mach dann weiter."
+    ],
+    "technique": "Treppe: Turm 1 sperrt eine Reihe, Turm 2 gibt auf der nächsten Reihe Schach, dann überholt wieder Turm 1, bis der König am Rand steht und das letzte Schach Matt ist. Die Türme arbeiten weit vom König entfernt, damit er sie nicht angreifen kann."
+  },
+  {
+    "id": "kp-sixth-rank",
+    "title": "Bauernendspiel: König auf der 6. Reihe",
+    "level": 1,
+    "fen": "4k3/8/4K3/4P3/8/8/8/8 w - - 0 1",
+    "side": "w",
+    "goal": "win",
+    "until": "promote",
+    "maxMoves": 10,
+    "par": 6,
+    "intro": "König und Bauer gegen König. Steht dein König auf der 6. Reihe vor seinem Bauern, gewinnst du immer, auch wenn du am Zug bist (nur beim Randbauern nicht). Du musst aber den richtigen Weg finden.",
+    "hints": [
+      "Dein König steht dem Bauern im Weg. Er muss zur Seite, aber auf der 6. Reihe bleiben.",
+      "Mit Kd6 oder Kf6 kontrolliert dein König die Felder vor dem Bauern. Erst dann rückt der Bauer vor.",
+      "Zieht der Bauer auf die 7. Reihe, ohne Schach zu geben, muss dein König das Umwandlungsfeld decken. Sonst droht Patt."
+    ],
+    "technique": "Regel: König auf der 6. Reihe vor seinem Bauern gewinnt, egal wer am Zug ist (außer beim Randbauern). Der König geht seitlich und bleibt vor dem Bauern, der Bauer folgt erst, wenn der König die Felder vor ihm beherrscht. Ziel: Dein König steht auf der 7. Reihe neben dem Bauern, dann hält ihn niemand mehr auf."
+  },
+  {
+    "id": "kp-key-squares",
+    "title": "Schlüsselfelder: König vor den Bauern",
+    "level": 1,
+    "fen": "8/8/3k4/8/3K4/8/3P4/8 w - - 0 1",
+    "side": "w",
+    "goal": "win",
+    "until": "promote",
+    "maxMoves": 15,
+    "par": 10,
+    "intro": "Dein König steht schon vor dem Bauern auf einem seiner Schlüsselfelder. Damit ist die Stellung gewonnen. Jetzt musst du es nur noch sauber nach Hause bringen.",
+    "hints": [
+      "Erst der König, dann der Bauer. Der Bauer geht nur vor, wenn dein König ihn begleitet.",
+      "Versuch mit dem König auf die 6. Reihe vor den Bauern zu kommen (c6, d6 oder e6). Wer den Bauern vorschiebt, während die Könige kämpfen, verliert oft die Opposition.",
+      "Stehen sich die Könige gegenüber und du bist am Zug, hilft ein Bauernzug als Wartezug."
+    ],
+    "technique": "Schlüsselfelder: Erreicht der König des Angreifers diese Felder, gewinnt er. Bei einem Bauern auf der 2. bis 4. Reihe liegen sie zwei Reihen vor dem Bauern (für d2: c4, d4, e4), ab der 5. Reihe zusätzlich direkt davor. Der König führt, der Bauer folgt."
+  },
+  {
+    "id": "kp-opposition",
+    "title": "Opposition: Gewinnen mit Reservetempo",
+    "level": 2,
+    "fen": "4k3/8/8/8/8/8/4P3/4K3 w - - 0 1",
+    "side": "w",
+    "goal": "win",
+    "until": "promote",
+    "maxMoves": 20,
+    "par": 14,
+    "intro": "Dein König steht hinter dem Bauern, der schwarze König ist noch weit weg. Ein falscher erster Zug, und es ist Remis. Die Regel heißt: Erst der König, dann der Bauer.",
+    "hints": [
+      "Nicht den Bauern zuerst ziehen. Der König geht voran, schräg nach vorn neben den Bauern (Kd2 oder Kf2).",
+      "Die Schlüsselfelder des Bauern auf e2 sind d4, e4 und f4. Erreicht dein König eins davon, ist die Partie gewonnen.",
+      "Stehen sich die Könige mit einem Feld Abstand gegenüber, gewinnt, wer nicht ziehen muss (Opposition). Ein Bauernzug ist dein Reservetempo, damit gibst du den Zug ab."
+    ],
+    "technique": "König vor den Bauern! Der König läuft zu den Schlüsselfeldern, der Bauer bleibt so lange hinten, wie es geht. Im Duell der Könige entscheidet die Opposition. Weil der Bauer noch auf e2 steht, hast du einen Wartezug in Reserve, mit dem du die Opposition zurückholst."
+  },
+  {
+    "id": "kp-defense-opposition",
+    "title": "Remis halten mit der Opposition",
+    "level": 1,
+    "fen": "8/8/8/3k4/8/3PK3/8/8 b - - 0 1",
+    "side": "b",
+    "goal": "draw",
+    "maxMoves": 12,
+    "intro": "Jetzt verteidigst du. Weiß hat einen Bauern mehr, aber dein König steht vor dem Bauern. Mit der Opposition hältst du Remis. Hier gibt es nur einen guten Zug.",
+    "hints": [
+      "Stell deinen König dem weißen König direkt gegenüber, mit einem Feld dazwischen.",
+      "Weicht der weiße König zur Seite aus, gehst du mit und bleibst vor dem Bauern.",
+      "Rückt der Bauer vor, geh mit dem König gerade zurück vor den Bauern. Kommt der weiße König vor den Bauern, nimm wieder die Opposition."
+    ],
+    "technique": "Der Verteidiger stellt seinen König vor den Bauern und nimmt die Opposition, sobald der gegnerische König vor den Bauern kommt. Zieht der Bauer, geht der König gerade zurück, nicht zur Seite. Am Ende bleibt Weiß nur Patt oder der Verlust des Bauern."
+  },
+  {
+    "id": "square-rule",
+    "title": "Quadratregel: Fang den Bauern",
+    "level": 1,
+    "fen": "7k/8/8/8/1p6/8/8/5K2 w - - 0 1",
+    "side": "w",
+    "goal": "draw",
+    "maxMoves": 8,
+    "intro": "Nur noch die Könige und ein schwarzer Freibauer. Holt dein König ihn noch ein? Die Quadratregel beantwortet das in einer Sekunde, ganz ohne Rechnen.",
+    "hints": [
+      "Zeichne vom Bauern aus ein Quadrat bis zur Umwandlungsreihe: b4, b1, e1, e4.",
+      "Steht dein König nach deinem Zug im Quadrat, holt er den Bauern ein. Welche Felder liegen darin?",
+      "Ke2 oder Ke1 betreten das Quadrat. Danach läufst du dem Bauern hinterher und schlägst ihn."
+    ],
+    "technique": "Quadratregel: Die Seite des Quadrats ist der Weg des Bauern bis zur Umwandlung. Steht der König nach seinem Zug im Quadrat, fängt er den Bauern. Achtung: Ein Bauer auf der Grundstellung darf einen Doppelschritt machen. Dann zeichnest du das Quadrat ab dem Feld nach dem Doppelschritt."
+  },
+  {
+    "id": "lucena",
+    "title": "Lucena-Stellung: die Brücke bauen",
+    "level": 2,
+    "fen": "1K1k4/1P6/8/8/8/8/r7/2R5 w - - 0 1",
+    "side": "w",
+    "goal": "win",
+    "until": "promote",
+    "maxMoves": 20,
+    "par": 12,
+    "intro": "Die wichtigste Gewinnstellung im Turmendspiel. Dein König steht vor dem Bauern, der schwarze König ist abgeschnitten. Das Problem: Kommt dein König heraus, gibt der schwarze Turm endlos Schach.",
+    "hints": [
+      "Dräng den schwarzen König erst noch eine Linie weiter ab: Td1+.",
+      "Stell dann den Turm auf die 4. Reihe (Td4). Er wird die Brücke, die später die Turmschachs abfängt.",
+      "Jetzt kommt dein König heraus und läuft auf deinen Turm zu. Gibt Schwarz von der Seite Schach, stellst du den Turm dazwischen."
+    ],
+    "technique": "Brückenbau: 1. Mit Turmschach den gegnerischen König eine weitere Linie abdrängen. 2. Turm auf die 4. Reihe. 3. König heraus und den Schachs entgegen zum Turm laufen. 4. Der Turm stellt sich auf der 4. Reihe dazwischen, die Schachs sind vorbei, der Bauer wandelt um."
+  },
+  {
+    "id": "philidor",
+    "title": "Philidor-Stellung: Remis mit Turm",
+    "level": 2,
+    "fen": "3k4/7r/8/3PK3/8/8/8/R7 b - - 0 1",
+    "side": "b",
+    "goal": "draw",
+    "maxMoves": 15,
+    "intro": "Turm gegen Turm und Bauer, und du verteidigst. Dein König steht vor dem Bauern, das ist schon die halbe Miete. Mit der Methode von Philidor ist es ein sicheres Remis.",
+    "hints": [
+      "Stell deinen Turm auf die 6. Reihe (Th6). Dann kommt der weiße König nicht vor.",
+      "Bleib mit dem Turm auf der 6. Reihe, solange der Bauer auf der 5. steht. Wartezüge machst du entlang dieser Reihe.",
+      "Zieht der Bauer auf die 6. Reihe, geh mit dem Turm ganz nach hinten (1. Reihe) und gib von hinten Schach. Jetzt findet der weiße König keinen Schutz mehr."
+    ],
+    "technique": "Philidor: König vor den Bauern, Turm auf der 6. Reihe, der dritten Reihe von deiner Seite aus. Rückt der Bauer auf diese Reihe vor, wechselt der Turm auf die Grundreihe des Gegners und gibt von hinten Schach. Der Bauer nimmt dem weißen König dann den Unterschlupf."
+  },
+  {
+    "id": "queen-vs-pawn",
+    "title": "Dame gegen Bauer auf der 7. Reihe",
+    "level": 2,
+    "fen": "8/8/8/8/8/1Q6/3pk3/7K w - - 0 1",
+    "side": "w",
+    "goal": "win",
+    "until": "material",
+    "maxMoves": 20,
+    "par": 12,
+    "intro": "Der schwarze Bauer steht kurz vor der Umwandlung, aber deine Dame ist schneller. Gegen einen Mittel- oder Springerbauern gewinnt die Dame: Sie zwingt den König vor seinen eigenen Bauern.",
+    "hints": [
+      "Gib Schach oder greif das Umwandlungsfeld so an, dass der schwarze König vor seinen Bauern (nach d1) muss.",
+      "Steht der König auf d1, blockiert er seinen eigenen Bauern. Jetzt hast du einen freien Zug: Dein König kommt näher.",
+      "Wiederhole das, bis dein König da ist. Dann gewinnst du den Bauern oder setzt matt."
+    ],
+    "technique": "Dame gegen Bauer auf der 7. Reihe: Mit Schachs und Angriffen auf das Umwandlungsfeld den König vor den Bauern zwingen. Jedes Mal, wenn er dort steht, kommt der eigene König einen Schritt näher. Ausnahme: Läufer- und Randbauern (a, c, f, h). Dort rettet sich der Verteidiger oft mit einem Patt-Trick."
+  },
+  {
+    "id": "wrong-bishop",
+    "title": "Falscher Läufer mit Randbauer",
+    "level": 2,
+    "fen": "8/6k1/8/5K2/7P/3B4/8/8 b - - 0 1",
+    "side": "b",
+    "goal": "draw",
+    "maxMoves": 15,
+    "drawMargin": 300,
+    "intro": "Weiß hat Läufer und Bauer mehr und kann trotzdem nicht gewinnen. Der Läufer läuft auf den weißen Feldern, das Umwandlungsfeld h8 ist schwarz. Erreicht dein König die Ecke, bekommt ihn dort niemand mehr heraus.",
+    "hints": [
+      "Bring deinen König nach h8 oder direkt daneben (g8, h7).",
+      "Lass dich nicht aus der Ecke drängen. Zwischen h8, g8 und h7 hin und her zu pendeln reicht.",
+      "Patt ist für dich ein Erfolg. Bleib einfach in der Ecke."
+    ],
+    "technique": "Randbauer plus Läufer, der das Umwandlungsfeld nicht beherrscht (falscher Läufer), ist Remis, sobald der verteidigende König die Ecke erreicht. Für deine Partien: Mit so einem Läufer nicht alles abtauschen. Als Verteidiger dagegen genau auf diese Stellung hinarbeiten."
+  },
+  {
+    "id": "pawn-breakthrough",
+    "title": "Bauerndurchbruch",
+    "level": 2,
+    "fen": "6k1/ppp5/8/PPP5/8/8/8/6K1 w - - 0 1",
+    "side": "w",
+    "goal": "win",
+    "until": "promote",
+    "maxMoves": 8,
+    "par": 5,
+    "intro": "Drei gegen drei Bauern, die Könige sind weit weg. Normale Züge führen zu nichts. Mit zwei Bauernopfern brichst du aber durch, und einer deiner Bauern wird Dame.",
+    "hints": [
+      "Der mittlere Bauer macht den Anfang: b6!",
+      "Nimmt Schwarz mit dem a-Bauern, folgt c6! Nimmt er mit dem c-Bauern, folgt a6!",
+      "Nach dem zweiten Opfer kann Schwarz deinen letzten Bauern nicht mehr aufhalten."
+    ],
+    "technique": "Durchbruch: 1.b6! axb6 2.c6! bxc6 3.a6 und der a-Bauer läuft durch (oder 1…cxb6 2.a6! bxa6 3.c6). Prüf vorher: Ist der gegnerische König weit genug weg, und ist mein neuer Freibauer schneller als die Bauern des Gegners?"
+  },
+  {
+    "id": "rook-vs-pawn",
+    "title": "Turm gegen Bauer",
+    "level": 2,
+    "fen": "8/8/8/8/8/2kp4/8/3R2K1 w - - 0 1",
+    "side": "w",
+    "goal": "win",
+    "until": "material",
+    "maxMoves": 15,
+    "par": 8,
+    "intro": "Turm gegen einen weit vorgerückten Bauern, den sein König unterstützt. Der Turm allein schafft das nicht. Dein König muss so schnell wie möglich mithelfen.",
+    "hints": [
+      "Bring deinen König sofort Richtung Bauer: Kf1 und weiter nach e1 oder e2.",
+      "Der Turm bleibt auf der d-Linie und hält den Bauern auf. Gib nicht unnötig Schach, das treibt den König nur nach vorn.",
+      "Steht dein König vor dem Bauern, fällt der Bauer, und du hast Turm gegen König."
+    ],
+    "technique": "Turm gegen Bauer: Der Turm hält den Bauern auf seiner Linie fest, der eigene König läuft auf dem kürzesten Weg vor den Bauern. Vorher zählen: Wie viele Züge braucht mein König, wie viele der Bauer? Unnötige Schachs drängen den gegnerischen König oft genau dorthin, wo er hinwill."
+  },
+  {
+    "id": "rook-behind-passer",
+    "title": "Der Turm gehört hinter den Freibauern",
+    "level": 2,
+    "fen": "r7/6k1/8/P7/8/2K5/8/R7 w - - 0 1",
+    "side": "w",
+    "goal": "win",
+    "until": "promote",
+    "maxMoves": 30,
+    "par": 20,
+    "intro": "Turm und Freibauer gegen Turm. Dein Turm steht hinter dem a-Bauern, der schwarze Turm muss vor ihm Wache stehen. Weil der schwarze König weit weg ist, entscheidet jetzt dein König.",
+    "hints": [
+      "Dein Turm bleibt hinter dem Bauern. So wird er mit jedem Bauernschritt stärker, der schwarze Turm vor dem Bauern immer passiver.",
+      "Lauf mit dem König zum Bauern, Richtung b6 und b7. Vor den Turmschachs versteckst du dich hinter oder neben dem Bauern.",
+      "Steht dein König neben dem Bauern und der Bauer auf a7, muss Schwarz seinen Turm für den Bauern geben."
+    ],
+    "technique": "Türme gehören hinter Freibauern, die eigenen wie die gegnerischen. Der Turm hinter dem Bauern unterstützt jeden Schritt, der Turm vor dem Bauern wird zum passiven Wächter. Der König geht zum Bauern, der Turm des Gegners muss sich am Ende für den Bauern opfern."
+  },
+  {
+    "id": "opposite-bishops",
+    "title": "Verschiedenfarbige Läufer: die Blockade",
+    "level": 2,
+    "fen": "8/6b1/3k4/3P4/4PK2/8/2B5/8 b - - 0 1",
+    "side": "b",
+    "goal": "draw",
+    "maxMoves": 15,
+    "drawMargin": 250,
+    "intro": "Weiß hat zwei Bauern mehr, aber die Läufer laufen auf verschiedenfarbigen Feldern. Dein König und dein Läufer blockieren die Bauern auf den schwarzen Feldern, und dort kann der weiße Läufer sie nie vertreiben.",
+    "hints": [
+      "Dein König bleibt vor den Bauern auf d6, einem schwarzen Feld.",
+      "Dein Läufer kontrolliert e5. Über dieses Feld müsste der e-Bauer vorrücken.",
+      "Mehr ist nicht nötig. Halte König und Läufer auf den schwarzen Feldern vor den Bauern und zieh geduldig hin und her."
+    ],
+    "technique": "Verschiedenfarbige Läufer sind die großen Remis-Macher. Der Verteidiger blockiert die Bauern auf Feldern seiner eigenen Läuferfarbe, dort kann ihn der andere Läufer nicht angreifen. Oft reichen selbst zwei Mehrbauern nicht. Für deine Partien: Stehst du schlechter, steuere auf verschiedenfarbige Läufer zu."
+  },
+  {
+    "id": "outside-passer",
+    "title": "Der entfernte Freibauer",
+    "level": 2,
+    "fen": "8/6pp/8/P3k3/8/4K3/6PP/8 w - - 0 1",
+    "side": "w",
+    "goal": "win",
+    "until": "material",
+    "maxMoves": 25,
+    "par": 16,
+    "intro": "Bauernendspiel, du hast einen Freibauern am Damenflügel. Er selbst wird kaum Dame, aber er lockt den schwarzen König weg. Dann frisst dein König die Bauern am anderen Flügel.",
+    "hints": [
+      "Schieb den a-Bauern vor. Der schwarze König muss hinterherlaufen, sonst wird der Bauer Dame.",
+      "Während der König den a-Bauern holt, läuft dein König zum Königsflügel.",
+      "Dort gewinnst du die schwarzen Bauern. Danach wird einer deiner Bauern Dame."
+    ],
+    "technique": "Der entfernte Freibauer ist ein Lockvogel: Er zieht den gegnerischen König an den Rand, während der eigene König auf der anderen Seite die Bauern gewinnt. Darum ist im Bauernendspiel ein Freibauer weit weg vom Geschehen oft so viel wert wie eine Figur."
+  },
+  {
+    "id": "reti-study",
+    "title": "Réti-Studie: zwei Ziele zugleich",
+    "level": 3,
+    "fen": "7K/8/k1P5/7p/8/8/8/8 w - - 0 1",
+    "side": "w",
+    "goal": "draw",
+    "maxMoves": 10,
+    "intro": "Die berühmteste Endspielstudie (Richard Réti, 1921). Dein König ist weit weg vom h-Bauern, und dein c-Bauer ist bedroht. Es sieht hoffnungslos aus, ist aber Remis.",
+    "hints": [
+      "Ein König kommt diagonal genauso schnell voran wie gerade, kann dabei aber zwei Ziele verfolgen.",
+      "Kg7! Der König läuft zum h-Bauern und gleichzeitig in Richtung deines c-Bauern.",
+      "Schlägt Schwarz den c-Bauern, holt dein König den h-Bauern ein. Läuft der h-Bauer, hilft dein König dem c-Bauern zur Umwandlung."
+    ],
+    "technique": "1.Kg7! h4 2.Kf6! Kb6 (2…h3 3.Ke7 h2 4.c7 und beide wandeln um) 3.Ke5! Jetzt erreicht der König entweder das Quadrat des h-Bauern oder den c-Bauern. Merke: Ein diagonaler Königsweg kann zwei Aufgaben auf einmal erfüllen."
+  },
+  {
+    "id": "zugzwang-outflank",
+    "title": "Zugzwang: der Umweg über e6",
+    "level": 2,
+    "fen": "8/2k5/2p5/2PK4/8/8/8/8 w - - 0 1",
+    "side": "w",
+    "goal": "win",
+    "until": "material",
+    "maxMoves": 15,
+    "par": 8,
+    "intro": "Der schwarze König muss seinen Bauern c6 decken und darf sich kaum bewegen. Dein König geht um ihn herum und bringt ihn in Zugzwang: Jeder schwarze Zug verschlechtert dann seine Stellung. Aber Vorsicht, nicht jeder Königszug gewinnt.",
+    "hints": [
+      "Der schwarze König ist an c6 gebunden. Nimm ihm das Feld d7, dann muss er c7 verlassen.",
+      "Ke6! Danach geht dein König nach d6 oder d7 und greift c6 an.",
+      "Der schwarze König kann nicht zugleich c6 decken und deinem König ausweichen. Nach Kxc6 gehst du mit dem König vor den Bauern."
+    ],
+    "technique": "Zugzwang: Der Verteidiger muss ziehen und gibt dabei etwas auf. Hier ist der schwarze König an den Bauern c6 gebunden. Mit 1.Ke6! nimmst du ihm d7, und dein König gelangt über d6 oder d7 an den Bauern. Ziehst du dagegen zurück (Kd4 oder Kc4), befreit sich Schwarz mit Kd7, und es ist Remis."
+  },
+  {
+    "id": "two-bishops-mate",
+    "title": "Matt mit zwei Läufern",
+    "level": 3,
+    "fen": "8/8/8/4k3/8/8/8/2B1KB2 w - - 0 1",
+    "side": "w",
+    "goal": "win",
+    "until": "mate",
+    "maxMoves": 30,
+    "par": 20,
+    "intro": "Zwei Läufer setzen matt, brauchen aber die Hilfe des Königs und etwas Geduld. Die Läufer bauen nebeneinander eine Wand, die der König nicht überschreiten kann.",
+    "hints": [
+      "Stell die beiden Läufer nebeneinander in die Brettmitte. Zusammen sperren sie zwei Diagonalen wie eine Mauer.",
+      "Bring deinen König dicht heran. Er nimmt dem schwarzen König die Felder, die die Läufer nicht erreichen.",
+      "Treib den König zuerst an den Rand, dann in eine Ecke. Matt geht nur in der Ecke. Achte dabei auf Patt."
+    ],
+    "technique": "Läuferpaar: Die Läufer arbeiten nebeneinander und verkleinern Diagonale um Diagonale den Raum, der König rückt nach. Am Rand drängst du den König in eine Ecke, das Matt fällt dort mit einem Läuferschach. Vor jedem Zug prüfen, ob der König noch ein Feld hat, sonst ist es Patt."
+  }
+]

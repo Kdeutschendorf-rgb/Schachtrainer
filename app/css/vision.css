@@ -29,6 +29,7 @@
 .vision-found .pill.check { border-color: var(--info); color: var(--info); }
 
 /* Ungedeckte Figuren: Auflösung */
+.vision-solution { display: flex; flex-direction: column; gap: 6px; }
 .vision-loose { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
 .vision-loose li.hit strong { color: var(--accent); }
 .vision-loose li.miss strong { color: var(--bad); }

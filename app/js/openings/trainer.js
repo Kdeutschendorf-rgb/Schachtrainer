@@ -303,7 +303,7 @@ export function createLineTrainer(el, { model, line, mode = 'review', onFinish, 
     ArrowRight: () => phase === 'demo' && demoStep(1),
     ArrowLeft: () => phase === 'demo' && demoStep(-1),
     h: hint,
-  });
+  }, el);
 
   if (mode === 'learn') startDemo(); else startPlay();
 

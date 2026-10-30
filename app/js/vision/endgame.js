@@ -5,6 +5,8 @@ export const WIN_CP = 500;         // „klar gewonnen“ ab +5 aus Nutzersicht
 export const LOST_WIN_CP = 80;     // darunter ist der Gewinn verspielt
 export const LOST_CP = -400;       // Remis-Aufgabe: darunter ist die Stellung verloren
 export const DRAW_MARGIN = 150;    // Remis gehalten, wenn die Bewertung am Ende nicht schlechter ist
+// Pro Stellung überschreibbar: drawMargin und lostCp (z. B. verschiedenfarbige Läufer, wo die Engine
+// trotz Remis einen Mehrbauern mit +1 bis +2 bewertet).
 
 // Bis wann gespielt wird: 'mate' (Matt), 'promote' (Umwandlung mit klarer Bewertung),
 // 'material' (Gegner hat nur noch den König, klare Bewertung). Ohne Angabe: eigene Bauern → Umwandlung, sonst Matt.
@@ -21,6 +23,15 @@ export function userCp(score, side) {
   if (!score) return null;
   let cp = score.mate != null ? (score.mate > 0 ? 100000 : score.mate < 0 ? -100000 : 0) : score.cp;
   return side === 'w' ? cp : -cp;
+}
+
+const VAL = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
+
+// Materialvorsprung von side in Bauerneinheiten (z. B. +5 = ein Turm mehr)
+export function materialEdge(game, side) {
+  let sum = 0;
+  for (const p of game.board().flat()) if (p) sum += (p.color === side ? 1 : -1) * VAL[p.type];
+  return sum;
 }
 
 function onlyKing(game, color) {
@@ -52,6 +63,8 @@ export function judgeAfterUser(pos, game, { score, userMoves, lastMove } = {}) {
     const until = untilOf(pos);
     if (cp != null && cp >= WIN_CP) {
       if (until === 'promote' && lastMove?.promotion) return { status: 'won', reason: 'Umgewandelt, und die Stellung ist klar gewonnen.' };
+      // Der Gegner hat eine Figur für den Bauern gegeben: Das zählt wie die Umwandlung.
+      if (until === 'promote' && materialEdge(game, side) >= 5) return { status: 'won', reason: 'Der Gegner musste eine Figur für deinen Bauern geben. Klar gewonnen.' };
       if (until === 'material' && onlyKing(game, opp)) return { status: 'won', reason: 'Der Gegner hat nur noch den König. Der Rest ist Technik.' };
     }
     if (cp != null && cp < LOST_WIN_CP) return { status: 'failed', reason: 'Nach diesem Zug ist der Gewinn weg.' };
@@ -59,7 +72,7 @@ export function judgeAfterUser(pos, game, { score, userMoves, lastMove } = {}) {
     return { status: 'continue' };
   }
   // goal 'draw'
-  if (cp != null && cp <= LOST_CP) return { status: 'failed', reason: 'Nach diesem Zug ist die Stellung verloren.' };
+  if (cp != null && cp <= (pos.lostCp ?? LOST_CP)) return { status: 'failed', reason: 'Nach diesem Zug ist die Stellung verloren.' };
   if (userMoves >= pos.maxMoves) {
     const margin = pos.drawMargin ?? DRAW_MARGIN;
     if (cp == null || cp >= -margin) return { status: 'won', reason: `${pos.maxMoves} Züge gehalten. Remis!` };

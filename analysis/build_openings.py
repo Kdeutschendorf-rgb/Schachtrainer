@@ -4,10 +4,12 @@ Aufruf:  .venv/bin/python -I analysis/build_openings.py [--check] [--engine] [--
 
   ohne Option        data/raw/openings/*.tsv → app/data/lichess_openings.json
                      (Liste von {eco, name, moves:[SAN], uci:[...], epd}, sortiert nach ECO und Zuglänge)
-  --check            prüft app/data/openings_catalog.json: Pflichtfelder, eindeutige IDs, legale Züge,
-                     ECO/Name gegen die Lichess-Liste, Fallen legal
-  --engine           (mit --check) jede Falle mit Stockfish prüfen: Endet sie mit Matt oder mit
-                     klarem Vorteil (≥ 2 Bauern) für die Seite, die den letzten Zug macht?
+  --check            prüft app/data/openings_catalog.json: mindestens 120 Einträge, Pflichtfelder, eindeutige
+                     IDs/Namen/Zugfolgen, legale Züge, ECO/Name gegen die Lichess-Liste (gleiche Zugfolge,
+                     sonst gleiche Endstellung per Zugumstellung, sonst Name muss bei Lichess mit diesem ECO
+                     vorkommen), Fallen legal
+  --engine           (mit --check) jede Falle mit Stockfish prüfen: Endet sie mit Matt oder klar gewonnen
+                     (≥ 3 Bauern) für die Seite, die den letzten Zug macht?
   --sync-repertoire  setzt inRepertoire im Katalog neu aus app/data/repertoire_white/black.json
                      (nur, wenn mindestens eine der Dateien existiert)
 """
@@ -29,7 +31,8 @@ REPS = {"w": os.path.join(ROOT, "app", "data", "repertoire_white.json"),
 ENGINE = os.path.join(ROOT, "tools", "stockfish", "stockfish-macos-universal")
 
 REQUIRED = ("id", "name", "nameEn", "eco", "family", "level", "moves", "ideas", "white", "black", "trap", "inRepertoire")
-TRAP_MIN_CP = 200  # so viel muss die Falle mindestens bringen (aus Sicht des Fallenstellers)
+TRAP_MIN_CP = 300  # so viel muss die Falle mindestens bringen (aus Sicht des Fallenstellers)
+MIN_ENTRIES = 120
 
 
 def parse_pgn_moves(pgn):
@@ -87,11 +90,15 @@ def play(moves):
 def check_catalog(use_engine):
     cat = json.load(open(CAT, encoding="utf-8"))
     lichess = load_lichess()
-    by_moves = {}
+    by_moves, by_epd, by_name = {}, {}, {}
     for o in lichess:
         by_moves.setdefault(tuple(o["moves"]), o)
+        by_epd.setdefault(o["epd"], []).append(o)
+        by_name.setdefault(o["name"], set()).add(o["eco"])
     errors, warnings = [], []
-    ids = set()
+    if len(cat) < MIN_ENTRIES:
+        errors.append("nur %d Einträge, mindestens %d nötig" % (len(cat), MIN_ENTRIES))
+    ids, names, seqs = set(), {}, {}
     engine = None
     if use_engine:
         engine = chess.engine.SimpleEngine.popen_uci(ENGINE)
@@ -105,6 +112,13 @@ def check_catalog(use_engine):
         if oid in ids:
             errors.append("doppelte ID %s" % oid)
         ids.add(oid)
+        if op.get("name") in names:
+            errors.append("%s: Name '%s' doppelt (auch %s)" % (oid, op["name"], names[op["name"]]))
+        names.setdefault(op.get("name"), oid)
+        seq = tuple(op.get("moves", ()))
+        if seq in seqs:
+            errors.append("%s: gleiche Zugfolge wie %s" % (oid, seqs[seq]))
+        seqs.setdefault(seq, oid)
         if op.get("level") not in (1, 2, 3):
             errors.append("%s: level muss 1, 2 oder 3 sein" % oid)
         board, err = play(op["moves"])
@@ -116,9 +130,17 @@ def check_catalog(use_engine):
             warnings.append("%s: Lichess nennt diese Zugfolge %s %s (Katalog: %s %s)" % (
                 oid, exact["eco"], exact["name"], op["eco"], op["nameEn"]))
         if not exact:
+            # Zugumstellung: gleiche Endstellung unter anderem Namen?
+            same = by_epd.get(board.epd(), [])
+            if same and not any(o["eco"] == op["eco"] and o["name"] == op["nameEn"] for o in same):
+                warnings.append("%s: Lichess nennt diese Stellung %s" % (
+                    oid, "; ".join("%s %s" % (o["eco"], o["name"]) for o in same)))
             n, hit = deepest_match(op["moves"], by_moves)
             if hit and hit["eco"][0] != op["eco"][0]:
                 warnings.append("%s: ECO %s passt nicht zu Lichess-Präfix %s %s" % (oid, op["eco"], hit["eco"], hit["name"]))
+            if op["eco"] not in by_name.get(op["nameEn"], ()):
+                warnings.append("%s: '%s' kommt bei Lichess nicht mit ECO %s vor (Präfix: %s %s)" % (
+                    oid, op["nameEn"], op["eco"], hit["eco"] if hit else "-", hit["name"] if hit else "-"))
 
         trap = op.get("trap")
         if not trap:

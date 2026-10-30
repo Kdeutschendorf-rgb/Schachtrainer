@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-30",
+  "headline": "Dein größter Hebel sind nicht die Eröffnungen, sondern eingestellte Figuren im Mittelspiel. Ein festes Repertoire hilft trotzdem, weil du dann weniger Zeit und Kraft in den ersten 10 Zügen verbrauchst.",
+  "strengths": [
+    "Rapid geht langsam nach oben: von 1050 (Mai 2025) auf 1141 heute, Höchstwert 1219.",
+    "Mit Italienisch als Weiß holst du 80 % der Punkte. Dieses Spiel liegt dir, darauf baut das Weiß-Repertoire auf.",
+    "Deine Eröffnungen sind nicht schlecht: Nach Zug 10 stehst du im Rapid im Mittel ausgeglichen (Gewinnchance ≈ 50 %).",
+    "Steht deine Stellung nach Zug 15 klar besser, gewinnst du 3 von 4 Partien.",
+    "Im Rapid verlierst du praktisch nie auf Zeit. Die Zeitverluste (218) stammen alle aus dem Bullet."
+  ],
+  "weaknesses": [
+    "Patzer im Mittelspiel: 0,8 pro Rapid-Partie. In 68 % deiner Partien kommt mindestens ein Patzer vor, der erste im Mittel schon um Zug 12.",
+    "Eingestellte Figuren: 0,64 pro Partie. Das ist der häufigste Fehlertyp, danach kommen übersehene Schachs (0,32) und Gabeln (0,26).",
+    "Verpasste Chancen: 0,7 pro Partie. Patzt der Gegner, nutzt du es oft nicht, weil du nicht nach Schlagzügen und Schachs suchst.",
+    "55 Rapid-Niederlagen durch Verlassen der Partie. 16 davon standen nach Zug 15 noch ausgeglichen. Dazu kommt: Aus klar schlechterer Stellung holst du noch 32 % der Partien zurück, Aufgeben lohnt sich auf deinem Niveau also nicht.",
+    "Schwache Eröffnungen laut Statistik: Russisch als Schwarz (Rapid 17 % Punkte, nach Zug 10 nur 26 % Gewinnchance), Philidor-Stellungen als Weiß (20 %), Mittelgambit 2.d4 als Weiß (39 %).",
+    "Englund-Gambit (1.d4 e5): Es holt zwar 58 %, aber nach Zug 10 stehst du im Mittel klar schlechter (34 %). Das funktioniert nur, solange die Gegner die Fallen nicht kennen. Ab etwa 1300 kippt das."
+  ],
+  "plan": [
+    "Jeden Tag 30 Minuten im Trainer, mit Taktik als Schwerpunkt (Aufwärmen, eigene Fehler, Schwächen-Mix) und dazu Vorausdenken (Drohungen und Schach-Schlagen-Drohen-Check).",
+    "Eröffnungen nach dem Kern-Repertoire lernen: Weiß 1.e4 mit Italienisch, Schwarz 1…e5 mit 2…Sc6 (statt Russisch) und gegen 1.d4 1…d5 (statt Englund).",
+    "Vor JEDEM Zug in deinen Partien: Was will der Gegner mit seinem letzten Zug? Welche Figur von mir hängt nach meinem Zug? Gibt es Schachs oder Schlagzüge für mich?",
+    "Rapid 10 min statt Bullet spielen. Bullet trainiert das schnelle Ziehen ohne Prüfen, also genau den Fehler, der dich Punkte kostet.",
+    "Nie eine Partie verlassen. Wenn du schlechter stehst: weiterspielen und Fallen stellen.",
+    "Einmal pro Woche: „Neue Partien holen“ im Bericht und mich hier um eine Wochenauswertung bitten."
+  ],
+  "notes": "Grundlage: Stockfish-19-Analyse aller 948 Partien vom 01.05.2025 bis 30.10.2026 (294 Rapid, 51 Blitz, 602 Bullet). Gezählt sind Fehler und Patzer, also mindestens 20 Prozentpunkte Gewinnchance verloren."
+}

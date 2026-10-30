@@ -153,6 +153,22 @@ export function defaultGoal(current, peak) {
   return Math.ceil(Math.max(current + 100, peak || 0) / 100) * 100;
 }
 
+// Tageszähler der Module (store.logActivity): [Aufgaben-Schlüssel], [Richtig-Schlüssel].
+// Damit lässt sich auch für übersprungene oder pausierte Blöcke zählen, was erledigt wurde.
+const COUNTERS = {
+  tactics: [['puzzles'], ['puzzlesSolved']],
+  openings: [['openingReviews', 'openingQuiz'], ['openingCorrect', 'openingQuizRight']],
+  vision: [['visionTasks'], ['visionSolved']],
+  endgames: [['endgames'], ['endgamesSolved']],
+};
+
+export function countersFor(module, activity = {}) {
+  const def = COUNTERS[module];
+  if (!def) return { done: 0, correct: 0 };
+  const sum = keys => keys.reduce((s, k) => s + (Number(activity?.[k]) || 0), 0);
+  return { done: sum(def[0]), correct: sum(def[1]) };
+}
+
 // Ergebnis eines Blocks in einem Satzteil
 export function describeResult(r) {
   if (r.failed) return 'nicht verfügbar, übersprungen';
@@ -261,16 +277,18 @@ export async function mount(el) {
         h('div.td-block-text', h('div.td-block-title', b.label), h('div.small.muted', b.why)),
         h('span.td-min', `${b.minutes} min`)))),
       plan.notes.length ? h('ul.td-notes.small.muted', plan.notes.map(n => h('li', n))) : null,
+      plan.blocks.length ? null : h('div.feedback.warn', 'Alle Blöcke stehen auf 0. Unter „Plan anpassen“ mindestens einen Block einschalten.'),
       h('div.td-start-row',
-        h('button.primary.td-start', { onclick: () => startTraining(plan) },
+        h('button.primary.td-start', { onclick: () => startTraining(plan), disabled: !plan.blocks.length },
           doneToday >= 1 ? 'Noch eine Runde trainieren' : 'Training starten'),
         h('span.small.muted', 'oder Enter drücken')));
 
     const tip = h('div.card.td-tip', h('div.small.muted', 'Tipp des Tages'),
       h('div', tipOfTheDay({ date: day, focus: summary?.focus })));
 
-    root.append(hero, planCard, showSettings ? renderSettings() : null,
-      h('div.td-grid', renderWeek(), tip), renderFreeLinks());
+    // append(null) würde den Text „null“ einfügen, daher filtern
+    root.append(...[hero, planCard, showSettings ? renderSettings() : null,
+      h('div.td-grid', renderWeek(), tip), renderFreeLinks()].filter(Boolean));
   }
 
   // Einstellungen: Minuten am Tag, Ziel, adaptiv, Anteile der Blöcke
@@ -340,7 +358,7 @@ export async function mount(el) {
   }
 
   function startTraining(plan) {
-    if (runner) return;
+    if (runner || !plan.blocks.length) return;
     runner = createRunner(root, plan, { focus: summary?.focus, onExit: () => { runner = null; renderHome(); } });
   }
 
@@ -369,7 +387,7 @@ function createRunner(root, plan, { focus, onExit }) {
   const results = [];
   const startedAt = new Date();
   let idx = -1;
-  let current = null;        // {idx, token, cleanup, usedMs}; token = null → Block wurde abgebrochen
+  let current = null;        // {idx, token, cleanup, usedMs, snap, resumed, recorded, failed}; token = null → Block wurde abgebrochen
   let paused = false;
   let finished = false;
   let saved = false;
@@ -395,14 +413,19 @@ function createRunner(root, plan, { focus, onExit }) {
       h('span', b.icon), ` ${b.label} `, h('span.muted', `${b.minutes} min`))));
   }
 
-  // Gesamtfortschritt: fertige Blöcke voll, der laufende anteilig (höchstens bis zu seiner Planzeit)
-  const iv = setInterval(() => {
+  // Aktive Zeit fortschreiben (läuft nur, solange ein Block aktiv ist, nicht in der Pause)
+  function advance() {
     const now = Date.now();
     if (!paused && !finished && current?.token) {
       activeMs += now - lastTick;
       current.usedMs += now - lastTick;
     }
     lastTick = now;
+  }
+
+  // Gesamtfortschritt: fertige Blöcke voll, der laufende anteilig (höchstens bis zu seiner Planzeit)
+  const iv = setInterval(() => {
+    advance();
     const doneMs = blocks.slice(0, Math.max(0, idx)).reduce((s, b) => s + b.minutes * 60000, 0);
     const curMs = current && blocks[idx] ? Math.min(current.usedMs, blocks[idx].minutes * 60000) : 0;
     bar.set((doneMs + curMs) / (plannedMs() || 1));
@@ -411,27 +434,43 @@ function createRunner(root, plan, { focus, onExit }) {
 
   function stopCurrent() {
     if (!current) return;
+    advance();                       // Zeit bis jetzt noch dem Block gutschreiben
     current.token = null;            // ab jetzt ignoriert blockDone diesen Block
     const fn = current.cleanup;
     current.cleanup = null;
     try { fn?.(); } catch (e) { console.error(e); }
   }
 
+  // Was seit Blockbeginn in den Tageszählern dazugekommen ist
+  function counted() {
+    const b = blocks[idx];
+    if (!b || !current?.snap) return { done: 0, correct: 0 };
+    const now = countersFor(b.module, store.all().activity?.[todayStr()]);
+    return { done: Math.max(0, now.done - current.snap.done), correct: Math.max(0, now.correct - current.snap.correct) };
+  }
+
+  // Ergebnis des aktuellen Blocks festhalten, höchstens einmal pro Blockstart
+  // (sonst zählt z. B. „Überspringen“ nach einem ausgefallenen Block doppelt)
   function record(extra) {
+    if (!current || current.recorded) return;
+    current.recorded = true;
     const b = blocks[idx];
     const minutes = Math.round((current?.usedMs || 0) / 6000) / 10;
     results.push({ id: b.id, type: b.module, mode: b.mode, planned: b.minutes, done: 0, correct: 0, ...extra, minutes });
   }
 
   async function startBlock(i, minutes) {
-    const keep = current && current.idx === i ? current.usedMs : 0;   // nach einer Pause: bisherige Zeit behalten
+    const resumed = !!current && current.idx === i;   // nach einer Pause: bisherige Zeit und Zählerstand behalten
+    const keep = resumed ? current.usedMs : 0;
+    const snap = resumed ? current.snap : null;
     idx = i;
     paintSteps();
     if (i >= blocks.length) { finish(true); return; }
     const b = blocks[i];
     titleEl.textContent = `${b.icon} ${b.label}`;
     const token = {};
-    current = { idx: i, token, cleanup: null, usedMs: keep };
+    current = { idx: i, token, cleanup: null, usedMs: keep, resumed,
+      snap: snap || countersFor(b.module, store.all().activity?.[todayStr()]) };
     clear(stage).append(h('div.card.muted', 'Lade …'));
     let mod;
     try {
@@ -460,6 +499,7 @@ function createRunner(root, plan, { focus, onExit }) {
     console.error(err);
     stopCurrent();
     record({ failed: true, error: String(err?.message || err).slice(0, 200) });
+    current.failed = true;
     const b = blocks[idx];
     const next = blocks[idx + 1];
     if (next) { next.minutes += b.minutes; paintSteps(); }
@@ -476,7 +516,10 @@ function createRunner(root, plan, { focus, onExit }) {
     if (!current || current.token !== token || finished) return;   // abgebrochene Blöcke melden nichts mehr
     stopCurrent();
     const s = summary && typeof summary === 'object' ? summary : {};
-    record({ type: s.type || blocks[idx].module, mode: s.mode || blocks[idx].mode, done: s.done || 0, correct: s.correct || 0, details: s.details });
+    // Nach einer Pause kennt das Modul nur den zweiten Teil: dann zählen die Tageszähler
+    const c = current.resumed ? counted() : null;
+    const done = c && c.done > (s.done || 0) ? c : { done: s.done || 0, correct: s.correct || 0 };
+    record({ type: s.type || blocks[idx].module, mode: s.mode || blocks[idx].mode, ...done, details: s.details });
     startBlock(idx + 1);
   }
 
@@ -488,7 +531,7 @@ function createRunner(root, plan, { focus, onExit }) {
 
   // Pause beendet den Block (Module haben keine Pause-Schnittstelle) und startet ihn danach mit der Restzeit neu.
   function togglePause() {
-    if (finished || !current || idx >= blocks.length) return;
+    if (finished || !current || current.failed || idx >= blocks.length) return;
     if (!paused) {
       setPaused(true);
       stopCurrent();
@@ -506,14 +549,14 @@ function createRunner(root, plan, { focus, onExit }) {
   function skip() {
     if (finished || !current || idx >= blocks.length) return;
     stopCurrent();
-    record({ skipped: true });
+    record({ skipped: true, ...counted() });
     setPaused(false);
     startBlock(idx + 1);
   }
 
   function endEarly() {
     if (finished) return;
-    if (current && idx < blocks.length) { stopCurrent(); record({ skipped: true }); }
+    if (current && idx < blocks.length) { stopCurrent(); record({ skipped: true, ...counted() }); }
     finish(false);
   }
 
@@ -529,9 +572,10 @@ function createRunner(root, plan, { focus, onExit }) {
 
   function finish(completed) {
     if (finished) return;
+    stopCurrent();
     finished = true;
     clearInterval(iv);
-    stopCurrent();
+    window.removeEventListener('pagehide', onPageHide);
     current = null;
     save(completed);
     renderSummary(completed);
@@ -559,17 +603,25 @@ function createRunner(root, plan, { focus, onExit }) {
         h('a.btn', { href: '#/bericht' }, 'Zum Bericht')));
   }
 
+  // Seite verlassen (anderer Menüpunkt) oder Tab schließen: laufenden Block beenden, bisherige Zeit speichern
+  function abort() {
+    if (!finished) {
+      if (current && idx < blocks.length) { stopCurrent(); record({ skipped: true, ...counted() }); }
+      finished = true;
+      save(false);
+    }
+    clearInterval(iv);
+    window.removeEventListener('pagehide', onPageHide);
+  }
+  // Beim Schließen des Tabs gibt es keinen Router-Wechsel: Sitzung sofort sichern
+  function onPageHide() {
+    if (finished) return;
+    abort();
+    store.flush();
+  }
+  window.addEventListener('pagehide', onPageHide);
+
   startBlock(0);
 
-  return {
-    // Seite verlassen: laufenden Block beenden, bisherige Zeit trotzdem speichern
-    destroy() {
-      if (!finished) {
-        if (current && idx < blocks.length) { stopCurrent(); record({ skipped: true }); }
-        finished = true;
-        save(false);
-      }
-      clearInterval(iv);
-    },
-  };
+  return { destroy: abort };
 }

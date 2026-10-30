@@ -149,7 +149,7 @@
    "Bc4",
    "Nd4"
   ],
-  "ideas": "Ein fragwürdiger Fallen-Zug: Schwarz stellt den Bauern e5 scheinbar ein. Wer gierig mit Sxe5 zugreift, wird schnell mattgesetzt. Richtig ist ruhiges 4.Sxd4 exd4 5.O-O oder 4.c3.",
+  "ideas": "Ein fragwürdiger Fallen-Zug: Schwarz stellt den Bauern e5 scheinbar ein. Wer gierig mit Sxe5 zugreift, wird schnell mattgesetzt. Richtig ist ruhiges 4.Sxd4 exd4 5.O-O oder einfach 4.O-O.",
   "white": "Nicht 4.Sxe5?!, sondern 4.Sxd4 exd4 5.c3 oder 5.O-O mit Entwicklungsvorsprung.",
   "black": "Hofft auf 4.Sxe5?? Dg5!. Gegen ruhiges Spiel steht Schwarz schlechter.",
   "trap": {
@@ -238,7 +238,7 @@
   ],
   "ideas": "Nach 5…Sxd5? opfert Weiß den Springer auf f7, zieht den König mit Df3+ heraus und greift den Sd5 an. Schwarz muss sehr genau verteidigen. Darum spielt Schwarz nach 4.Sg5 d5 5.exd5 besser 5…Sa5!.",
   "white": "6.Sxf7 Kxf7 7.Df3+ Ke6 8.Sc3 mit Druck auf d5, dann d4 und O-O mit Angriff auf den König in der Brettmitte.",
-  "black": "Nicht 5…Sxd5, sondern 5…Sa5! (Läufer angreifen) mit gutem Spiel für den Bauern. Im Fegatello: König über e6 und d6 laufen, Figuren zur Verteidigung ziehen.",
+  "black": "Nicht 5…Sxd5, sondern 5…Sa5! (Läufer angreifen) mit gutem Spiel für den Bauern. Im Fegatello: d5 mit …Scb4 oder …Se7 und …c6 decken, Figuren zur Verteidigung holen und den König später über d7 in Sicherheit bringen.",
   "trap": null,
   "inRepertoire": false
  },
@@ -279,7 +279,7 @@
    "Nc6",
    "Bb5"
   ],
-  "ideas": "Weiß greift den Verteidiger von e5 an und baut langfristig Druck auf. Eine der ältesten und wichtigsten Eröffnungen. Wichtig: 4.Lxc6 und 5.Sxe5 gewinnt noch keinen Bauern, weil …Dd4 ihn zurückholt.",
+  "ideas": "Weiß greift den Verteidiger von e5 an und baut langfristig Druck auf. Eine der ältesten und wichtigsten Eröffnungen. Wichtig: 4.Lxc6 dxc6 5.Sxe5 gewinnt noch keinen Bauern, weil …Dd4 (Gabel auf e5 und e4) ihn zurückholt.",
   "white": "O-O, Te1, c3 und d4, Läufer über a4 nach b3/c2, Springer über d2–f1–g3.",
   "black": "3…a6 stellt die Frage an den Läufer, dann …Sf6, …Le7, …b5, …d6, …O-O. Solide und bewährt.",
   "trap": null,
@@ -584,7 +584,7 @@
    "Bc5"
   ],
   "ideas": "Schwarz entwickelt mit Tempo auf den Sd4. Nach 5.Le3 Df6 6.c3 Sge7 kämpfen beide um das Zentrum.",
-  "white": "5.Sxc6 Df6 6.Df2 oder 5.Sb3 bzw. 5.Le3. Zentrum mit c3 stützen.",
+  "white": "5.Sxc6 Df6 6.Dd2 oder 5.Sb3 bzw. 5.Le3. Zentrum mit c3 stützen.",
   "black": "…Df6 und …Sge7, Druck auf d4 und f2, später …d5.",
   "trap": null,
   "inRepertoire": false
@@ -850,7 +850,7 @@
    "Nc6"
   ],
   "ideas": "Ein schlechtes, aber fallenreiches Gambit, das durch Online-Schach bekannt wurde. Schwarz gibt einen Bauern für schnelle Entwicklung und hofft auf Fehler. Gegen ruhiges Spiel steht Weiß klar besser.",
-  "white": "4.Sxc6 dxc6 5.d3 Lc5 6.Le2! und auf …Sg4 einfach 7.O-O. Nicht 6.Lg5?? spielen.",
+  "white": "4.Sxc6 dxc6 5.d3 Lc5 6.Le2! und auf 6…Sg4 einfach 7.Lxg4 Dh4 8.Df3: Weiß behält den Mehrbauern. Nicht 6.Lg5?? spielen.",
   "black": "Auf Fallen hoffen: …Lc5, …Sg4, …h5 mit Druck auf f2.",
   "trap": {
    "moves": [
@@ -943,7 +943,7 @@
     "dxe5",
     "Qd5"
    ],
-   "text": "Nach 4.Lc4 Le7? 5.dxe5 dxe5?? 6.Dd5! droht Dxf7#. Schwarz muss 6…Sh6 spielen und verliert nach 7.Lxh6 eine Figur (7…gxh6?? 8.Dxf7#). Richtig wäre 4…c6 statt 4…Le7."
+   "text": "Nach 4.Lc4 Le7? 5.dxe5 dxe5?? 6.Dd5! droht Dxf7#. Jede Verteidigung kostet eine Figur: 6…Sh6 7.Lxh6 (7…gxh6?? 8.Dxf7#) oder 6…Lb4+ 7.c3 De7 8.cxb4. Richtig wäre 4…c6 statt 4…Le7."
   },
   "inRepertoire": true
  },
@@ -1038,7 +1038,7 @@
   ],
   "ideas": "Weiß greift mit Dame und Läufer f7 an. Gegen genaue Verteidigung verliert Weiß Zeit, weil die Dame früh gejagt wird. Du musst es sicher abwehren können.",
   "white": "Für Weiß kein guter Plan: Die Dame wird zur Zielscheibe.",
-  "black": "2…Sc6 (deckt e5), 3…g6 (sperrt die Diagonale), 4…Sf6 (deckt h5/f7, Entwicklung). Danach …Sd4 oder …Lg7 mit Tempo gegen die Dame.",
+  "black": "2…Sc6 (deckt e5), 3…g6 (sperrt die Diagonale), 4…Sf6 (sperrt die f-Linie und schützt so f7, dazu Entwicklung). Danach …Sd4 mit Tempo gegen die Dame, …Lg7 und Rochade.",
   "trap": {
    "moves": [
     "e4",
@@ -1431,7 +1431,7 @@
    "Nc6",
    "f4"
   ],
-  "ideas": "Aggressiver Aufbau mit f4, Sf3 und Lc4 bzw. Lb5. Ziel ist ein Königsangriff mit f5 und Df1–h4.",
+  "ideas": "Aggressiver Aufbau mit f4, Sf3 und Lc4 bzw. Lb5. Ziel ist ein Königsangriff mit f5 und De1–h4.",
   "white": "Sf3, Lc4/Lb5, O-O, d3, De1–h4 und f5.",
   "black": "…g6, …Lg7, …e6 und …d5, um das Zentrum zu öffnen.",
   "trap": null,
@@ -1721,7 +1721,7 @@
    "e5"
   ],
   "ideas": "Weiß sperrt das Zentrum und gewinnt Raum am Königsflügel. Schwarz greift die Bauernkette mit …c5 und …f6 an. Klare Pläne, darum gut für dein Repertoire.",
-  "white": "c3 und Sf3, um d4 zu stützen, dann Ld3, O-O, Le2 oder Ld3, und Raum am Königsflügel.",
+  "white": "c3 und Sf3, um d4 zu stützen, dann Ld3 oder Le2, O-O und Raum am Königsflügel.",
   "black": "3…c5 4.c3 Sc6 5.Sf3 Db6 mit Druck auf d4, später …f6.",
   "trap": {
    "moves": [
@@ -1743,7 +1743,7 @@
     "Qxd4",
     "Bb5+"
    ],
-   "text": "Nach 6.Ld3 cxd4 7.cxd4 sieht d4 wie ein Freibauer aus. 7…Sxd4?? 8.Sxd4 Dxd4 9.Lb5+! ist ein Abzugsangriff: Der Läufer gibt Schach, die Dd1 greift die Dd4 an. Schwarz verliert die Dame."
+   "text": "Nach 6.Ld3 cxd4 7.cxd4 sieht der Bauer d4 wie ein Geschenk aus: Sc6 und Db6 greifen ihn an, nur der Sf3 deckt. 7…Sxd4?? 8.Sxd4 Dxd4 9.Lb5+! ist ein Abzugsangriff: Der Läufer gibt Schach, die Dd1 greift die Dd4 an. Schwarz verliert die Dame."
   },
   "inRepertoire": true
  },
@@ -1931,7 +1931,7 @@
   ],
   "ideas": "Schwarz bereitet …Sgf6 vor, um nach Sxf6 mit dem Springer zurückzuschlagen. Sehr solide, aber mit einer berühmten Falle.",
   "white": "Sf3, Lc4 oder Ld3, De2. Nach …Sgf6 auf Sd6# achten.",
-  "black": "Erst …Sgf6, wenn der Se4 nicht mehr nach d6 springen kann, oder …Sdf6.",
+  "black": "Nach 5.De2 nicht 5…Sgf6??, sondern 5…Sdf6 oder 5…e6. Sonst …Sgf6, …e6, …Ld6 oder …Le7 und …c5.",
   "trap": {
    "moves": [
     "e4",
@@ -1965,7 +1965,7 @@
    "exd5",
    "cxd5"
   ],
-  "ideas": "Symmetrische Struktur. Weiß spielt oft Ld3, c3 und Lf4 (wie ein umgekehrtes Damengambit-Abtausch).",
+  "ideas": "Symmetrische Struktur. Weiß spielt oft Ld3, c3 und Lf4 (wie im Damengambit-Abtausch mit vertauschten Farben).",
   "white": "Ld3, c3, Lf4, Sf3, Dc2/Db3 und Druck am Königsflügel.",
   "black": "…Sc6, …Sf6, …Lg4, …e6, …Ld6, Minoritätsangriff am Damenflügel.",
   "trap": null,
@@ -2008,7 +2008,7 @@
    "Nf3"
   ],
   "ideas": "Weiß entwickelt beide Springer und hält d4 zurück. Gegen …Lg4 kommt h3 und das Läuferpaar.",
-  "white": "h3, Lxf3/Dxf3, d3, g3, Lg2.",
+  "white": "h3, nach …Lxf3 Dxf3, dann d3, g3, Lg2 und das Läuferpaar nutzen.",
   "black": "…Lg4 und Tausch auf f3, dann …e6, …Sf6 und solides Zentrum.",
   "trap": null,
   "inRepertoire": false
@@ -2864,7 +2864,7 @@
    "e5"
   ],
   "ideas": "Ein Fallen-Gambit: Schwarz opfert e5 und hofft auf schnelle Fehler. Gegen gute Spieler steht Schwarz schlecht. Deshalb wird es in deinem Repertoire durch 1…d5 ersetzt.",
-  "white": "2.dxe5 Sc6 3.Sf3 De7 4.Dd5! oder 4.Sc3 und Mehrbauer behalten. Nicht 4.Lf4??",
+  "white": "2.dxe5 Sc6 3.Sf3 De7 4.Dd5! oder 4.Sc3 und den Mehrbauern behalten. Nicht 4.Lf4??",
   "black": "…Sc6, …De7, …Dxb2-Ideen, Fallen auf c1 und b2.",
   "trap": {
    "moves": [
@@ -3156,7 +3156,7 @@
    "b5"
   ],
   "ideas": "Schwarz opfert einen Damenflügelbauern für langfristigen Druck über die a- und b-Linie. Auch im Endspiel bleibt der Druck bestehen.",
-  "white": "cxb5 a6 bxa6 und den Mehrbauer festhalten, e4, Sf3, g3, Lg2.",
+  "white": "cxb5 a6 bxa6 und den Mehrbauern festhalten, e4, Sf3, g3, Lg2.",
   "black": "…a6, …Lxa6, …g6, …Lg7, …d6, …O-O, Türme auf a- und b-Linie.",
   "trap": null,
   "inRepertoire": false
@@ -3194,7 +3194,7 @@
    "e5"
   ],
   "ideas": "Schwarz opfert e5, um ihn mit …Sg4 und …Sc6 zurückzugewinnen. Aktives Figurenspiel, mit einer berühmten Mattfalle.",
-  "white": "3.dxe5 Sg4 4.Lf4 Sc6 5.Sf3 Lb4+ 6.Sbd2 und nach …De7 7.e3 (nicht 7.a3??).",
+  "white": "3.dxe5 Sg4 4.Lf4 Sc6 5.Sf3 Lb4+ 6.Sbd2 und nach 6…De7 7.a3 Sgxe5 8.Sxe5 Sxe5 9.e3 (nicht 8.axb4?? Sd3#).",
   "black": "…Sg4, …Sc6, …Lb4+, …De7, Bauern e5 zurückgewinnen.",
   "trap": {
    "moves": [
@@ -3215,7 +3215,7 @@
     "axb4",
     "Nd3#"
    ],
-   "text": "7.a3? Sgxe5! 8.axb4?? Sd3# – ersticktes Matt: Der e-Bauer ist von der De7 gefesselt und kann den Springer nicht schlagen. Nach 8.Sxe5 Sxe5 hätte Schwarz den Bauern sicher zurück."
+   "text": "Nach 7.a3 Sgxe5 ist 8.axb4?? der Fehler: 8…Sd3# – ersticktes Matt: Der e-Bauer ist von der De7 gefesselt und kann den Springer nicht schlagen. Nach 8.Sxe5 Sxe5 hätte Schwarz den Bauern sicher zurück."
   },
   "inRepertoire": false
  },
@@ -3280,7 +3280,7 @@
   "id": "dutch-stonewall",
   "name": "Holländisch: Stonewall-Variante",
   "nameEn": "Dutch Defense: Stonewall Variation",
-  "eco": "A90",
+  "eco": "A92",
   "family": "Holländisch",
   "level": 3,
   "moves": [
@@ -3291,11 +3291,15 @@
    "g3",
    "e6",
    "Bg2",
+   "Be7",
+   "Nf3",
+   "O-O",
+   "O-O",
    "d5"
   ],
   "ideas": "Schwarz baut die Bauernmauer d5/e6/f5 und besetzt e4 mit dem Springer. Fest, aber das Feld e5 und der Läufer c8 sind Probleme.",
-  "white": "Sf3, O-O, b3, La3 (schlechten Läufer tauschen), Se5.",
-  "black": "…Ld6, …c6, …O-O, …De7, …Se4 und Angriff mit …Dh5 bzw. …g5.",
+  "white": "b3 und La3 (tauscht den guten schwarzen Läufer, der die dunklen Felder deckt), Sc3, Se5 oder Se1–d3 und Kampf um das Feld e5.",
+  "black": "…c6, …Se4, …De8–h5 und Angriff am Königsflügel, auch …g5. Moderner ist der Läufer auf d6 statt e7.",
   "trap": null,
   "inRepertoire": false
  },
@@ -3344,7 +3348,7 @@
    "c4",
    "e5"
   ],
-  "ideas": "Schwarz besetzt das Zentrum mit e5 – wie Sizilianisch mit einem Tempo weniger. Ein einfacher, robuster Aufbau gegen 1.c4.",
+  "ideas": "Schwarz besetzt das Zentrum mit …e5. Das ist Sizilianisch mit vertauschten Farben: Weiß hat ein Tempo mehr, Schwarz bekommt ein freies, einfaches Spiel. Ein einfacher, robuster Aufbau gegen 1.c4.",
   "white": "Sc3, g3, Lg2, d3, Sf3 oder e4 (Botwinnik-Aufbau).",
   "black": "…Sf6, …Sc6, …Lb4 oder …d5, später …Le7/…Lc5 und O-O.",
   "trap": null,

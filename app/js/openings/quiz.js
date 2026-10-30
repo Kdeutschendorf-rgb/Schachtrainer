@@ -1,7 +1,8 @@
 // Eröffnungsquiz: „Wie heißt diese Eröffnung?“ (4 Antworten) und „Finde den Hauptzug“.
 //
-// const q = createQuiz(el, { pool, onAnswer(right, question), onQuestion, onExit });  q.destroy()
+// const q = createQuiz(el, { pool, onAnswer(right, question), onQuestion, onEmpty, onExit });  q.destroy()
 // onQuestion() vor jeder neuen Frage; gibt sie false zurück, kommt keine Frage mehr.
+// onEmpty() kommt, wenn sich aus den Daten keine Frage bauen lässt.
 // pool aus logic.quizPool (Katalog = deutsche Namen, Lichess = englische Namen).
 
 import { createBoard } from '../board.js';
@@ -10,7 +11,7 @@ import { makeNameQuestion, makeMoveQuestion, checkMoveAnswer } from './logic.js'
 import { progress, saveQuiz } from './data.js';
 import { onKeys, button } from './widgets.js';
 
-export function createQuiz(el, { pool, onAnswer, onQuestion, onExit }) {
+export function createQuiz(el, { pool, onAnswer, onQuestion, onEmpty, onExit }) {
   const hasCatalog = pool.some(p => p.src === 'katalog');
   const hasLichess = pool.some(p => p.src === 'lichess');
   let q = null;
@@ -55,12 +56,19 @@ export function createQuiz(el, { pool, onAnswer, onQuestion, onExit }) {
     const src = pickSrc();
     q = Math.random() < 0.5 ? makeNameQuestion(pool, Math.random, src) : makeMoveQuestion(pool, Math.random, src);
     q ||= makeNameQuestion(pool, Math.random) || makeMoveQuestion(pool, Math.random);
-    if (!q) { clear(questionEl).append(h('div.feedback.warn', 'Für das Quiz fehlen noch Daten.')); return; }
     // Fehlerhafte Zugfolgen in den Daten überspringen
-    try {
-      board.loadLine(q.type === 'name' ? q.entry.moves : q.setup);
-    } catch {
-      if (++badData < 10) next();
+    if (q) {
+      try {
+        board.loadLine(q.type === 'name' ? q.entry.moves : q.setup);
+      } catch {
+        if (++badData < 10) { next(); return; }
+        q = null;
+      }
+    }
+    if (!q) {
+      clear(questionEl).append(h('div.feedback.warn', 'Für das Quiz fehlen noch (brauchbare) Daten.'));
+      setControls([]);
+      onEmpty?.();
       return;
     }
     renderStats();
@@ -146,7 +154,7 @@ export function createQuiz(el, { pool, onAnswer, onQuestion, onExit }) {
     ' ': () => primaryAction?.(),
     Enter: () => primaryAction?.(),
     h: hint,
-  });
+  }, el);
 
   next();
 

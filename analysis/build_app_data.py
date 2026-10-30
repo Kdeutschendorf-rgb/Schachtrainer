@@ -115,12 +115,13 @@ def wdl(games):
 HEADER_RE = re.compile(r'^\[(\w+) "(.*)"\]\s*$', re.M)
 
 
-def game_key(end_time, opponent):
-    """Schlüssel einer Partie: Endzeit (HH:MM:SS) + Gegner. Unabhängig vom Datumsformat.
-    Der Download schreibt '8:35:07 GMT+0000', die API '08:35:07', daher normalisieren."""
+def game_key(date, end_time, opponent):
+    """Schlüssel einer Partie: Datum + Endzeit (HH:MM:SS) + Gegner.
+    Der Download schreibt '8:35:07 GMT+0000', die API '08:35:07', daher normalisieren.
+    Datum ist der Date-Header (UTC-Starttag), in Download und API gleich."""
     m = re.match(r"\s*(\d{1,2}):(\d{2}):(\d{2})", end_time or "")
     t = "%02d:%s:%s" % (int(m.group(1)), m.group(2), m.group(3)) if m else (end_time or "")
-    return "%s|%s" % (t, (opponent or "").lower())
+    return "%s|%s|%s" % ((date or "").replace("-", "."), t, (opponent or "").lower())
 
 
 def san_tokens(movetext, limit=40):
@@ -151,7 +152,7 @@ def read_raw_games(folder=RAW):
             white = headers.get("White", "")
             opp = headers.get("Black", "") if white.lower() == ME else white
             body = HEADER_RE.sub("", block)
-            moves[game_key(headers.get("EndTime"), opp)] = san_tokens(body)
+            moves[game_key(headers.get("Date"), headers.get("EndTime"), opp)] = san_tokens(body)
     return moves
 
 
@@ -239,7 +240,7 @@ def repertoire_coverage(games, raw_moves, reps):
         for g in games:
             if g["color"] != side:
                 continue
-            sans = raw_moves.get(game_key(g.get("end"), g.get("opponent")))
+            sans = raw_moves.get(game_key(g.get("date"), g.get("end"), g.get("opponent")))
             if not sans:
                 continue
             plies, reason, detail = follow_repertoire(sans, rep, side)
@@ -510,9 +511,15 @@ def insights(summary):
                                                                   round(r["score"]), r["games"]))
     t = summary["time"]
     if t["losses"] and t["timeLosses"] / t["losses"] >= 0.2:
-        weaknesses.append("%d deiner %d Niederlagen waren Zeitverluste (%d %%)." % (
-            t["timeLosses"], t["losses"], round(100 * t["timeLosses"] / t["losses"])))
-    if t["abandoned"] >= 5:
+        bullet = t["byTc"].get("bullet", {}).get("zeit", 0)
+        where = (", %d davon im Bullet" % bullet) if bullet >= 0.6 * t["timeLosses"] else ""
+        weaknesses.append("%d deiner %d Niederlagen waren Zeitverluste (%d %%%s)." % (
+            t["timeLosses"], t["losses"], round(100 * t["timeLosses"] / t["losses"]), where))
+    rapid_t = t["byTc"].get("rapid", {})
+    if rapid_t.get("verlassen", 0) >= 5:
+        weaknesses.append("%d deiner %d Rapid-Niederlagen kamen durch Verlassen der Partie. Spiel weiter, "
+                          "auf deinem Niveau drehen sich viele Stellungen noch." % (rapid_t["verlassen"], rapid_t["losses"]))
+    elif t["abandoned"] >= 5:
         weaknesses.append("%d Partien hast du verlassen statt weiterzuspielen." % t["abandoned"])
     tags = summary["mistakeTags"]["all"]
     if tags:
@@ -524,11 +531,12 @@ def insights(summary):
     ph = summary["phases"]["all"]
     per_game = {p: ph[p]["perGame"]["blunder"] + 0.5 * ph[p]["perGame"]["mistake"] for p in PHASES}
     if any(per_game.values()):
+        # Nur die schwächste Phase nennen: Endspiele werden seltener erreicht, ein Vergleich pro Partie
+        # würde das Endspiel sonst fälschlich als Stärke ausweisen.
         worst = max(per_game, key=per_game.get)
-        best = min(per_game, key=per_game.get)
-        weaknesses.append("Die meisten groben Fehler passieren im %s." % PHASE_DE[worst])
-        if best != worst:
-            strengths.append("Im %s machst du die wenigsten groben Fehler." % PHASE_DE[best])
+        where = {"eroeffnung": "in der Eröffnung", "mittelspiel": "im Mittelspiel", "endspiel": "im Endspiel"}[worst]
+        weaknesses.append("Die meisten groben Fehler passieren %s (%s pro Partie)." % (
+            where, ("%.1f" % per_game[worst]).replace(".", ",")))
     tr = summary["trend"].get("rapid")
     if tr and tr["early"]["accuracy"] and tr["late"]["accuracy"]:
         d = tr["late"]["accuracy"] - tr["early"]["accuracy"]
@@ -539,7 +547,7 @@ def insights(summary):
     fb = summary["focus"].get("firstBlunderMove")
     if fb and fb <= 20:
         weaknesses.append("Dein erster Patzer kommt im Schnitt schon in Zug %d." % round(fb))
-    return {"strengths": strengths[:5], "weaknesses": weaknesses[:6]}
+    return {"strengths": strengths[:5], "weaknesses": weaknesses[:8]}
 
 
 def clean_puzzles(puzzles):

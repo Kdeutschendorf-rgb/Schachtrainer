@@ -1,0 +1,1087 @@
+"""Quelle für app/data/repertoire_white.json (Repertoire Weiß, 1.e4). Wird von w_build.py gelesen.
+
+Pro Linie: "pgn" = englische SAN ab Grundstellung, Notiz in {…} direkt hinter dem Zug, zu dem sie gehört.
+Texte deutsch, deutsche Notation. Alle Behauptungen sind mit w_check.py / w_explore.py (Stockfish) geprüft.
+"""
+
+E5_GROUP = "Weiß: 1.e4 e5"
+SEMI_GROUP = "Weiß: Halboffene Eröffnungen"
+RARE_GROUP = "Weiß: Seltene Antworten"
+
+CHAPTERS = []
+
+# ---------------------------------------------------------------- Italienisch (Hauptsystem)
+CHAPTERS.append({
+    "id": "w-italian",
+    "group": E5_GROUP,
+    "title": "Italienisch – Giuoco Pianissimo",
+    "priority": 1,
+    "intro": (
+        "Nach 1.e4 e5 2.Sf3 Sc6 3.Lc4 spielst du Italienisch mit c3 und d3. Das ist dein Hauptsystem: "
+        "In deinen Rapid-Partien antwortet Schwarz in mehr als jeder zweiten Partie mit 1…e5, und fast immer folgt 2…Sc6. "
+        "Du brauchst kaum Theorie, die Figuren kommen auf natürliche Felder, und der Läufer c4 zielt dauerhaft auf f7. "
+        "Gegen 3…Sf6 spielst du 4.d3 statt wilder Abenteuer mit Sg5. "
+        "Gewonnen wird später: durch bessere Figuren, den Springerweg nach g3 und Taktik, die der Gegner übersieht."
+    ),
+    "ideas": [
+        "Aufbau: c3, d3, O-O, Te1, dann Sbd2–f1–g3 und h3. Erst wenn alles steht, d3–d4.",
+        "a4 verhindert …b5 mit Angriff auf deinen Läufer, Lb3–c2 schont ihn vor …Sa5.",
+        "h3 nimmt Läufer c8 und Springer f6 das Feld g4: kein lästiges …Lg4 oder …Sg4.",
+        "Nicht zu früh angreifen: Ein schnelles Sg5 oder Lxf7+ ohne Vorbereitung verliert meist nur Zeit.",
+        "Vor jedem Zug fragen: Was will Schwarz mit …d5 oder …Sg4? Dann rechtzeitig vorbeugen.",
+    ],
+    "lines": [
+        {
+            "id": "w-it-main",
+            "name": "3…Lc5 4.c3 Sf6 5.d3 d6 6.O-O O-O 7.Te1 a6 8.a4",
+            "frequency": "häufig",
+            "pgn": (
+                "e4 {Der Königsbauer besetzt das Zentrum und öffnet Dame und Läufer f1 den Weg.} "
+                "e5 {Schwarz hält dagegen. In deinen Rapid-Partien kam 1…e5 in mehr als jeder zweiten Partie.} "
+                "Nf3 {Sf3 entwickelt mit Angriff auf e5 und bereitet die kurze Rochade vor.} "
+                "Nc6 {Der natürlichste Zug: Sc6 deckt e5.} "
+                "Bc4 {Lc4 zielt auf f7, den schwächsten Punkt im schwarzen Lager: Ihn deckt nur der König.} "
+                "Bc5 {Giuoco Piano: Schwarz stellt den Läufer spiegelbildlich auf und zielt auf f2.} "
+                "c3 {c3 bereitet d4 vor und nimmt dem Springer c6 das Feld d4. Dein Läufer bekommt später über b3 und c2 einen sicheren Platz.} "
+                "Nf6 {Sf6 greift e4 an.} "
+                "d3 {d3 deckt e4 ganz ruhig und öffnet den Läufer c1. Kein frühes d4: Erst entwickeln und rochieren.} "
+                "d6 "
+                "O-O {König in Sicherheit, der Turm kann nach e1. Im Italiener rochierst du früh.} "
+                "O-O "
+                "Re1 {Te1 stützt e4 und bereitet d4 vor. Außerdem macht er f1 für den Springer frei: Sbd2–f1–g3.} "
+                "a6 {Schwarz schafft dem Läufer c5 ein Rückzugsfeld auf a7, damit b4 ihn nicht vertreibt.} "
+                "a4 {a4 gewinnt Raum am Damenflügel und macht …b5 unattraktiv, das sonst deinen Läufer c4 angreifen würde.} "
+                "Ba7 "
+                "h3 {h3 nimmt Läufer c8 und Springer f6 das Feld g4. Jetzt folgen Sbd2–f1–g3 oder Le3.}"
+            ),
+            "plan": (
+                "Sbd2–f1–g3 bringt den Springer an den Königsflügel, Le3 tauscht den starken Läufer a7. "
+                "Erst wenn alles entwickelt ist, d3–d4. Die Stellung ist ausgeglichen: Gewinnen wirst du durch die "
+                "besseren Figuren und Taktik, die der Gegner übersieht."
+            ),
+        },
+        {
+            "id": "w-it-d5",
+            "name": "5…O-O 6.O-O d5 7.exd5 Sxd5 8.Te1",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d3 "
+                "O-O "
+                "O-O {Auch hier zuerst die Rochade. Dein Aufbau bleibt gleich, egal ob Schwarz …d6 oder …O-O spielt.} "
+                "d5 {…d5 greift gleichzeitig deinen Läufer c4 und den Bauern e4 an.} "
+                "exd5 {Pflicht: 7.exd5 löst beide Angriffe auf einmal.} "
+                "Nxd5 "
+                "Re1 {Te1 greift sofort e5 an, den nur noch der Springer c6 deckt. Schwarz muss reagieren, und du bekommst das leichtere Spiel.}"
+            ),
+            "plan": (
+                "Typisch sind Sbd2–e4 mit Angriff auf den Läufer c5 und a4 mit Raumgewinn. "
+                "Halte Druck auf e5 und achte darauf, dass dein Läufer c4 nicht von …Sb6 oder …Le6 abgetauscht wird, ohne dass du etwas bekommst."
+            ),
+        },
+        {
+            "id": "w-it-qe7",
+            "name": "4…De7 5.O-O d6 6.d4 Lb6 7.a4",
+            "frequency": "selten",
+            "pgn": (
+                "e4 e5 Nf3 Nc6 Bc4 Bc5 c3 "
+                "Qe7 {Schwarz deckt e5 mit der Dame. Das ist solide, aber etwas passiv.} "
+                "O-O {Erst rochieren. Weil e5 jetzt fest gedeckt ist, kommt danach d4 mit Tempo gegen den Läufer c5.} "
+                "d6 "
+                "d4 {Jetzt passt d4: Der Läufer c5 wird angegriffen und du baust ein großes Zentrum.} "
+                "Bb6 "
+                "a4 {a4 droht a5: Dann hätte der Läufer b6 kein gutes Feld mehr. Schwarz muss mit …a6 oder …a5 vorbeugen.}"
+            ),
+            "plan": (
+                "Nach …a6 spielst du Te1 und h3, nach …a5 Sa3–c4 oder Lb5. Du hast mehr Raum im Zentrum. "
+                "Den Bauern e4 deckt notfalls Te1, und d4–d5 vertreibt später den Springer c6."
+            ),
+        },
+        {
+            "id": "w-it-d6",
+            "name": "4…d6 5.d3 Sf6 6.O-O (Zugumstellung)",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 e5 Nf3 Nc6 Bc4 Bc5 c3 "
+                "d6 {Schwarz deckt e5 zusätzlich und öffnet den Läufer c8.} "
+                "d3 {Einfach weiter mit dem Standardaufbau. d4 wäre auch gut, aber d3 hält alles einfach.} "
+                "Nf6 "
+                "O-O {Mit 6…O-O 7.Te1 a6 8.a4 landest du in der Hauptlinie.}"
+            ),
+            "plan": "Weiter wie in der Hauptlinie: Te1, a4, h3, Sbd2–f1–g3. Die Zugfolge ist egal, der Aufbau bleibt gleich.",
+        },
+        {
+            "id": "w-it-2n",
+            "name": "3…Sf6 4.d3 Lc5 5.c3 (Zugumstellung)",
+            "frequency": "häufig",
+            "pgn": (
+                "e4 e5 Nf3 Nc6 Bc4 "
+                "Nf6 {Zweispringerverteidigung: Schwarz greift sofort e4 an.} "
+                "d3 {4.d3 deckt e4 ruhig. Das scharfe 4.Sg5 führt nach 4…d5 in viel Theorie, die du nicht brauchst.} "
+                "Bc5 "
+                "c3 {Wieder der Standardaufbau. Diese Stellung kennst du aus der Hauptlinie.} "
+                "d6 "
+                "O-O O-O "
+                "Re1 {Jetzt steht die Hauptlinie mit Te1 auf dem Brett. Weiter mit a4 und h3.}"
+            ),
+            "plan": "Weiter wie in der Hauptlinie: a4, h3, Sbd2–f1–g3. Erst wenn alles steht, d4.",
+        },
+        {
+            "id": "w-it-2n-be7",
+            "name": "3…Sf6 4.d3 Le7 5.O-O O-O 6.Te1 d6 7.c3",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 e5 Nf3 Nc6 Bc4 Nf6 d3 "
+                "Be7 {Der Läufer steht auf e7 sicher, aber passiver als auf c5.} "
+                "O-O {Rochade zuerst, der Rest läuft wie immer.} "
+                "O-O "
+                "Re1 {Te1 stützt e4 und gibt f1 für den Springer frei.} "
+                "d6 "
+                "c3 {c3 bereitet d4 vor und gibt dem Läufer c4 den Rückweg über b3 nach c2.}"
+            ),
+            "plan": (
+                "Sbd2–f1–g3, h3 und später d4. Spielt Schwarz …Sa5, ziehst du mit Lb5 oder Lb3 weg, damit der Läufer nicht getauscht wird."
+            ),
+        },
+        {
+            "id": "w-it-2n-h6",
+            "name": "3…Sf6 4.d3 h6 5.O-O d6 6.c3",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 e5 Nf3 Nc6 Bc4 Nf6 d3 "
+                "h6 {…h6 verhindert Sg5 und Lg5, kostet aber Zeit.} "
+                "O-O {Einfach weiterentwickeln: Rochade, dann c3.} "
+                "d6 "
+                "c3 {Standardaufbau. Danach Te1, a4 und Sbd2–f1–g3.}"
+            ),
+            "plan": "Te1, a4, Sbd2–f1–g3. Wenn Schwarz kurz rochiert, lohnt später ein Läufer auf e3 oder Sh4–f5.",
+        },
+        {
+            "id": "w-it-2n-d5",
+            "name": "3…Sf6 4.d3 d5?! 5.exd5 Sxd5 6.O-O",
+            "frequency": "selten",
+            "pgn": (
+                "e4 e5 Nf3 Nc6 Bc4 Nf6 d3 "
+                "d5 {Zu früh: …d5 greift Läufer c4 und e4 an, öffnet aber das Spiel, bevor Schwarz entwickelt ist.} "
+                "exd5 {Nimm auf d5. Danach steht der schwarze Springer d5 im Visier deines Läufers c4.} "
+                "Nxd5 "
+                "O-O {Rochieren und dann Te1: Der Bauer e5 ist nur vom Springer c6 gedeckt.}"
+            ),
+            "plan": "Te1 mit Druck auf e5, dann Sbd2–e4 oder Sc3. Du hast den Vorsprung in der Entwicklung, also öffne das Spiel weiter.",
+        },
+        {
+            "id": "w-it-h6",
+            "name": "3…h6 4.d3 Sf6 5.O-O",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 e5 Nf3 Nc6 Bc4 "
+                "h6 {…h6 ist auf deinem Niveau beliebt: Es verhindert Sg5 und Lg5, kostet aber ein Tempo.} "
+                "d3 {Ruhig weiter mit dem Standardaufbau. Das Tempo von …h6 nutzt du später für Te1 und c3.} "
+                "Nf6 "
+                "O-O {Zugumstellung zu 3…Sf6 4.d3 h6. Weiter mit c3 und Te1.}"
+            ),
+            "plan": "c3, Te1, a4 und Sbd2–f1–g3. Du hast durch …h6 ein Tempo mehr: Nutze es für schnelle Entwicklung.",
+        },
+        {
+            "id": "w-it-be7",
+            "name": "3…Le7 4.d3 Sf6 5.O-O",
+            "frequency": "selten",
+            "pgn": (
+                "e4 e5 Nf3 Nc6 Bc4 "
+                "Be7 {Ungarische Verteidigung: sehr vorsichtig, der Läufer steht passiv.} "
+                "d3 {Auch hier reicht der Standardaufbau. d4 wäre etwas aktiver, aber d3 hält alles einfach.} "
+                "Nf6 "
+                "O-O {Gleiche Stellung wie nach 3…Sf6 4.d3 Le7. Weiter mit Te1 und c3.}"
+            ),
+            "plan": "Te1, c3, Sbd2–f1–g3, h3 und später d4. Schwarz steht eng, du hast mehr Raum.",
+        },
+    ],
+})
+
+# ---------------------------------------------------------------- Italienisch: Fallen
+CHAPTERS.append({
+    "id": "w-italian-traps",
+    "group": E5_GROUP,
+    "title": "Italienisch – Fallen und frühe Ausflüge",
+    "priority": 1,
+    "intro": (
+        "Auf 1000–1400 kommen im Italiener ständig Tricks: …Sd4 mit der Falle …Dg5, die frühe Dame auf f6, "
+        "…Sg4 gegen f2 und die Fesselung …Lg4. Hier lernst du, wie du nicht hineinfällst und wie du Schwarz für zu frühe "
+        "Ausflüge bestrafst. Zum Abschluss das berühmte Légal-Matt."
+    ),
+    "ideas": [
+        "Gegen …Sd4 nicht 4.Sxe5? wegen …Dg5!, sondern einfach 4.Sxd4.",
+        "Kommt die schwarze Dame früh heraus, entwickle mit Tempo: Sc3–d5 oder Sc3–b5 greift sie und c7 an.",
+        "f7 ist der schwache Punkt: Lc4 plus Sg5 oder Dh5 ergibt oft einen Doppelangriff.",
+        "Eine Fesselung …Lg4 gegen Sf3 ist nicht immer echt: Wenn Lxf7+ und ein Springerschach folgen, darf der Springer ziehen (Légal).",
+    ],
+    "lines": [
+        {
+            "id": "w-it-nd4",
+            "name": "3…Sd4 4.Sxd4 exd4 5.O-O Sf6 6.Te1 d6 7.c3",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 e5 Nf3 Nc6 Bc4 "
+                "Nd4 {Falle! Nach 4.Sxe5? Dg5! greift die Dame Se5 und g2 an. Gierig weiter mit 5.Sxf7?? Dxg2 6.Tf1 Dxe4+ 7.Le2 Sf3# ist es sogar Matt.} "
+                "Nxd4 {Einfach den Springer tauschen. Der Bauer e5 läuft nicht weg, und die Falle ist entschärft.} "
+                "exd4 "
+                "O-O {Rochieren. Der schwarze Bauer d4 steht vorgeschoben und wird gleich mit c3 angegriffen.} "
+                "Nf6 "
+                "Re1 {Te1 deckt e4 und bereitet e4–e5 gegen den Springer f6 vor.} "
+                "d6 "
+                "c3 {Jetzt c3: Nach cxd4 hast du das Traumzentrum mit d4 und e4, Schwarz ist hinterher in der Entwicklung.}"
+            ),
+            "plan": "Nach cxd4 spielst du d3 oder d4 mit Sc3, Lg5 und h3. Du hast mehr Raum und schnellere Entwicklung, Schwarz hat für den Springerausflug nur Zeit verloren.",
+        },
+        {
+            "id": "w-it-nd4-bc5",
+            "name": "3…Sd4 4.Sxd4 exd4 5.O-O Lc5? 6.Lxf7+!",
+            "frequency": "selten",
+            "pgn": (
+                "e4 e5 Nf3 Nc6 Bc4 Nd4 Nxd4 exd4 O-O "
+                "Bc5 {Falle! Der Läufer c5 ist ungedeckt. Das kannst du sofort ausnutzen.} "
+                "Bxf7+ {Lxf7+ lenkt den König ab. Nach 6…Kf8 behältst du einfach einen Bauern mehr, und Schwarz kann nicht mehr rochieren.} "
+                "Kxf7 "
+                "Qh5+ {Schach und gleichzeitig Angriff auf den Läufer c5: ein Doppelangriff.} "
+                "g6 "
+                "Qxc5 {Du hast die Figur zurück und einen Bauern mehr. Der schwarze König steht offen, und d4 hängt als Nächstes.}"
+            ),
+            "plan": "Nimm bei Gelegenheit auf d4 und bring Sc3 und Te1 ins Spiel. Mit Mehrbauer und sicherem König: Figuren tauschen, dann gewinnt das Endspiel.",
+        },
+        {
+            "id": "w-it-ng4",
+            "name": "4.c3 Sf6 5.d3 Sg4?! 6.d4!",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d3 "
+                "Ng4 {Schwarz droht …Sxf2 mit Gabel gegen Dame d1 und Turm h1. Der Ausflug ist aber zu früh.} "
+                "d4 {Die beste Antwort: d4 greift den Läufer c5 an, Lc5 schaut danach nicht mehr auf f2. Zugleich baust du dein Zentrum.} "
+                "exd4 "
+                "cxd4 {Mit Angriff auf den Läufer. Jetzt hast du das große Zentrum d4 und e4.} "
+                "Bb4+ "
+                "Nc3 {Sc3 blockiert das Schach und entwickelt eine Figur. Nicht Ld2: Du willst schnell weiter.} "
+                "d5 "
+                "exd5 {Du hast einen Bauern mehr, und d5 greift den Springer c6 an. Der Springer g4 steht weiter ohne Aufgabe herum.}"
+            ),
+            "plan": "Nach …Lxc3+ bxc3 rochierst du, spielst Te1+ und h3 gegen den Springer g4. Mehrbauer, starkes Zentrum und die schwarzen Figuren verstreut: einfach weiter entwickeln.",
+        },
+        {
+            "id": "w-it-qf6-nge7",
+            "name": "3…Df6?! 4.Sc3 Sge7 5.Sb5!",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 e5 Nf3 Nc6 Bc4 "
+                "Qf6 {Die frühe Dame: Sie zielt auf f2, nimmt dem Springer g8 aber sein bestes Feld und wird zur Zielscheibe.} "
+                "Nc3 {Sc3 entwickelt und will nach d5 springen: Angriff auf die Dame und auf c7.} "
+                "Nge7 "
+                "Nb5 {Droht Sxc7+ mit Gabel gegen König und Turm a8. Schwarz muss reagieren, am besten mit …Kd8, und verliert das Rochaderecht.} "
+                "Kd8 "
+                "d4 {Öffne das Zentrum, solange der schwarze König in der Mitte steht und nicht mehr rochieren kann.}"
+            ),
+            "plan": "Nach dxe5 oder Lg5 kommen deine Figuren mit Tempo. Der König auf d8 sperrt den schwarzen Turm ein: Öffne Linien, rochiere selbst und greif an.",
+        },
+        {
+            "id": "w-it-qf6-bc5",
+            "name": "3…Df6?! 4.Sc3 Lc5 5.Sd5 Dg6 6.O-O",
+            "frequency": "selten",
+            "pgn": (
+                "e4 e5 Nf3 Nc6 Bc4 Qf6 Nc3 "
+                "Bc5 {Schwarz droht jetzt nichts Konkretes, entwickelt sich aber nur mit Dame und Läufer.} "
+                "Nd5 {Mit Tempo: Der Springer greift die Dame f6 und den Bauern c7 an.} "
+                "Qg6 {Die Dame greift jetzt e4 und g2 an.} "
+                "O-O {Rochade deckt g2. Sxc7+ droht weiter, und Schwarz hat noch keine Figur am Damenflügel entwickelt.}"
+            ),
+            "plan": "Als Nächstes d3 oder d4 und Sh4 gegen die Dame. Bleib ruhig: Du bist weit voraus in der Entwicklung, Schwarz muss c7 und f7 gleichzeitig halten.",
+        },
+        {
+            "id": "w-it-qf6-nd4",
+            "name": "3…Df6?! 4.Sc3 Sd4 5.Sxd4 exd4 6.Sd5 Dd6 7.d3",
+            "frequency": "selten",
+            "pgn": (
+                "e4 e5 Nf3 Nc6 Bc4 Qf6 Nc3 "
+                "Nd4 {Wieder der Springer nach d4, diesmal mit Druck auf f3 und c2.} "
+                "Nxd4 {Tausche den Springer ab. Danach ist die Dame f6 allein.} "
+                "exd4 "
+                "Nd5 {Angriff auf die Dame und auf c7.} "
+                "Qd6 "
+                "d3 {d3 öffnet den Läufer c1. Lf4 mit Angriff auf die Dame folgt.} "
+                "c6 "
+                "Bf4 {Mit Tempo gegen die Dame d6.} "
+                "Qg6 "
+                "Nc7+ {Gabel! Schach dem König und Angriff auf den Turm a8.} "
+                "Kd8 "
+                "Nxa8 {Du gewinnst den Turm. Mit Turm mehr: tauschen, König in Sicherheit, dann den Springer a8 befreien oder für einen Bauern geben.}"
+            ),
+            "plan": "Rochiere, decke g2 und hol den Springer a8 nicht um jeden Preis zurück: Er ist bereits ein Turm wert gewesen. Mit Turm mehr gewinnt jedes ruhige Spiel.",
+        },
+        {
+            "id": "w-it-legal",
+            "name": "3…d6 4.Sc3 Lg4 5.h3 Lh5? 6.Sxe5! – Légals Matt",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 e5 Nf3 Nc6 Bc4 "
+                "d6 {Schwarz deckt e5 und öffnet den Läufer c8. Gegen diese Zugfolge spielst du Sc3.} "
+                "Nc3 {Sc3 entwickelt und deckt d5. Jetzt wird die Fesselung …Lg4 gefährlich – für Schwarz.} "
+                "Bg4 {Die Fesselung: Der Springer f3 scheint nicht ziehen zu dürfen, sonst hängt die Dame d1.} "
+                "h3 {h3 fragt den Läufer: tauschen oder zurück?} "
+                "Bh5 {Falle! Der Läufer hält die Fesselung, aber …} "
+                "Nxe5 {Légal! Der Springer zieht trotz Fesselung. Nimmt Schwarz die Dame, ist es Matt in zwei.} "
+                "Bxd1 {Gierig. Besser war 6…Sxe5, dann gewinnst du aber auch einen Bauern.} "
+                "Bxf7+ {Schach. Der König muss nach e7, weil f7 von Se5 gedeckt ist.} "
+                "Ke7 "
+                "Nd5# {Matt! Drei Leichtfiguren gegen den König, die Dame d1 nützt Schwarz nichts.}"
+            ),
+            "plan": "Das Muster merken: Lc4 auf f7, ein Springer auf e5 und ein Springer auf d5. Wenn Schwarz fesselt und f7 schwach ist, rechne immer Sxe5 durch.",
+        },
+        {
+            "id": "w-it-legal-nxe5",
+            "name": "Légal: 6…Sxe5 7.Dxh5 Sxc4 8.Db5+",
+            "frequency": "selten",
+            "pgn": (
+                "e4 e5 Nf3 Nc6 Bc4 d6 Nc3 Bg4 h3 Bh5 Nxe5 "
+                "Nxe5 {Die bessere Antwort: Schwarz schlägt den Springer.} "
+                "Qxh5 {Jetzt ist der Läufer h5 ohne Fesselung ungedeckt. Die Dame greift auch f7 an.} "
+                "Nxc4 "
+                "Qb5+ {Schach mit Angriff auf den Springer c4: Doppelangriff.} "
+                "c6 "
+                "Qxc4 {Bilanz: Du hast einen Bauern mehr (e5), alle Figuren sind getauscht oder zurückgewonnen.}"
+            ),
+            "plan": "Rochiere, spiel d3 und Le3. Mit einem gesunden Mehrbauern und dem Läuferpaar von Schwarz weg: tauschen und das Endspiel gewinnen.",
+        },
+        {
+            "id": "w-it-d6-bxf3",
+            "name": "3…d6 4.Sc3 Lg4 5.h3 Lxf3 6.Dxf3 Sf6 7.d3",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 e5 Nf3 Nc6 Bc4 d6 Nc3 Bg4 h3 "
+                "Bxf3 {Richtig von Schwarz: Er gibt den Läufer für den Springer, bevor Légal möglich wird.} "
+                "Qxf3 {Die Dame schlägt zurück und steht aktiv, wieder mit Blick auf f7.} "
+                "Nf6 "
+                "d3 {d3 deckt e4 und öffnet den Läufer c1. Auf …Sd4 geht die Dame einfach nach d1 zurück.}"
+            ),
+            "plan": "Le3, Se2 oder O-O. Du hast das Läuferpaar: Halte die Stellung offen und spiel später f4.",
+        },
+        {
+            "id": "w-it-d6-nf6",
+            "name": "3…d6 4.Sc3 Sf6 5.Sg5! d5 6.exd5 Sa5 7.Lb5+",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 e5 Nf3 Nc6 Bc4 d6 Nc3 "
+                "Nf6 {Natürlich, aber jetzt ist f7 nur vom König gedeckt.} "
+                "Ng5 {Droht Sxf7 mit Gabel gegen Dame d8 und Turm h8. Der Unterschied zum Zweispringer: Schwarz hat mit …d6 schon ein Tempo verloren.} "
+                "d5 {Schwarz sperrt den Läufer c4 ab und gibt einen Bauern.} "
+                "exd5 {Nimm den Bauern. Jetzt ist auch der Springer c6 angegriffen.} "
+                "Na5 "
+                "Bb5+ {Schach, damit der Läufer nicht vom Springer a5 getauscht wird.} "
+                "c6 "
+                "dxc6 {Tausche den vorgeschobenen Bauern ab. Nach …bxc6 hat Schwarz isolierte Bauern auf a7 und c6, und du behältst den Mehrbauern.} "
+                "bxc6 "
+                "Be2 {Der Läufer geht sicher zurück. Du hast einen Bauern mehr, Schwarz hat Entwicklung als Ausgleich.}"
+            ),
+            "plan": "d3, O-O und dann Sge4 oder Sf3. Gib den Bauern nicht leichtfertig zurück: Erst den König sichern, dann die Figuren zentralisieren.",
+        },
+    ],
+})
+
+# ---------------------------------------------------------------- Philidor
+CHAPTERS.append({
+    "id": "w-philidor",
+    "group": E5_GROUP,
+    "title": "Philidor-Verteidigung 2…d6 3.d4",
+    "priority": 1,
+    "intro": (
+        "2…d6 ist nach 2…Sc6 die zweithäufigste Antwort in deinen Partien. Schwarz deckt e5 mit einem Bauern, steht aber eng. "
+        "Du spielst sofort 3.d4 und nimmst dir das Zentrum. Viele Gegner auf deinem Niveau machen hier früh einen Fehler: "
+        "…Lg4 mit Tausch auf f3, …Sd7 mit …Le7 oder …Sgf6 – dann ist f7 schwach und du gewinnst Material. "
+        "Über 1…d6 2.d4 e5 3.Sf3 landest du in denselben Stellungen."
+    ),
+    "ideas": [
+        "Gegen …exd4 einfach Sxd4, Sc3, Le2, O-O: mehr Raum und leichte Entwicklung.",
+        "Lc4 plus Db3 oder Dd5 zielt auf f7 (und b7). Viele Philidor-Fallen drehen sich um diesen Punkt.",
+        "Nach dxe5 dxe5 und Damentausch auf d8 kann Schwarz nicht mehr rochieren: Sxe5 oder Lxf7+ gewinnen oft einen Bauern.",
+    ],
+    "lines": [
+        {
+            "id": "w-ph-exd4",
+            "name": "3…exd4 4.Sxd4 Sf6 5.Sc3 Le7 6.Le2 O-O 7.O-O",
+            "frequency": "häufig",
+            "pgn": (
+                "e4 e5 Nf3 "
+                "d6 {Philidor: Schwarz deckt e5 mit einem Bauern, sperrt aber seinen Läufer f8 ein.} "
+                "d4 {Sofort ins Zentrum. Schwarz muss entscheiden: tauschen, halten oder Druck machen.} "
+                "exd4 {Schwarz gibt das Zentrum auf.} "
+                "Nxd4 {Mit dem Springer zurückschlagen: Er steht zentral, und e4 ist durch nichts bedroht.} "
+                "Nf6 {Greift e4 an.} "
+                "Nc3 {Sc3 deckt e4 und entwickelt.} "
+                "Be7 "
+                "Be2 {Ruhig und solide: Le2, dann rochieren. Lf4 mit Dd2 ist aktiver, aber Le2 reicht völlig.} "
+                "O-O "
+                "O-O {Beide Könige sind sicher. Du hast mehr Raum, Schwarz hat keine Schwächen, aber wenig Platz.}"
+            ),
+            "plan": "f4 oder Lf3 mit Druck auf die lange Diagonale, Le3 und Dd2. Schwarz will …Te8 und …Lf8 gegen e4: Halte e4 mit Lf3 oder Te1 fest und gewinne weiter Raum.",
+        },
+        {
+            "id": "w-ph-nf6",
+            "name": "3…Sf6?! 4.dxe5 Sxe4 5.Dd5 Sc5 6.Lg5",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 e5 Nf3 d6 d4 "
+                "Nf6 {Ungenau: Schwarz greift e4 an, lässt aber e5 im Stich.} "
+                "dxe5 {Nimm auf e5. Jetzt hängt auch der Bauer d6 an der Fesselung durch die Dame.} "
+                "Nxe4 "
+                "Qd5 {Die Dame greift den Springer e4 an. Er hat kaum ein gutes Feld, und e5xd6 droht nebenbei.} "
+                "Nc5 "
+                "Bg5 {Mit Tempo gegen die Dame d8. Schwarz muss den Läufer stellen und kann kaum noch rochieren.} "
+                "Be7 "
+                "exd6 {Öffnet die e-Linie: Der Läufer e7 ist jetzt gefesselt gegen den König.} "
+                "Qxd6 "
+                "Nc3 {Entwickle weiter und plane die lange Rochade. Schwarz hat keine Zeit, sein Spiel zu ordnen.}"
+            ),
+            "plan": "O-O-O mit dem Turm auf der offenen d-Linie, dann Lb5+ oder Sb5. Bietet Schwarz den Damentausch an, ist dein Endspiel wegen der besseren Entwicklung angenehm.",
+        },
+        {
+            "id": "w-ph-opera",
+            "name": "3…Lg4?! 4.dxe5 Lxf3 5.Dxf3 dxe5 6.Lc4 – Morphys Opernpartie",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 e5 Nf3 d6 d4 "
+                "Bg4 {Fesselung des Springers, aber der Läufer wird gleich getauscht und Schwarz verliert Zeit.} "
+                "dxe5 {Nimm auf e5. Jetzt muss Schwarz den Läufer tauschen.} "
+                "Bxf3 {4…dxe5? verliert nach 5.Dxd8+ Kxd8 6.Sxe5 einen Bauern, der Springer greift Lg4 und f7 an. Darum tauscht Schwarz zuerst.} "
+                "Qxf3 {Die Dame schlägt zurück und zielt auf f7 und b7.} "
+                "dxe5 "
+                "Bc4 {Zweiter Angreifer auf f7. Schwarz hat das Läuferpaar abgegeben und liegt in der Entwicklung zurück.} "
+                "Nf6 "
+                "Qb3 {Doppelangriff auf f7 und b7. Es droht sogar Lxf7+ Kd7 De6 matt.} "
+                "Qe7 "
+                "Nc3 {So spielte Morphy 1858 in der Oper von Paris: erst entwickeln. 8.Dxb7 ist ebenfalls stark.} "
+                "c6 "
+                "Bg5 {Fesselt den Springer f6 gegen die Dame. Weiß ist schon fast komplett entwickelt.} "
+                "b5? {Schwarz will den Läufer vertreiben, öffnet aber die Stellung um den eigenen König.} "
+                "Nxb5! {Morphy opfert den Springer, um Linien zu öffnen.} "
+                "cxb5 "
+                "Bxb5+ {Schach mit Fesselung: Der Springer d7 wird gleich gefesselt sein.} "
+                "Nbd7 "
+                "O-O-O {Der Turm kommt auf die d-Linie und greift den gefesselten Springer d7 an. Schwarz ist nicht mehr zu retten.}"
+            ),
+            "plan": "Morphy gewann mit Txd7, Td1, Lxd7+ und Db8+ Sxb8 Td8 matt. Merke: Entwicklungsvorsprung plus offene Linien gegen einen König in der Mitte schlägt Material.",
+        },
+        {
+            "id": "w-ph-nd7-c6",
+            "name": "3…Sd7 4.Lc4 c6 5.O-O Le7 6.dxe5 dxe5 7.Sg5",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 e5 Nf3 d6 d4 "
+                "Nd7 {Hanham-Variante: Schwarz hält e5 mit dem Springer, verstellt aber den Läufer c8.} "
+                "Bc4 {Der Läufer zielt auf f7. Genau dort ist die Philidor nach …Sd7 empfindlich.} "
+                "c6 {Gut von Schwarz: …c6 bereitet …b5 und …d5 vor.} "
+                "O-O {Rochieren. Gefahr durch …b5 besteht noch nicht, weil e5 sonst fällt.} "
+                "Be7 "
+                "dxe5 {Öffne die d-Linie, bevor Schwarz …Sgf6 und …O-O schafft.} "
+                "dxe5 "
+                "Ng5 {Sg5 und Lc4 greifen f7 an. Nach 7…Lxg5 holst du die Figur mit 8.Dh5 zurück: Doppelangriff auf g5 und f7.}"
+            ),
+            "plan": "Nach 7…Sh6 kommt Se6! mit Druck, nach 7…Lxg5 8.Dh5 tauschst du auf g5 und hast das Läuferpaar. Schwarz muss immer auf f7 aufpassen.",
+        },
+        {
+            "id": "w-ph-nd7-ngf6",
+            "name": "3…Sd7 4.Lc4 Sgf6? 5.dxe5 Sxe5 6.Sxe5 dxe5 7.Lxf7+",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 e5 Nf3 d6 d4 Nd7 Bc4 "
+                "Ngf6? {Falle! Natürlich aussehend, aber jetzt fehlt eine Deckung für f7.} "
+                "dxe5 {Öffnet die d-Linie gegen die Dame d8.} "
+                "Nxe5 "
+                "Nxe5 {Tausche den Springer. Danach ist die d-Linie offen, und f7 steht im Visier.} "
+                "dxe5 "
+                "Bxf7+ {Lenkt den König ab, die Dame d8 steht danach ungedeckt.} "
+                "Ke7 "
+                "Qxd8+ {Damentausch mit Schach. Danach greift nichts den Läufer f7 an.} "
+                "Kxd8 {Du hast einen gesunden Bauern mehr, und Schwarz kann nicht mehr rochieren.}"
+            ),
+            "plan": "Zuerst e4 decken (f3 oder Sc3), denn …Sxe4 ist die einzige Gegenchance. Dann Lb3, Le3 und Ke2. Mit einem Bauern mehr: Figuren tauschen und das Endspiel gewinnen.",
+        },
+        {
+            "id": "w-ph-nd7-be7",
+            "name": "3…Sd7 4.Lc4 Le7?? 5.dxe5 dxe5 6.Dd5!",
+            "frequency": "selten",
+            "pgn": (
+                "e4 e5 Nf3 d6 d4 Nd7 Bc4 "
+                "Be7?? {Falle! Sieht solide aus, aber f7 ist jetzt nicht mehr zu halten.} "
+                "dxe5 {Öffnet die d-Linie. Auf 5…Sxe5 gewinnt 6.Sxe5 dxe5 7.Dh5 den Bauern e5 mit Angriff.} "
+                "dxe5 "
+                "Qd5 {Droht Dxf7 matt. Schwarz kann f7 nur mit …Sh6 decken.} "
+                "Nh6 "
+                "Bxh6 {Der Verteidiger ist weg. Auf 7…gxh6 folgt 8.Dxf7 matt, also hast du eine Figur mehr.}"
+            ),
+            "plan": "Läufer zurück nach e3, Sc3 und O-O-O. Mit einer Figur mehr: alles entwickeln, tauschen, gewinnen.",
+        },
+        {
+            "id": "w-ph-nc6",
+            "name": "3…Sc6 4.d5 Sce7 5.c4",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 e5 Nf3 d6 d4 "
+                "Nc6 {Schwarz hält e5 mit dem Springer.} "
+                "d5 {Vertreibt den Springer mit Raumgewinn. Er hat nur schlechte Felder (e7, b8, b4).} "
+                "Nce7 "
+                "c4 {c4 stützt d5. Später bereitet c5 einen Angriff am Damenflügel vor.}"
+            ),
+            "plan": "Sc3, Le2, O-O und dann c4–c5 mit Druck auf d6. Schwarz hat wenig Raum: Er will …f5 spielen, darum Figuren so stellen, dass e4 gut gedeckt ist.",
+        },
+    ],
+})
+
+# ---------------------------------------------------------------- Russisch (Petrow) und Stafford
+CHAPTERS.append({
+    "id": "w-petrov",
+    "group": E5_GROUP,
+    "title": "Russisch 2…Sf6 und Stafford-Gambit",
+    "priority": 1,
+    "intro": (
+        "Gegen 2…Sf6 nimmst du mit 3.Sxe5 den Bauern. Die Hauptvariante 3…d6 4.Sf3 Sxe4 5.Sc3 ist ruhig und ungefährlich. "
+        "Auf deinem Niveau kommen aber oft zwei Fallen: das sofortige 3…Sxe4?, das 4.De2! bestraft, und das Stafford-Gambit 3…Sc6, "
+        "das voller Tricks gegen f2 ist. Hier lernst du die sicheren Antworten."
+    ),
+    "ideas": [
+        "Nach 3…Sxe4? stellt 4.De2 die Dame auf die e-Linie: Der Springer e4 hängt, und Abzugsschach droht.",
+        "Im Stafford-Gambit ist f2 das Ziel (…Lc5, …Sg4, …Dh4). Mit d3, Le2, c3 und d4 schließt du die Diagonale.",
+        "Nie Lg5?? im Stafford: Nach …Sxe4! und …Lxf2+ droht Matt.",
+    ],
+    "lines": [
+        {
+            "id": "w-pe-main",
+            "name": "3…d6 4.Sf3 Sxe4 5.Sc3 Sxc3 6.dxc3 Le7 7.Le3",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 e5 Nf3 "
+                "Nf6 {Russische Verteidigung: Schwarz greift sofort e4 an, statt e5 zu decken.} "
+                "Nxe5 {Nimm den Bauern. Jetzt hängt e4 zwar auch, aber Schwarz muss erst …d6 spielen.} "
+                "d6 {Richtig: Erst den Springer vertreiben, dann auf e4 schlagen.} "
+                "Nf3 {Zurück. Der Springer steht auf f3 sicher.} "
+                "Nxe4 "
+                "Nc3 {Tauschangebot mit Entwicklung. 5.d4 ist auch gut, aber 5.Sc3 ist einfacher.} "
+                "Nxc3 "
+                "dxc3 {Mit dem d-Bauern schlagen: Die d-Linie öffnet sich für deine Türme, und der Läufer c1 ist frei.} "
+                "Be7 "
+                "Be3 {Le3, Dd2 und O-O-O: ein klarer Plan mit schnellem Angriff am Königsflügel.}"
+            ),
+            "plan": "Dd2, O-O-O, dann h4 und g4, wenn Schwarz kurz rochiert. Die offene d-Linie gehört deinen Türmen.",
+        },
+        {
+            "id": "w-pe-nxe4",
+            "name": "3…Sxe4? 4.De2 De7 5.Dxe4 d6 6.d4",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 e5 Nf3 Nf6 Nxe5 "
+                "Nxe4? {Falle! Symmetrisch, aber jetzt steht die e-Linie offen.} "
+                "Qe2 {Greift den Springer e4 an und droht ein Abzugsschach mit dem Springer e5.} "
+                "Qe7 {Die einzige vernünftige Antwort: Schwarz deckt auf der e-Linie.} "
+                "Qxe4 {Du gewinnst die Figur zurück.} "
+                "d6 {Fesselung: Der Springer e5 ist angegriffen und steht vor deiner Dame.} "
+                "d4 {Deckt den Springer. Nach 6…dxe5 7.dxe5 ist alles wieder ausgeglichen im Material, aber du bist in der Entwicklung voraus.} "
+                "dxe5 "
+                "dxe5 {Meist folgt der Damentausch. Danach steht dein Endspiel angenehm, weil deine Figuren schneller ins Spiel kommen.}"
+            ),
+            "plan": "Sc3, Lf4 und O-O-O. Wenn Schwarz auf e5 schlägt und die Damen tauscht, spielst du Sb5 oder Lf4 mit Tempo.",
+        },
+        {
+            "id": "w-pe-nxe4-nf6",
+            "name": "3…Sxe4? 4.De2 Sf6?? 5.Sc6+ – Damengewinn",
+            "frequency": "selten",
+            "pgn": (
+                "e4 e5 Nf3 Nf6 Nxe5 Nxe4 Qe2 "
+                "Nf6?? {Falle! Der Springer zieht weg und die e-Linie ist offen.} "
+                "Nc6+ {Abzugsschach durch die Dame e2 und gleichzeitig greift der Springer die Dame d8 an. Schwarz verliert die Dame.}"
+            ),
+            "plan": "Nach dem Damengewinn: ruhig entwickeln und tauschen. Das Muster merken: Abzugsschach erlaubt dem Springer jeden Angriff.",
+        },
+        {
+            "id": "w-pe-stafford",
+            "name": "Stafford: 3…Sc6 4.Sxc6 dxc6 5.d3 Lc5 6.Le2 h5 7.c3",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 e5 Nf3 Nf6 Nxe5 "
+                "Nc6 {Stafford-Gambit: Schwarz opfert einen Bauern für schnelle Entwicklung und Fallen gegen f2.} "
+                "Nxc6 {Tausch: Schwarz muss mit dem Bauern zurückschlagen.} "
+                "dxc6 "
+                "d3 {Deckt e4. Nicht 5.e5? Se4 6.d3 Lc5! 7.dxe4?? Lxf2+ 8.Ke2 Lg4+ und die Dame d1 fällt.} "
+                "Bc5 {Der Läufer zielt auf f2. Jetzt aufpassen: 6.Lg5?? Sxe4! 7.Lxd8 Lxf2+ 8.Ke2 Lg4 ist Matt.} "
+                "Be2 {Le2 verhindert …Sg4 und …Lg4 mit Damenangriff und bereitet die Rochade vor.} "
+                "h5 {Schwarz will …Sg4 spielen. Nach Lxg4 hxg4 wäre die h-Linie offen.} "
+                "c3 {Plan: d3–d4 vertreibt den Läufer c5 von der Diagonale gegen f2.} "
+                "Ng4 {Droht …Sxf2 mit Gabel gegen Dd1 und Th1.} "
+                "d4 {Der Bauer d4 sperrt die Diagonale c5–f2 und greift den Läufer an. Jetzt deckt der König f2 allein, das reicht.}"
+            ),
+            "plan": "Rochiere bald (vorher h3, um den Springer g4 zu vertreiben), dann Sd2–f3 und Lf4. Du hast einen Bauern mehr und Schwarz keine Fallen mehr.",
+        },
+        {
+            "id": "w-pe-stafford-ng4",
+            "name": "Stafford: 6…Sg4 7.Lxg4 Dh4 8.Df3",
+            "frequency": "selten",
+            "pgn": (
+                "e4 e5 Nf3 Nf6 Nxe5 Nc6 Nxc6 dxc6 d3 Bc5 Be2 "
+                "Ng4 {Sofort auf f2. Es droht …Sxf2 oder …Lxf2+.} "
+                "Bxg4 {Nimm den Springer weg. Ohne ihn hat Schwarz zu wenig Angreifer.} "
+                "Qh4 {Doppelangriff auf g4 und f2.} "
+                "Qf3 {Deckt f2 mit der Dame und bietet den Damentausch an. Nach …Dxg4 Dxg4 Lxg4 bleibt dein Mehrbauer.}"
+            ),
+            "plan": "Nach dem Damentausch: f3 gegen den Läufer g4, Sc3, Ke2 oder O-O. Im Endspiel zählt der Mehrbauer.",
+        },
+        {
+            "id": "w-pe-qe7",
+            "name": "3…De7 4.Sf3 Dxe4+ 5.Le2",
+            "frequency": "selten",
+            "pgn": (
+                "e4 e5 Nf3 Nf6 Nxe5 "
+                "Qe7 {Schwarz will den Bauern über die e-Linie zurückholen.} "
+                "Nf3 {Der Springer geht in Sicherheit, e4 darf fallen.} "
+                "Qxe4+ "
+                "Be2 {Deckt das Schach und entwickelt. Danach O-O, Te1 und Sc3 mit Tempo gegen die schwarze Dame.}"
+            ),
+            "plan": "O-O, Te1 und Sc3 (oder c4 und Sc3): Die schwarze Dame steht auf der e-Linie gegen deinen Turm. Du bist deutlich weiter entwickelt.",
+        },
+    ],
+})
+
+# ---------------------------------------------------------------- 2…Df6, 2…f6, 2…Lc5 (frühe Ausflüge)
+CHAPTERS.append({
+    "id": "w-e5-early",
+    "group": E5_GROUP,
+    "title": "Frühe Dame und …f6: 2…Df6, 2…f6, 2…Lc5",
+    "priority": 1,
+    "intro": (
+        "2…Df6 kam in deinen Partien erstaunlich oft vor (13-mal), dazu 2…f6 und 2…Lc5 mit der Idee …Dh4. "
+        "Alle drei Züge sind schlecht, aber gefährlich, wenn man die Antwort nicht kennt. "
+        "Die Regel: Entwickle mit Tempo gegen die Dame, und nimm auf e5, wenn Schwarz den Bauern nicht richtig deckt."
+    ),
+    "ideas": [
+        "Gegen …Df6 spielst du Sc3 mit der Drohung Sd5 (Angriff auf Dame und c7) und später Lg5 mit Tempo.",
+        "Gegen 2…f6 gewinnt 3.Sxe5!: Auf 3…fxe5? 4.Dh5+ verliert Schwarz den Turm h8 oder kommt mit dem König unter die Räder.",
+        "Wenn Schwarz Lc5 und Dh4 gegen f2 aufstellt: d4 sperrt die Diagonale mit Tempo gegen den Läufer.",
+    ],
+    "lines": [
+        {
+            "id": "w-ee-qf6-c6",
+            "name": "2…Df6?! 3.Sc3 c6 4.d4 d6 5.Lg5",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 e5 Nf3 "
+                "Qf6 {Die Dame deckt e5, nimmt dem Springer g8 aber sein bestes Feld und wird zur Zielscheibe.} "
+                "Nc3 {Entwickelt und will nach d5: von dort greift der Springer die Dame und c7 an.} "
+                "c6 {Schwarz nimmt dem Springer das Feld d5.} "
+                "d4 {Öffne das Zentrum, solange die schwarze Dame ungünstig steht.} "
+                "d6 "
+                "Bg5 {Entwicklung mit Tempo gegen die Dame. Schwarz verliert schon wieder Zeit.}"
+            ),
+            "plan": "Dd2, O-O-O und dxe5 öffnen die d-Linie gegen den König in der Mitte. Schwarz hat seine Leichtfiguren noch nicht entwickelt: spiel schnell und direkt.",
+        },
+        {
+            "id": "w-ee-qf6-bc5",
+            "name": "2…Df6?! 3.Sc3 Lc5 4.Sd5 Dd6 5.d4!",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 e5 Nf3 Qf6 Nc3 "
+                "Bc5 {Läufer und Dame zielen auf f2, aber das ist wegen Sf3 harmlos.} "
+                "Nd5 {Mit Tempo: Der Springer greift die Dame f6 und den Bauern c7 an.} "
+                "Qd6 "
+                "d4 {Greift den Läufer c5 an und öffnet die Diagonale für den Läufer c1. Die schwarzen Figuren stehen sich gegenseitig im Weg.} "
+                "Bb6 "
+                "Nxe5 {Bauer gewonnen. Gleich folgt Sc4 mit Angriff auf die Dame d6, und Sxb6 zerstört die schwarzen Bauern.}"
+            ),
+            "plan": "Sc4 gegen die Dame, dann Sxb6, Lf4 und Lc4. Du hast einen Bauern mehr und einen großen Entwicklungsvorsprung.",
+        },
+        {
+            "id": "w-ee-qf6-nc6",
+            "name": "2…Df6?! 3.Sc3 Sc6 4.Lc4 (Zugumstellung)",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 e5 Nf3 Qf6 Nc3 "
+                "Nc6 "
+                "Bc4 {Dieselbe Stellung wie nach 2…Sc6 3.Lc4 Df6 4.Sc3. Jetzt drohen Sd5 und Sb5 mit Angriff auf c7.}"
+            ),
+            "plan": "Weiter wie im Kapitel „Italienisch – Fallen“: Gegen …Sge7 kommt Sb5, gegen …Lc5 Sd5, gegen …Sd4 Sxd4 und Sd5.",
+        },
+        {
+            "id": "w-ee-f6",
+            "name": "2…f6? 3.Sxe5! fxe5? 4.Dh5+ g6 5.Dxe5+",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 e5 Nf3 "
+                "f6? {Damiano-Verteidigung: Der Bauer f6 deckt e5, schwächt aber die Diagonale e8–h5 vor dem König.} "
+                "Nxe5! {Das Springeropfer ist korrekt. Nimmt Schwarz, kommt Dh5+.} "
+                "fxe5? "
+                "Qh5+ {Nach 4…Ke7 5.Dxe5+ Kf7 6.Lc4+ wird der König gejagt und Weiß steht auf Gewinn. Darum 4…g6.} "
+                "g6 "
+                "Qxe5+ {Gabel: Schach dem König und Angriff auf den Turm h8.} "
+                "Qe7 "
+                "Qxh8 {Turm gewonnen. Bilanz: Du hast Turm und zwei Bauern für den Springer.}"
+            ),
+            "plan": "Die Dame steht auf h8 etwas abseits: Bring sie über d4 oder e5 zurück, entwickle Sc3 und d3, rochiere. Schwarz hat für den Turm nichts.",
+        },
+        {
+            "id": "w-ee-f6-qe7",
+            "name": "2…f6? 3.Sxe5! De7 4.Sf3 Dxe4+ 5.Le2",
+            "frequency": "selten",
+            "pgn": (
+                "e4 e5 Nf3 f6 Nxe5 "
+                "Qe7 {Die beste Antwort: Schwarz greift den Springer an und holt den Bauern auf e4 zurück.} "
+                "Nf3 {Der Springer geht zurück, e4 darf fallen.} "
+                "Qxe4+ "
+                "Be2 {Material ist gleich, aber …f6 hat die schwarze Stellung geschwächt und die Dame steht ungeschickt. Als Nächstes O-O und Te1.}"
+            ),
+            "plan": "O-O, Te1 und d4 mit Angriff auf die Dame auf der e-Linie, dann Sc3. Der schwarze König kommt wegen der Dame schwer in Sicherheit.",
+        },
+        {
+            "id": "w-ee-bc5",
+            "name": "2…Lc5 3.Sxe5! Dh4 4.d4 Dxe4+ 5.Le3",
+            "frequency": "selten",
+            "pgn": (
+                "e4 e5 Nf3 "
+                "Bc5 {Schwarz deckt e5 nicht. Die Idee ist …Dh4 gegen f2.} "
+                "Nxe5 {Nimm den Bauern. Der Trick 3…Lxf2+ 4.Kxf2 Dh4+ bringt nichts: 5.Kg1! und Schwarz hat zu wenig für den Läufer. Nicht 5.Ke3? Dg5+ mit Gabel gegen König und Se5.} "
+                "Qh4 {Die frühe Dame: Es droht Dxf2 matt!} "
+                "d4 {Sperrt die Diagonale c5–f2 und greift den Läufer an. Damit ist f2 sicher.} "
+                "Qxe4+ "
+                "Be3 {Deckt das Schach mit Entwicklung. Der Läufer c5 hängt weiter, und Sc3 kommt mit Tempo gegen die Dame.}"
+            ),
+            "plan": "Sc3, Ld3 und Dd2: Jede Figur kommt mit Tempo gegen die schwarze Dame. Schwarz hat seinen Bauern zurück, aber die Entwicklung ist katastrophal.",
+        },
+    ],
+})
+
+# ---------------------------------------------------------------- 2…d5, 2…f5, 2…De7
+CHAPTERS.append({
+    "id": "w-e5-gambits",
+    "group": E5_GROUP,
+    "title": "Gambits und Seltenes: 2…d5, 2…f5, 2…De7",
+    "priority": 2,
+    "intro": (
+        "Das Elefantengambit 2…d5, das Lettische Gambit 2…f5 und 2…De7 sind selten, aber unangenehm, wenn man sie nicht kennt. "
+        "Für alle gilt: Nimm den angebotenen Bauern, wenn es sicher ist, entwickle mit Tempo und rochiere bald."
+    ),
+    "ideas": [
+        "Gegen 2…d5 schlägst du exd5. Nach …e4 stellt De2 den Bauern e4 unter Druck.",
+        "Gegen 2…f5 nimmt 3.Sxe5 den Bauern. Danach Sc4 und Sc3 gegen den Bauern e4.",
+        "Gegen 2…De7 einfach Sc3, d4 und Lc4: Die Dame blockiert den Läufer f8.",
+    ],
+    "lines": [
+        {
+            "id": "w-eg-d5",
+            "name": "Elefantengambit 2…d5 3.exd5 e4 4.De2 Sf6 5.d3",
+            "frequency": "selten",
+            "pgn": (
+                "e4 e5 Nf3 "
+                "d5 {Elefantengambit: Schwarz greift sofort e4 an und lässt e5 hängen.} "
+                "exd5 {Nimm den Bauern. Das ist sicherer als 3.Sxe5, weil e4 dann nicht mehr angegriffen ist.} "
+                "e4 {Greift den Springer f3 an.} "
+                "Qe2 {Die Dame greift den Bauern e4 an und fesselt ihn: …exf3 ist nicht erlaubt, weil dann Schach auf der e-Linie stünde.} "
+                "Nf6 "
+                "d3 {Greift e4 ein zweites Mal an. Du behältst den Mehrbauern oder Schwarz verliert Zeit.}"
+            ),
+            "plan": "dxe4, Sc3, Lg5 und O-O-O. Achte auf Schachgebote auf der e-Linie, solange deine Dame und dein König dort stehen.",
+        },
+        {
+            "id": "w-eg-f5",
+            "name": "Lettisch 2…f5 3.Sxe5 Df6 4.d4 d6 5.Sc4 fxe4 6.Sc3",
+            "frequency": "selten",
+            "pgn": (
+                "e4 e5 Nf3 "
+                "f5 {Lettisches Gambit: Schwarz greift e4 an und öffnet die f-Linie.} "
+                "Nxe5 {Nimm den Bauern e5. Der Springer steht zentral und blickt auf f7.} "
+                "Qf6 "
+                "d4 {Deckt den Springer und baut das Zentrum.} "
+                "d6 "
+                "Nc4 {Der Springer geht auf ein sicheres Feld. Von c4 kann er nach e3 oder zurück nach e5.} "
+                "fxe4 "
+                "Nc3 {Greift den Bauern e4 an, der im Moment gar nicht gedeckt ist. Schwarz muss Zeit investieren, um ihn zu halten.}"
+            ),
+            "plan": "Se3, Le2 und O-O, oder f3 zum Öffnen. Der Bauer e4 fällt früher oder später, und der schwarze König steht unsicher.",
+        },
+        {
+            "id": "w-eg-qe7",
+            "name": "2…De7 3.Sc3 c6 4.d4",
+            "frequency": "selten",
+            "pgn": (
+                "e4 e5 Nf3 "
+                "Qe7 {Die Dame deckt e5, blockiert aber den Läufer f8.} "
+                "Nc3 {Entwickelt und droht Sd5 mit Angriff auf die Dame und c7.} "
+                "c6 {Nimmt dem Springer das Feld d5.} "
+                "d4 {Öffne das Zentrum. Die schwarze Dame steht auf der e-Linie im Weg.}"
+            ),
+            "plan": "Lc4, O-O und Te1. Wenn Schwarz auf d4 tauscht, nimmst du mit dem Springer und spielst Sf5 gegen die Dame.",
+        },
+    ],
+})
+
+# ---------------------------------------------------------------- Skandinavisch
+CHAPTERS.append({
+    "id": "w-scandi",
+    "group": SEMI_GROUP,
+    "title": "Skandinavisch 1…d5",
+    "priority": 1,
+    "intro": (
+        "1…d5 ist in deinen Partien die zweithäufigste Antwort auf 1.e4 (22 von 150 Rapid-Partien). "
+        "Du nimmst mit 2.exd5 und greifst die schwarze Dame nach 2…Dxd5 sofort mit 3.Sc3 an. "
+        "Danach spielst du d4, Sf3 und entwickelst mit Tempo. Gegen 2…Sf6 hältst du einfach mit 3.d4 das Zentrum. "
+        "Wichtig: Die Dame wird auf a5, d6 oder e5 oft Zielscheibe für Ld2, Sb5, Lf4 oder Sd5."
+    ),
+    "ideas": [
+        "Entwickle mit Tempo gegen die Dame: Sc3, später Ld2 (gegen Da5), Lf4 (gegen Dd6) oder Sd5 mit Abzugsangriff.",
+        "Ein Bauer auf d4 und Figuren auf f3, c4/d3 und d2 bilden einen einfachen Aufbau, dann rochieren.",
+        "Gegen …Lg4 oder …Lf5 hilft h3 (und manchmal g4), um den Läufer zu vertreiben. Nicht zu weit gehen, wenn dein König noch in der Mitte steht.",
+    ],
+    "lines": [
+        {
+            "id": "w-sc-qa5",
+            "name": "2…Dxd5 3.Sc3 Da5 4.d4 Sf6 5.Sf3 c6 6.Lc4 Lf5 7.Ld2",
+            "frequency": "häufig",
+            "pgn": (
+                "e4 "
+                "d5 {Skandinavisch: Schwarz greift sofort e4 an.} "
+                "exd5 {Nimm den Bauern. Schwarz muss mit der Dame zurückschlagen oder ein Gambit spielen.} "
+                "Qxd5 "
+                "Nc3 {Entwicklung mit Tempo: Die Dame muss schon wieder ziehen.} "
+                "Qa5 {Das Hauptfeld: Von a5 fesselt die Dame den Springer c3 nach …Lb4.} "
+                "d4 {Nimmt das Zentrum und öffnet den Läufer c1.} "
+                "Nf6 "
+                "Nf3 {Der Springer kommt auf sein bestes Feld. Achte auf …Lg4, dagegen hilft später h3.} "
+                "c6 {Schafft der Dame einen Rückzug über c7 und d8.} "
+                "Bc4 {Der Läufer steht aktiv. Er zielt auf f7 und kann bei …b5 nach b3 ausweichen.} "
+                "Bf5 "
+                "Bd2 {Ld2 verhindert eine Fesselung mit …Lb4 und bereitet einen Trick vor: Zieht der Springer c3, greift Ld2 die Dame a5 an.} "
+                "e6 "
+                "Nd5 {Abzugsangriff! Der Läufer d2 greift jetzt die Dame an. Auf 8…cxd5 9.Lxa5 verliert Schwarz die Dame.} "
+                "Qd8 "
+                "Nxf6+ {Du tauschst den Springer gegen den wichtigsten Verteidiger und bekommst nach …gxf6 eine kaputte schwarze Bauernstruktur.}"
+            ),
+            "plan": "De2, O-O-O oder O-O und dann d4–d5 oder Se5. Du hast mehr Raum und bessere Figuren, Schwarz muss auf Fallen um f7 und die e-Linie achten.",
+        },
+        {
+            "id": "w-sc-qa5-bg4",
+            "name": "3…Da5 4.d4 Sf6 5.Sf3 Lg4 6.h3 Lh5 7.g4 Lg6 8.Se5",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 "
+                "Bg4 {Der Läufer fesselt den Springer f3, bevor Schwarz …c6 gespielt hat.} "
+                "h3 {Frag den Läufer sofort. Nach …Lxf3 Dxf3 hast du das Läuferpaar.} "
+                "Bh5 "
+                "g4 {Vertreibt den Läufer weiter. Weil die Dame auf a5 weit weg ist, ist das hier sicher.} "
+                "Bg6 "
+                "Ne5 {Droht h4–h5: Der Läufer g6 hätte dann kaum noch ein Feld. Außerdem kommt Sc4 mit Tempo gegen die Dame a5.}"
+            ),
+            "plan": "h4–h5 gegen den Läufer, Sc4 gegen die Dame, dann Lg2 und Ld2. Schwarz muss sehr genau verteidigen.",
+        },
+        {
+            "id": "w-sc-qd6",
+            "name": "3…Dd6 4.d4 Sf6 5.Sf3 a6 6.g3",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 d5 exd5 Qxd5 Nc3 "
+                "Qd6 {Moderne Variante: Die Dame steht auf d6 zentral, aber Lf4 oder Sb5 können sie später angreifen.} "
+                "d4 {Wieder zuerst das Zentrum.} "
+                "Nf6 "
+                "Nf3 {Entwickeln. Ein frühes Sb5 bringt noch nichts, weil Schwarz einfach …Dd8 spielt.} "
+                "a6 {Verhindert Sb5 und Lb5+.} "
+                "g3 {Der Läufer kommt nach g2 und zielt auf b7. Danach Lf4 mit Tempo gegen die Dame.}"
+            ),
+            "plan": "Lg2, O-O, Lf4 und Te1. Gegen …Lg4 hilft h3. Die Dame d6 bleibt ein Ziel für Lf4 und Se4.",
+        },
+        {
+            "id": "w-sc-qd8",
+            "name": "3…Dd8 4.d4 Sf6 5.Sf3 Lg4 6.h3 Lxf3 7.Dxf3 c6 8.Le3",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 d5 exd5 Qxd5 Nc3 "
+                "Qd8 {Der vorsichtigste Rückzug. Schwarz hat dafür viel Zeit verloren.} "
+                "d4 {Zentrum, dann entwickeln. Die schwarze Dame hat dreimal gezogen und steht wieder auf d8: Du bist klar voraus in der Entwicklung.} "
+                "Nf6 "
+                "Nf3 {Natürlich. Achte auf …Lg4 gegen den Springer.} "
+                "Bg4 "
+                "h3 {Frag den Läufer: Tausch oder Rückzug.} "
+                "Bxf3 "
+                "Qxf3 {Die Dame steht aktiv und zielt auf b7. Du hast das Läuferpaar.} "
+                "c6 "
+                "Be3 {Le3 und O-O-O: ein klarer Plan. Die d-Linie und das Läuferpaar gehören dir.}"
+            ),
+            "plan": "O-O-O, Ld3 und dann g4–g5 gegen den Springer f6. Mit dem Läuferpaar ist eine offene Stellung dein Freund.",
+        },
+        {
+            "id": "w-sc-qe5",
+            "name": "3…De5+ 4.Le2 Lg4 5.d4!",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 d5 exd5 Qxd5 Nc3 "
+                "Qe5+ {Schach, aber die Dame steht auf e5 sehr offen.} "
+                "Be2 {Decken mit Entwicklung. Der Läufer bereitet zugleich die Rochade vor.} "
+                "Bg4 {Schwarz will Le2 tauschen und deine Entwicklung stören.} "
+                "d4 {Mit Tempo gegen die Dame! Falle: Weicht sie nach a5 oder d6 aus, gewinnt 6.Lxg4 einen ganzen Läufer, denn g4 ist dann ungedeckt.}"
+            ),
+            "plan": "Nach 5…Lxe2 6.Sgxe2 rochierst du und spielst Lf4 oder Te1 mit Tempo gegen die Dame. Gegen 4…c6 einfach Sf3, d4 und O-O.",
+        },
+        {
+            "id": "w-sc-qe6",
+            "name": "3…De6+ 4.Le2 Sf6 5.d4",
+            "frequency": "selten",
+            "pgn": (
+                "e4 d5 exd5 Qxd5 Nc3 "
+                "Qe6+ {Seltener Rückzug mit Schach. Die Dame blockiert den Bauern e7 und den Läufer c8.} "
+                "Be2 {Decken mit Entwicklung, genau wie gegen …De5+.} "
+                "Nf6 "
+                "d4 {Zentrum. Gleich folgen Sf3, O-O und Te1 mit Druck auf der e-Linie gegen die Dame.}"
+            ),
+            "plan": "Sf3, O-O, Te1 und Lf4. Die Dame e6 steht auf der e-Linie, die du mit dem Turm besetzt.",
+        },
+        {
+            "id": "w-sc-nf6",
+            "name": "2…Sf6 3.d4 Sxd5 4.Sf3 g6 5.c4 Sb6 6.Sc3",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 d5 exd5 "
+                "Nf6 {Schwarz holt den Bauern später mit dem Springer zurück.} "
+                "d4 {Halte nicht krampfhaft am Bauern fest: d4 nimmt das Zentrum. Auf 3…Dxd5 4.Sc3 Da5 5.Sf3 landest du in der Hauptvariante.} "
+                "Nxd5 "
+                "Nf3 {Entwickeln. Danach vertreibt c4 den Springer d5.} "
+                "g6 "
+                "c4 {Raum mit Tempo: Der Springer muss nach b6 oder f6.} "
+                "Nb6 "
+                "Nc3 {Du hast ein großes Zentrum mit c4 und d4. Le3 und Le2 folgen.}"
+            ),
+            "plan": "Le3, Le2 und O-O, später d4–d5 mit noch mehr Raum. Schwarz drückt mit …Lg7 und …Sc6 auf d4: halte den Punkt mit Le3 und Sc3.",
+        },
+        {
+            "id": "w-sc-nf6-bg4",
+            "name": "2…Sf6 3.d4 Lg4 4.Le2",
+            "frequency": "selten",
+            "pgn": (
+                "e4 d5 exd5 Nf6 d4 "
+                "Bg4 {Schwarz entwickelt erst den Läufer und holt d5 später.} "
+                "Be2 {Tauschangebot. Nach 4…Lxe2 5.Dxe2 Dxd5 6.Sf3 bist du besser entwickelt.} "
+                "Bxe2 "
+                "Qxe2 {Mit der Dame zurück. Sie steht auf e2 gut und deckt c4 und e4.} "
+                "Qxd5 "
+                "Nf3 {Entwickeln und rochieren. Die schwarze Dame auf d5 wird von Sc3 angegriffen werden.}"
+            ),
+            "plan": "O-O, c4 mit Tempo gegen die Dame, Sc3 und Td1. Du hast mehr Raum und schnellere Entwicklung.",
+        },
+    ],
+})
+
+# ---------------------------------------------------------------- Sizilianisch: Alapin
+CHAPTERS.append({
+    "id": "w-alapin",
+    "group": SEMI_GROUP,
+    "title": "Sizilianisch: Alapin 2.c3",
+    "priority": 1,
+    "intro": (
+        "Gegen 1…c5 spielst du 2.c3 und danach d4. So vermeidest du die riesige Theorie des offenen Sizilianers "
+        "und bekommst ein klares Zentrum. Nach …cxd4 schlägst du mit dem c-Bauern zurück. "
+        "Typisch sind ein isolierter Bauer d4 (mit aktiven Figuren) oder ein Vorstoß e4–e5 mit Raumvorteil."
+    ),
+    "ideas": [
+        "2.c3 bereitet d4 vor: Nach …cxd4 cxd4 hast du zwei Bauern im Zentrum.",
+        "Gegen 2…d5 und 2…Dxd5 geht Sc3 nicht mit Tempo (c3 ist besetzt). Darum zuerst d4, Sf3 und Le2.",
+        "Mit dem isolierten Bauern d4 gilt: Figuren aktiv (Ld3, Te1, Se5), Angriff am Königsflügel, Figurentausch vermeiden.",
+    ],
+    "lines": [
+        {
+            "id": "w-al-d5",
+            "name": "2…d5 3.exd5 Dxd5 4.d4 Sf6 5.Sf3 e6 6.Le2 Sc6 7.O-O cxd4 8.cxd4",
+            "frequency": "häufig",
+            "pgn": (
+                "e4 "
+                "c5 {Sizilianisch: Schwarz kontrolliert d4 von der Seite.} "
+                "c3 {Alapin: c3 bereitet d4 vor. Nach …cxd4 schlägst du mit dem c-Bauern zurück und hast zwei Zentrumsbauern.} "
+                "d5 {Die direkteste Antwort: Schwarz greift e4 sofort an.} "
+                "exd5 {Nimm. Den Bauern e4 kannst du nicht gut halten.} "
+                "Qxd5 "
+                "d4 {Zentrum. Die Dame auf d5 lässt sich hier nicht mit Sc3 angreifen, weil c3 besetzt ist.} "
+                "Nf6 "
+                "Nf3 {Entwickeln. Achte auf …Lg4 gegen den Springer.} "
+                "e6 "
+                "Be2 {Le2 ist bescheiden, aber sicher: Kein Schach auf der Diagonale, die Rochade ist vorbereitet.} "
+                "Nc6 "
+                "O-O {König in Sicherheit. Jetzt kann Schwarz auf d4 tauschen.} "
+                "cxd4 "
+                "cxd4 {Isolierter Bauer d4: Er gibt dir Raum und die Felder e5 und c5 für deine Figuren.}"
+            ),
+            "plan": "Sc3 mit Tempo gegen die Dame, Le3, Tc1 und Se5. Mit dem Bauern d4 spielst du aktiv auf Angriff, nicht auf Figurentausch.",
+        },
+        {
+            "id": "w-al-nf6",
+            "name": "2…Sf6 3.e5 Sd5 4.d4 cxd4 5.Sf3 Sc6 6.Lc4 Sb6 7.Lb3",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 c5 c3 "
+                "Nf6 {Greift e4 an. Weil c3 den Springer c3 verhindert, kann e4 nicht von dort gedeckt werden.} "
+                "e5 {Vorstoß mit Tempo: Der Springer muss nach d5.} "
+                "Nd5 "
+                "d4 {Zentrum. Nach …cxd4 musst du nicht sofort zurückschlagen.} "
+                "cxd4 "
+                "Nf3 {Erst entwickeln, d4 holst du später mit cxd4 oder Sxd4 zurück.} "
+                "Nc6 "
+                "Bc4 {Greift den Springer d5 an.} "
+                "Nb6 "
+                "Bb3 {Der Läufer bleibt auf der Diagonale a2–g8 und zielt weiter auf f7.}"
+            ),
+            "plan": "cxd4, O-O und Sc3. Dein Bauer e5 nimmt Schwarz Raum. Wenn Schwarz …d6 spielt, tauschst du mit exd6 nur, wenn deine Figuren dadurch aktiver werden.",
+        },
+        {
+            "id": "w-al-e6",
+            "name": "2…e6 3.d4 d5 4.e5 (Zugumstellung zum Französischen)",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 c5 c3 "
+                "e6 {Bereitet …d5 vor.} "
+                "d4 {Zentrum, wie immer im Alapin.} "
+                "d5 "
+                "e5 {Vorstoß! Diese Stellung kennst du aus dem Französisch-Kapitel: 1.e4 e6 2.d4 d5 3.e5 c5 4.c3.}"
+            ),
+            "plan": "Weiter mit Sf3, Le2 und O-O wie im Französisch-Kapitel. Dein Bauer e5 gibt dir Raum am Königsflügel.",
+        },
+        {
+            "id": "w-al-d6",
+            "name": "2…d6 3.d4 Sf6 4.Ld3",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 c5 c3 "
+                "d6 {Ruhig: Schwarz will …Sf6 gegen e4 spielen.} "
+                "d4 {Zentrum. Schwarz hat …d5 nicht gespielt, also bleibt dein Bauernduo stehen.} "
+                "Nf6 {Greift e4 an.} "
+                "Bd3 {Deckt e4 mit Entwicklung. Danach Se2 oder Sf3, h3 und O-O.}"
+            ),
+            "plan": "h3 (gegen …Lg4 und …Sg4), Sf3 und O-O. Nach …cxd4 cxd4 hast du das ideale Zentrum d4 und e4.",
+        },
+        {
+            "id": "w-al-nc6",
+            "name": "2…Sc6 3.d4 cxd4 4.cxd4 d5 5.exd5 Dxd5 6.Sf3",
+            "frequency": "mittel",
+            "pgn": (
+                "e4 c5 c3 "
+                "Nc6 {Natürlich: Schwarz drückt gegen d4.} "
+                "d4 {Trotzdem d4. Auf 3…d5 nimmst du 4.exd5 Dxd5 und spielst 5.Sf3.} "
+                "cxd4 "
+                "cxd4 {Jetzt hast du zwei Zentrumsbauern.} "
+                "d5 "
+                "exd5 {Tauschen. Die Dame muss zurückschlagen und wird gleich angegriffen.} "
+                "Qxd5 "
+                "Nf3 {Entwickeln, dann Sc3 mit Tempo gegen die Dame. Auch auf 6…Lg4 kommt 7.Sc3.}"
+            ),
+            "plan": "Sc3, Le2 und O-O. Du spielst wieder mit dem isolierten Bauern d4: aktive Figuren und Druck gegen den Königsflügel.",
+        },
+        {
+            "id": "w-al-g6",
+            "name": "2…g6 3.d4 cxd4 4.cxd4 d5 5.e5",
+            "frequency": "selten",
+            "pgn": (
+                "e4 c5 c3 "
+                "g6 {Schwarz will den Läufer nach g7 stellen.} "
+                "d4 {Zentrum. Das zielt direkt gegen die lange Diagonale.} "
+                "cxd4 "
+                "cxd4 {Mit dem c-Bauern zurück: Jetzt stehen d4 und e4 nebeneinander.} "
+                "d5 "
+                "e5 {Schließt die Diagonale des Läufers g7 und gewinnt Raum. Danach Sc3, Sf3 und Lb5+ oder Le2.}"
+            ),
+            "plan": "Sf3, Sc3, Le2 und O-O. Schwarz greift mit …Sc6 und …Lg4 d4 an: Halte ihn mit Le3 und Sc3.",
+        },
+    ],
+})
