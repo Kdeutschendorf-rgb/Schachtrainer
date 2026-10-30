@@ -1,0 +1,36 @@
+/* Vorausdenken (views/vision.js) */
+.vision-head { margin-bottom: 16px; }
+.vision-head p { max-width: 760px; }
+.vision-grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+.vision-card { display: flex; flex-direction: column; gap: 8px; }
+.vision-card h3 { margin: 0; }
+.vision-card p { margin: 0; }
+.vision-tip { margin-top: 16px; }
+
+.vision-title { margin: 0; font-size: 1.1rem; }
+.vision-timer .timer { margin-left: 8px; }
+.vision-prompt { display: flex; flex-direction: column; gap: 6px; }
+.vision-body { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+.vision-body:empty { display: none; }
+.vision-controls:empty, .vision-feedback:empty { display: none; }
+.vision-nav { margin-top: 4px; }
+
+/* Blind rechnen: Züge erscheinen nacheinander */
+.vision-line { font-size: 1.15rem; line-height: 1.9; }
+.vision-mv { opacity: 0; transition: opacity .25s; padding: 1px 3px; border-radius: 4px; }
+.vision-mv.on { opacity: 1; }
+.vision-mv.on:last-of-type { background: var(--panel-2); }
+.vision-after:empty { display: none; }
+
+/* Schach & Schlagen */
+.vision-counter { font-size: 1.3rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.vision-found { display: flex; flex-wrap: wrap; gap: 6px; }
+.vision-found .pill { font-size: .9rem; color: var(--text); }
+.vision-found .pill.check { border-color: var(--info); color: var(--info); }
+
+/* Ungedeckte Figuren: Auflösung */
+.vision-loose { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+.vision-loose li.hit strong { color: var(--accent); }
+.vision-loose li.miss strong { color: var(--bad); }
+
+.vision-summary { max-width: 520px; }

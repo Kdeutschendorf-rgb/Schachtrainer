@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Schachtrainer</title>
+  <link rel="stylesheet" href="vendor/chessground.base.css">
+  <link rel="stylesheet" href="vendor/chessground.brown.css">
+  <link rel="stylesheet" href="vendor/chessground.cburnett.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#/heute">♞ Schachtrainer</a>
+    <nav id="nav">
+      <a href="#/heute" data-route="heute">Heute</a>
+      <a href="#/eroeffnungen" data-route="eroeffnungen">Eröffnungen</a>
+      <a href="#/taktik" data-route="taktik">Taktik</a>
+      <a href="#/rechnen" data-route="rechnen">Vorausdenken</a>
+      <a href="#/endspiele" data-route="endspiele">Endspiele</a>
+      <a href="#/bericht" data-route="bericht">Bericht</a>
+    </nav>
+    <span id="streak" class="streak" title="Tage in Folge trainiert"></span>
+  </header>
+  <main id="view"></main>
+  <div id="toasts"></div>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

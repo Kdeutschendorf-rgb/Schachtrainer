@@ -1,0 +1,12 @@
+[
+ {"id":"italian-giuoco","name":"Italienisch: Giuoco Piano","nameEn":"Italian Game: Giuoco Piano","eco":"C50","family":"Italienisch","level":1,
+  "moves":["e4","e5","Nf3","Nc6","Bc4","Bc5"],"ideas":"Schnelle Entwicklung, Druck auf f7.","white":"c3 und d4.","black":"Sf6, d6, kurz rochieren.",
+  "trap":{"moves":["e4","e5","Nf3","Nc6","Bc4","Nd4","Nxe5","Qg5","Nxf7","Qxg2","Rf1","Qxe4+","Be2","Nf3#"],"text":"Blackburne-Schilling-Falle: Nach 4.Sxe5?? Dg5 bricht Schwarz durch."},
+  "inRepertoire":true},
+ {"id":"sicilian-najdorf","name":"Sizilianisch: Najdorf-Variante","nameEn":"Sicilian Defense: Najdorf Variation","eco":"B90","family":"Sizilianisch","level":2,
+  "moves":["e4","c5","Nf3","d6","d4","cxd4","Nxd4","Nf6","Nc3","a6"],"ideas":"a6 kontrolliert b5.","white":"Le3, f3, Dd2.","black":"e5 oder e6, b5.","trap":null,"inRepertoire":false},
+ {"id":"french-advance","name":"Französisch: Vorstoßvariante","nameEn":"French Defense: Advance Variation","eco":"C02","family":"Französisch","level":1,
+  "moves":["e4","e6","d4","d5","e5"],"ideas":"Raum am Königsflügel.","white":"c3, Sf3, Ld3.","black":"c5, Sc6, Db6.","trap":null,"inRepertoire":true},
+ {"id":"qgd","name":"Damengambit abgelehnt","nameEn":"Queen's Gambit Declined","eco":"D30","family":"Damengambit","level":1,
+  "moves":["d4","d5","c4","e6"],"ideas":"Solides Zentrum.","white":"Sc3, Lg5, e3.","black":"Sf6, Le7, O-O.","trap":null,"inRepertoire":true}
+]

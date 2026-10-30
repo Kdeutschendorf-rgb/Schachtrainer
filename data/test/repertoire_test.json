@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "side": "w",
+  "chapters": [
+    {
+      "id": "t-italian", "side": "w", "group": "Weiß: 1.e4 e5", "title": "Italienisch (Test)", "priority": 1,
+      "intro": "Testkapitel.", "ideas": ["d3 und c3", "Kurz rochieren"],
+      "lines": [
+        { "id": "t-it-main", "name": "3...Lc5 4.c3", "frequency": "häufig",
+          "moves": ["e4","e5","Nf3","Nc6","Bc4","Bc5","c3","Nf6","d3","d6","O-O","O-O"],
+          "notes": {"2": "Sf3 greift e5 an.", "4": "Lc4 zielt auf f7.", "6": "c3 bereitet d4 vor."}, "plan": "Re1, Sbd2-f1-g3." },
+        { "id": "t-it-2nf6", "name": "3...Sf6 4.d3", "frequency": "mittel",
+          "moves": ["e4","e5","Nf3","Nc6","Bc4","Nf6","d3","Be7","O-O"],
+          "notes": {"6": "d3 deckt e4."}, "plan": "c3, Re1." },
+        { "id": "t-it-trap", "name": "3...Sd4 Falle", "frequency": "selten",
+          "moves": ["e4","e5","Nf3","Nc6","Bc4","Nd4","Nxd4","exd4","c3"],
+          "notes": {"5": "Falle! Nicht 4.Sxe5?? Dg5.", "6": "Sxd4 ist einfach und gut."}, "plan": "" },
+        { "id": "t-broken", "name": "kaputt", "frequency": "selten", "moves": ["e4","e5","Ke3"], "notes": {}, "plan": "" }
+      ]
+    },
+    {
+      "id": "t-scandi", "side": "w", "group": "Weiß: 1.e4 sonstige", "title": "Skandinavisch (Test)", "priority": 2,
+      "intro": "", "ideas": [],
+      "lines": [
+        { "id": "t-sc-main", "name": "2...Dxd5 3.Sc3", "frequency": "häufig",
+          "moves": ["e4","d5","exd5","Qxd5","Nc3","Qa5","d4","Nf6","Nf3"], "notes": {"4": "Sc3 mit Tempo."}, "plan": "" }
+      ]
+    }
+  ]
+}

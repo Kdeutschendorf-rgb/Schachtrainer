@@ -1,0 +1,19 @@
+/* Endspiele (views/endgames.js) */
+.eg-head { margin-bottom: 12px; }
+.eg-head p { max-width: 760px; }
+.eg-group { margin-top: 20px; }
+.eg-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+.eg-card { color: var(--text); text-decoration: none; display: flex; flex-direction: column; gap: 8px; transition: border-color .15s; }
+.eg-card:hover { border-color: var(--muted); }
+.pill.eg-win { color: var(--accent); border-color: var(--accent-2); }
+.pill.eg-draw { color: var(--info); border-color: var(--info); }
+
+.eg-title { margin: 0; font-size: 1.1rem; }
+.eg-goal { display: flex; gap: 6px; align-items: baseline; flex-wrap: wrap; }
+.eg-intro { margin: 10px 0; }
+.eg-moves { margin-top: 6px; min-height: 1.7em; }
+.eg-hints { display: flex; flex-direction: column; gap: 8px; }
+.eg-hints:empty, .eg-feedback:empty, .eg-after:empty { display: none; }
+.eg-technique h3 { margin-bottom: .3em; }
+.eg-technique p { margin: 0 0 .5em; }
+.eg-summary { max-width: 520px; }

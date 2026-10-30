@@ -1,0 +1,71 @@
+/* Heute: Startseite mit Tagesplan und Trainingsablauf */
+.td-root { display: flex; flex-direction: column; gap: 16px; }
+
+/* Kopf: Begrüßung + Rapid-Elo */
+.td-hero { display: grid; grid-template-columns: 1fr minmax(240px, 320px); gap: 24px; align-items: center; }
+.td-hello h1 { font-size: 1.7rem; margin-bottom: 2px; }
+.td-streak { margin-top: 10px; color: var(--warn); font-weight: 600; }
+.td-done { margin-top: 6px; color: var(--accent); }
+.td-elo { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; background: var(--panel-2); border-radius: 8px; }
+.td-elo-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+@media (max-width: 700px) { .td-hero { grid-template-columns: 1fr; } }
+
+/* Plan */
+.td-plan h2 { margin: 0; }
+.td-link { background: none; border: none; color: var(--info); padding: 4px 6px; }
+.td-link:hover { text-decoration: underline; }
+.td-blocks { list-style: none; margin: 14px 0 6px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.td-block { display: grid; grid-template-columns: 28px 28px 1fr auto; gap: 10px; align-items: center; padding: 10px 12px; background: var(--panel-2); border-radius: 8px; }
+.td-num { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--bg); color: var(--muted); font-size: .8rem; font-weight: 700; }
+.td-icon { font-size: 1.2rem; text-align: center; }
+.td-block-title { font-weight: 600; }
+.td-min { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--accent); white-space: nowrap; }
+.td-notes { margin: 8px 0 0; padding-left: 18px; }
+.td-start-row { display: flex; align-items: center; gap: 14px; margin-top: 14px; flex-wrap: wrap; }
+.td-start { font-size: 1.15rem; padding: 14px 32px; border-radius: 10px; }
+
+/* Einstellungen */
+.td-settings { display: flex; flex-direction: column; gap: 12px; }
+.td-settings h2 { margin: 0; }
+.td-settings-grid { display: flex; flex-wrap: wrap; gap: 16px; }
+.td-settings-grid label { display: flex; flex-direction: column; gap: 4px; font-size: .9rem; color: var(--muted); }
+.td-settings-grid input { width: 120px; }
+.td-check { display: flex; gap: 8px; align-items: center; cursor: pointer; }
+.td-weights { display: flex; flex-wrap: wrap; gap: 10px; }
+.td-weight { display: flex; flex-direction: column; gap: 4px; font-size: .85rem; color: var(--muted); }
+.td-weight input { width: 90px; }
+
+/* Woche + Tipp */
+.td-grid { display: grid; grid-template-columns: minmax(260px, 1fr) 2fr; gap: 16px; }
+@media (max-width: 800px) { .td-grid { grid-template-columns: 1fr; } }
+.td-week h3 { margin: 0; }
+.td-week-bars { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 10px; }
+.td-day { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.td-bar-box { width: 100%; max-width: 26px; height: 64px; background: var(--panel-2); border-radius: 4px; display: flex; align-items: flex-end; overflow: hidden; }
+.td-bar { width: 100%; background: var(--accent-2); border-radius: 4px 4px 0 0; min-height: 0; }
+.td-bar.full { background: var(--accent); }
+.td-tip { display: flex; flex-direction: column; gap: 6px; border-left: 4px solid var(--info); }
+
+/* Frei trainieren */
+.td-free h3 { margin-bottom: 8px; }
+.td-free-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+.td-free-link { color: var(--text); text-decoration: none; }
+.td-free-link:hover { border-color: var(--muted); }
+
+/* Laufendes Training */
+.td-run-head { display: flex; flex-direction: column; gap: 10px; position: sticky; top: 52px; z-index: 5; }
+.td-run-title { margin: 0; }
+.td-time { font-variant-numeric: tabular-nums; }
+.td-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.td-step { font-size: .82rem; padding: 3px 10px; border-radius: 999px; background: var(--panel-2); border: 1px solid var(--line); color: var(--muted); }
+.td-step.cur { color: var(--text); border-color: var(--accent); }
+.td-step.done { color: var(--accent); border-color: var(--accent-2); }
+.td-stage { min-height: 200px; }
+.td-pause { text-align: center; padding: 40px 16px; }
+
+/* Tageszusammenfassung */
+.td-summary h1 { margin-bottom: 14px; }
+.td-sum-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; margin-bottom: 14px; }
+.td-sum-stats > div { background: var(--panel-2); border-radius: 8px; padding: 10px 12px; }
+.td-sum-table { width: 100%; border-collapse: collapse; }
+.td-sum-table td { padding: 6px 8px; border-top: 1px solid var(--line); }

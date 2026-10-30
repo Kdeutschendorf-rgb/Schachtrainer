@@ -1,0 +1,81 @@
+{
+ "version": 1,
+ "side": "b",
+ "chapters": [
+  {
+   "id": "tb-qgd",
+   "group": "Schwarz: 1.d4",
+   "title": "Damengambit abgelehnt (Test)",
+   "priority": 1,
+   "intro": "",
+   "ideas": [],
+   "lines": [
+    {
+     "id": "tb-qgd-1",
+     "name": "2.c4 e6 3.Sc3",
+     "frequency": "häufig",
+     "moves": [
+      "d4",
+      "d5",
+      "c4",
+      "e6",
+      "Nc3",
+      "Nf6"
+     ],
+     "notes": {
+      "1": "d5",
+      "3": "e6"
+     },
+     "plan": ""
+    },
+    {
+     "id": "tb-qgd-2",
+     "name": "3.Sf3",
+     "frequency": "mittel",
+     "moves": [
+      "d4",
+      "d5",
+      "c4",
+      "e6",
+      "Nf3",
+      "Nf6",
+      "Nc3",
+      "Be7"
+     ],
+     "notes": {},
+     "plan": ""
+    },
+    {
+     "id": "tb-qgd-3",
+     "name": "2.Sf3 (Zugumstellung)",
+     "frequency": "mittel",
+     "moves": [
+      "d4",
+      "d5",
+      "Nf3",
+      "e6",
+      "c4",
+      "Nf6",
+      "Nc3",
+      "Be7"
+     ],
+     "notes": {},
+     "plan": ""
+    },
+    {
+     "id": "tb-qgd-x",
+     "name": "Widerspruch",
+     "frequency": "selten",
+     "moves": [
+      "d4",
+      "d5",
+      "c4",
+      "c6"
+     ],
+     "notes": {},
+     "plan": ""
+    }
+   ]
+  }
+ ]
+}

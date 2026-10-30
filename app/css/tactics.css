@@ -1,0 +1,88 @@
+/* Modul 5: Taktik */
+
+.tk-trainer [hidden], .tk-view [hidden] { display: none !important; }
+
+/* Modus-Leiste */
+.tk-modes { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; margin-bottom: 6px; }
+.tk-modes a { color: var(--muted); text-decoration: none; padding: 6px 12px; border-radius: 8px; border: 1px solid transparent; }
+.tk-modes a:hover { color: var(--text); background: var(--panel-2); }
+.tk-modes a.active { color: var(--text); background: var(--panel-2); border-color: var(--line); box-shadow: inset 0 -2px 0 var(--accent); }
+.tk-badge { display: inline-block; min-width: 18px; margin-left: 6px; padding: 0 5px; border-radius: 999px; background: var(--warn); color: #1d1f21; font-size: .75rem; font-weight: 700; text-align: center; }
+.tk-intro { margin: 0 0 14px; }
+.tk-rating { font-variant-numeric: tabular-nums; color: var(--text); }
+
+/* Seitenleiste */
+.tk-side { min-width: 0; }
+.tk-turn { display: flex; align-items: center; gap: 8px; font-size: 1.15rem; font-weight: 600; margin-bottom: 6px; }
+.tk-turn::before { content: ''; width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--muted); }
+.tk-turn.w::before { background: #f4f1ea; }
+.tk-turn.b::before { background: #111; }
+.tk-context { margin-bottom: 8px; }
+.tk-own { padding: 8px 10px; border-radius: 8px; background: var(--panel-2); border-left: 4px solid var(--warn); }
+.tk-feedback { min-height: 44px; }
+.tk-feedback .feedback { animation: tk-pop .18s ease-out; }
+.tk-controls { margin-top: 10px; }
+
+/* Auswertung */
+.tk-result { display: flex; flex-direction: column; gap: 10px; }
+.tk-verdict { font-size: 1.5rem; font-weight: 700; animation: tk-pop .2s ease-out; }
+.tk-verdict.good { color: var(--accent); }
+.tk-verdict.bad { color: var(--bad); }
+.tk-result-line { display: flex; flex-direction: column; gap: 4px; }
+.tk-meta { display: flex; flex-direction: column; gap: 6px; }
+.tk-themes .pill { cursor: help; }
+.tk-replay { display: flex; flex-direction: column; gap: 6px; }
+.tk-nav { padding: 4px 12px; }
+.tk-moves { word-break: break-word; }
+.tk-analysis:empty { display: none; }
+.tk-analysis { padding: 8px 10px; background: var(--panel-2); border-radius: 8px; }
+.tk-key { border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; }
+.tk-next { min-width: 110px; }
+
+@keyframes tk-pop { from { transform: scale(.96); opacity: .4; } to { transform: none; opacity: 1; } }
+
+/* Block im Tagesplan und Rush */
+.tk-block-head .timer, .tk-rush-head .timer { font-size: 1.4rem; }
+.tk-note:empty { display: none; }
+.tk-note { display: block; margin-top: 6px; color: var(--warn); }
+.tk-rush-start { max-width: 560px; }
+.tk-rush-head .stat { margin-right: 6px; }
+.tk-lives { color: var(--bad); font-size: 1.3rem; letter-spacing: 2px; margin-right: 8px; }
+.tk-rush-list { display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0; }
+.tk-rush-list a.pill { text-decoration: none; }
+.tk-rush .tk-feedback { min-height: 0; }
+
+/* Leere Zustände */
+.tk-empty { max-width: 620px; }
+
+/* Themenauswahl */
+.tk-group { margin: 18px 0 8px; color: var(--muted); font-size: .95rem; text-transform: uppercase; letter-spacing: .04em; }
+.tk-theme-grid { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+.tk-theme { color: var(--text); text-decoration: none; transition: border-color .15s; }
+.tk-theme:hover { border-color: var(--accent); }
+.tk-theme.weak { border-left: 4px solid var(--bad); }
+.tk-theme-name { font-weight: 600; }
+
+/* Statistik */
+.tk-tiles { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); margin-bottom: 12px; }
+.tk-tile .stat { font-variant-numeric: tabular-nums; }
+.tk-body > .card + .card { margin-top: 12px; }
+.tk-chart { width: 100%; height: auto; display: block; }
+.tk-chart .grid { stroke: var(--line); stroke-width: 1; }
+.tk-chart .lbl { fill: var(--muted); font-size: 11px; }
+.tk-chart .line { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; }
+.tk-chart .area { fill: var(--accent); opacity: .12; }
+.tk-chart .dot { fill: var(--accent); }
+.tk-theme-cols { display: grid; gap: 20px; grid-template-columns: 1fr 1fr; }
+@media (max-width: 700px) { .tk-theme-cols { grid-template-columns: 1fr; } }
+.tk-theme-cols h4 { margin: 0 0 8px; font-weight: 600; }
+.tk-theme-row { display: grid; grid-template-columns: minmax(110px, 1fr) 2fr auto; gap: 10px; align-items: center; padding: 3px 0; }
+.tk-theme-row a { color: var(--text); text-decoration: none; }
+.tk-theme-row a:hover { color: var(--accent); }
+.tk-bar { height: 8px; background: var(--panel-2); border-radius: 999px; overflow: hidden; }
+.tk-bar > span { display: block; height: 100%; }
+.tk-bar.good > span { background: var(--accent); }
+.tk-bar.warn > span { background: var(--warn); }
+.tk-bar.bad > span { background: var(--bad); }
+.tk-all { margin-top: 12px; }
+.tk-all summary { cursor: pointer; color: var(--muted); margin-bottom: 6px; }

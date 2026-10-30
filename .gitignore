@@ -1,0 +1,6 @@
+.venv/
+data/raw/*.zst
+tools/
+data/backups/
+__pycache__/
+*.log
