@@ -1943,6 +1943,774 @@
      "plan": "Sf3, Sc3, Le2 und O-O. Schwarz greift mit …Sc6 und …Lg4 d4 an: Halte ihn mit Le3 und Sc3."
     }
    ]
+  },
+  {
+   "id": "w-french-advance",
+   "side": "w",
+   "group": "Weiß: Halboffene Eröffnungen",
+   "title": "Französisch: Vorstoßvariante 3.e5",
+   "priority": 1,
+   "intro": "Gegen 1…e6 spielst du 2.d4 d5 3.e5, die Vorstoßvariante. Der Bauer e5 nimmt Schwarz Raum am Königsflügel: Der Springer g8 bekommt das Feld f6 nicht, und der Läufer c8 steckt hinter seinen eigenen Bauern. Schwarz greift deine Bauernkette fast immer mit …c5, …Sc6 und …Db6 an. Du stützt d4 mit c3 und Sf3 und gewinnst mit a3 und b4 Raum am Damenflügel. Wenig Theorie, klare Pläne und ein schwarzer Läufer, der lange schlecht bleibt.",
+   "ideas": [
+    "Die Kette c3–d4–e5 ist dein Rückgrat: d4 immer ausreichend decken (c3, Sf3, notfalls Le3).",
+    "a3 und b4 gewinnen Raum am Damenflügel. Nach …c4 spielst du Sbd2, Le2, O-O und später b3.",
+    "Der Läufer f1 gehört meist nach e2: So bleibt die d-Linie für deine Dame offen und d4 gedeckt.",
+    "Gegen …cxd4 nimmst du mit cxd4 zurück und behältst die Kette d4–e5."
+   ],
+   "lines": [
+    {
+     "id": "w-fr-main",
+     "name": "3…c5 4.c3 Sc6 5.Sf3 Db6 6.a3 c4 7.Sbd2",
+     "frequency": "häufig",
+     "moves": [
+      "e4",
+      "e6",
+      "d4",
+      "d5",
+      "e5",
+      "c5",
+      "c3",
+      "Nc6",
+      "Nf3",
+      "Qb6",
+      "a3",
+      "c4",
+      "Nbd2"
+     ],
+     "notes": {
+      "0": "Der Königsbauer besetzt das Zentrum und öffnet Dame und Läufer f1 den Weg.",
+      "1": "Französisch: Schwarz bereitet …d5 vor.",
+      "2": "Das ganze Zentrum: Bauern auf e4 und d4.",
+      "3": "Schwarz greift e4 an.",
+      "4": "Vorstoß: Du gewinnst Raum am Königsflügel. Der Springer g8 kann nicht nach f6, und der Läufer c8 bleibt hinter e6 eingesperrt.",
+      "5": "Der typische Gegenangriff auf d4, die Spitze deiner Bauernkette.",
+      "6": "c3 stützt d4. Nach …cxd4 nimmst du mit dem Bauern zurück und behältst die Kette.",
+      "7": "Zweiter Angriff auf d4.",
+      "8": "Sf3 deckt d4 zum zweiten Mal und hält e5 fest.",
+      "9": "Dritter Angriff auf d4, dazu Druck auf b2.",
+      "10": "a3 bereitet b4 vor: Raum am Damenflügel. Außerdem nimmt a3 den schwarzen Figuren das Feld b4.",
+      "11": "Schwarz schließt den Damenflügel und verhindert b4. Dafür ist der Druck auf d4 weg.",
+      "12": "Sbd2 entwickelt und kontrolliert b3 und c4: Ein Springer auf b3 wäre sofort weg. Danach Le2, O-O und Tb1."
+     },
+     "plan": "Le2, O-O, Tb1 und b3: Damit stellst du den Bauern c4 in Frage und öffnest Linien am Damenflügel. Schwarz hat wenig Raum, und sein Läufer c8 bleibt schlecht."
+    },
+    {
+     "id": "w-fr-bd7",
+     "name": "5…Db6 6.a3 Ld7 7.b4 cxd4 8.cxd4",
+     "frequency": "mittel",
+     "moves": [
+      "e4",
+      "e6",
+      "d4",
+      "d5",
+      "e5",
+      "c5",
+      "c3",
+      "Nc6",
+      "Nf3",
+      "Qb6",
+      "a3",
+      "Bd7",
+      "b4",
+      "cxd4",
+      "cxd4"
+     ],
+     "notes": {
+      "0": "Der Königsbauer besetzt das Zentrum und öffnet Dame und Läufer f1 den Weg.",
+      "1": "Französisch: Schwarz bereitet …d5 vor.",
+      "2": "Das ganze Zentrum: Bauern auf e4 und d4.",
+      "3": "Schwarz greift e4 an.",
+      "4": "Vorstoß: Du gewinnst Raum am Königsflügel. Der Springer g8 kann nicht nach f6, und der Läufer c8 bleibt hinter e6 eingesperrt.",
+      "5": "Der typische Gegenangriff auf d4, die Spitze deiner Bauernkette.",
+      "6": "c3 stützt d4. Nach …cxd4 nimmst du mit dem Bauern zurück und behältst die Kette.",
+      "7": "Zweiter Angriff auf d4.",
+      "8": "Sf3 deckt d4 zum zweiten Mal und hält e5 fest.",
+      "9": "Dritter Angriff auf d4, dazu Druck auf b2.",
+      "10": "a3 bereitet b4 vor: Raum am Damenflügel. Außerdem nimmt a3 den schwarzen Figuren das Feld b4.",
+      "11": "Schwarz entwickelt den Läufer und bereitet …Tc8 vor.",
+      "12": "Jetzt passt b4: Raum am Damenflügel, und der Bauer schirmt b2 gegen die Dame b6 ab.",
+      "14": "Mit dem Bauern zurück, die Kette d4–e5 bleibt stehen. Falle: 8…Sxb4? 9.axb4 Lxb4+ 10.Ld2, und Schwarz hat nur zwei Bauern für die Figur."
+     },
+     "plan": "Lb2 deckt d4 ein weiteres Mal, dann Ld3, O-O und Sbd2. Schwarz drückt mit …Tc8 und …Sa5–c4 auf die c-Linie: Halte c4 mit Sbd2 unter Kontrolle."
+    },
+    {
+     "id": "w-fr-3bd7",
+     "name": "3…Ld7 4.Sf3 c5 5.c3 Sc6 6.Le2 Sge7 7.O-O",
+     "frequency": "selten",
+     "moves": [
+      "e4",
+      "e6",
+      "d4",
+      "d5",
+      "e5",
+      "Bd7",
+      "Nf3",
+      "c5",
+      "c3",
+      "Nc6",
+      "Be2",
+      "Nge7",
+      "O-O"
+     ],
+     "notes": {
+      "0": "Der Königsbauer besetzt das Zentrum und öffnet Dame und Läufer f1 den Weg.",
+      "1": "Französisch: Schwarz bereitet …d5 vor.",
+      "2": "Das ganze Zentrum: Bauern auf e4 und d4.",
+      "3": "Schwarz greift e4 an.",
+      "4": "Vorstoß: Du gewinnst Raum am Königsflügel. Der Springer g8 kann nicht nach f6, und der Läufer c8 bleibt hinter e6 eingesperrt.",
+      "5": "Schwarz will den schlechten Läufer über b5 oder a4 loswerden.",
+      "6": "Einfach entwickeln: Sf3 deckt d4 und e5.",
+      "8": "Wie gewohnt stützt c3 die Spitze d4.",
+      "10": "Le2 hält die d-Linie für deine Dame offen, und die Rochade ist frei.",
+      "11": "Der Springer will nach f5 oder g6 und Druck auf d4 und e5 machen.",
+      "12": "König in Sicherheit. Danach deckt Le3 den Bauern d4 noch einmal."
+     },
+     "plan": "Le3, Sbd2 und a3. Gegen …Sg6 oder …Sf5 hältst du e5 und d4 mit Le3 und Te1. Die Engine sieht Weiß leicht besser, weil Schwarz wenig Raum hat."
+    },
+    {
+     "id": "w-fr-3b6",
+     "name": "3…b6 4.c3 Dd7 5.Sf3 La6 6.Lxa6 Sxa6 7.O-O",
+     "frequency": "selten",
+     "moves": [
+      "e4",
+      "e6",
+      "d4",
+      "d5",
+      "e5",
+      "b6",
+      "c3",
+      "Qd7",
+      "Nf3",
+      "Ba6",
+      "Bxa6",
+      "Nxa6",
+      "O-O"
+     ],
+     "notes": {
+      "0": "Der Königsbauer besetzt das Zentrum und öffnet Dame und Läufer f1 den Weg.",
+      "1": "Französisch: Schwarz bereitet …d5 vor.",
+      "2": "Das ganze Zentrum: Bauern auf e4 und d4.",
+      "3": "Schwarz greift e4 an.",
+      "4": "Vorstoß: Du gewinnst Raum am Königsflügel. Der Springer g8 kann nicht nach f6, und der Läufer c8 bleibt hinter e6 eingesperrt.",
+      "5": "Schwarz will mit …La6 seinen schlechten Läufer gegen deinen guten Läufer f1 tauschen.",
+      "6": "c3 stützt die Kette, bevor Schwarz mit …c5 angreift. Kommt sofort 4…La6, folgt 5.Lxa6 Sxa6 6.Da4+ mit Gabel: Dxa6 gewinnt den Springer.",
+      "7": "Die Dame verhindert die Gabel auf a4. Jetzt ist …La6 vorbereitet.",
+      "8": "Sf3 entwickelt und deckt d4.",
+      "10": "Den Tausch nimmst du an: Danach steht der schwarze Springer am Rand.",
+      "12": "Rochade. Danach greift De2 sofort den Springer a6 an."
+     },
+     "plan": "De2, Sbd2 und a4. Der Springer a6 braucht Zeit (…Sb8 und …Sc6), und du hast mehr Raum. Die Engine sieht Weiß klar besser."
+    },
+    {
+     "id": "w-fr-2c5",
+     "name": "2…c5 3.d5 exd5 4.exd5 d6 5.Sc3 Sf6 6.Sf3 Le7 7.Ld3",
+     "frequency": "mittel",
+     "moves": [
+      "e4",
+      "e6",
+      "d4",
+      "c5",
+      "d5",
+      "exd5",
+      "exd5",
+      "d6",
+      "Nc3",
+      "Nf6",
+      "Nf3",
+      "Be7",
+      "Bd3"
+     ],
+     "notes": {
+      "0": "Der Königsbauer besetzt das Zentrum und öffnet Dame und Läufer f1 den Weg.",
+      "1": "Französisch: Schwarz bereitet …d5 vor.",
+      "2": "Das ganze Zentrum: Bauern auf e4 und d4.",
+      "3": "Schwarz greift d4 sofort an, ohne …d5.",
+      "4": "d5 rückt vor und gewinnt Raum. 3.Sf3 würde in ein Sizilianisch führen, das du nicht spielst.",
+      "6": "Zurücknehmen mit dem Bauern: Der Bauer d5 engt Schwarz ein.",
+      "8": "Sc3 deckt d5 und entwickelt.",
+      "10": "Sf3, dann Ld3 und O-O: einfache Entwicklung.",
+      "12": "Ld3 zielt auf h7 und macht die Rochade frei."
+     },
+     "plan": "O-O, h3 und Te1. Schwarz spielt …Sa6–c7 und …b5: Halte d5 mit Sc3 und antworte mit a4 oder Lf4. Die Engine sieht Weiß besser."
+    }
+   ]
+  },
+  {
+   "id": "w-caro-advance",
+   "side": "w",
+   "group": "Weiß: Halboffene Eröffnungen",
+   "title": "Caro-Kann: Vorstoßvariante 3.e5",
+   "priority": 1,
+   "intro": "Gegen 1…c6 spielst du wie gegen Französisch 2.d4 d5 3.e5. Der Bauer e5 gibt dir Raum am Königsflügel. Anders als im Französischen kommt der Läufer c8 mit 3…Lf5 vor …e6 heraus. Du spielst das ruhige Shortsystem: Sf3, Le2, O-O und je nach Lage Le3, c3 oder c4. Gegen 3…c5 nimmst du mit 4.dxc5 und entwickelst schnell.",
+   "ideas": [
+    "Sf3, Le2, O-O: erst entwickeln, dann mit c3 oder c4 das Spiel öffnen.",
+    "Gegen …c5 hilft Le3: Nach …cxd4 nimmst du mit dem Springer zurück und hast einen starken Springer auf d4.",
+    "Der Bauer e5 ist dein Trumpf: Ihn hält Sf3, später Lf4 oder Te1.",
+    "Achte auf …Db6 mit Druck auf b2 und d4."
+   ],
+   "lines": [
+    {
+     "id": "w-ck-main",
+     "name": "3…Lf5 4.Sf3 e6 5.Le2 c5 6.Le3 Sd7 7.O-O",
+     "frequency": "häufig",
+     "moves": [
+      "e4",
+      "c6",
+      "d4",
+      "d5",
+      "e5",
+      "Bf5",
+      "Nf3",
+      "e6",
+      "Be2",
+      "c5",
+      "Be3",
+      "Nd7",
+      "O-O"
+     ],
+     "notes": {
+      "0": "Der Königsbauer besetzt das Zentrum und öffnet Dame und Läufer f1 den Weg.",
+      "1": "Caro-Kann: Schwarz bereitet …d5 vor und hält den Weg für den Läufer c8 frei.",
+      "2": "Das ganze Zentrum: Bauern auf e4 und d4.",
+      "4": "Vorstoß: Raum am Königsflügel, der Springer g8 bekommt das Feld f6 nicht.",
+      "5": "Der Läufer kommt heraus, bevor …e6 ihn einsperrt.",
+      "6": "Sf3 entwickelt, deckt d4 und e5 und bereitet die Rochade vor.",
+      "8": "Le2 und O-O: ruhige Entwicklung. Ein Läufer auf d3 würde nur den Tausch gegen Lf5 anbieten.",
+      "9": "Wie im Französischen greift Schwarz d4 an.",
+      "10": "Le3 stützt d4 zusätzlich. Nach …cxd4 nimmst du mit Sxd4 zurück und hast einen starken Springer im Zentrum.",
+      "12": "Rochade. Erst wenn alles steht, öffnest du mit c3 oder c4."
+     },
+     "plan": "c4 oder Sbd2 mit c3. Mit dxc5 und Sd4 bekommst du gute Felder im Zentrum. Achte auf …Db6 mit Druck auf b2: Dann deckt Dc1 oder Sbd2 mit b3."
+    },
+    {
+     "id": "w-ck-nd7",
+     "name": "5.Le2 Sd7 6.O-O h6 7.Sbd2",
+     "frequency": "mittel",
+     "moves": [
+      "e4",
+      "c6",
+      "d4",
+      "d5",
+      "e5",
+      "Bf5",
+      "Nf3",
+      "e6",
+      "Be2",
+      "Nd7",
+      "O-O",
+      "h6",
+      "Nbd2"
+     ],
+     "notes": {
+      "0": "Der Königsbauer besetzt das Zentrum und öffnet Dame und Läufer f1 den Weg.",
+      "1": "Caro-Kann: Schwarz bereitet …d5 vor und hält den Weg für den Läufer c8 frei.",
+      "2": "Das ganze Zentrum: Bauern auf e4 und d4.",
+      "4": "Vorstoß: Raum am Königsflügel, der Springer g8 bekommt das Feld f6 nicht.",
+      "5": "Der Läufer kommt heraus, bevor …e6 ihn einsperrt.",
+      "6": "Sf3 entwickelt, deckt d4 und e5 und bereitet die Rochade vor.",
+      "8": "Le2 und O-O: ruhige Entwicklung. Ein Läufer auf d3 würde nur den Tausch gegen Lf5 anbieten.",
+      "9": "Schwarz entwickelt und hält …c5 noch zurück.",
+      "10": "Einfach rochieren. Dein Aufbau bleibt gleich.",
+      "11": "Schwarz gibt dem Läufer f5 das Rückzugsfeld h7.",
+      "12": "Der Springer will über b3: Von dort kontrolliert er c5 und d4."
+     },
+     "plan": "Sb3, c3 und Ld2 oder Le3. Gegen …c5 nimmst du mit dxc5 und stellst einen Springer nach d4. Kommt …a5, hält a4 den Springer auf b3."
+    },
+    {
+     "id": "w-ck-3c5",
+     "name": "3…c5 4.dxc5 e6 5.Sf3 Lxc5 6.Ld3 Se7 7.O-O",
+     "frequency": "selten",
+     "moves": [
+      "e4",
+      "c6",
+      "d4",
+      "d5",
+      "e5",
+      "c5",
+      "dxc5",
+      "e6",
+      "Nf3",
+      "Bxc5",
+      "Bd3",
+      "Ne7",
+      "O-O"
+     ],
+     "notes": {
+      "0": "Der Königsbauer besetzt das Zentrum und öffnet Dame und Läufer f1 den Weg.",
+      "1": "Caro-Kann: Schwarz bereitet …d5 vor und hält den Weg für den Läufer c8 frei.",
+      "2": "Das ganze Zentrum: Bauern auf e4 und d4.",
+      "4": "Vorstoß: Raum am Königsflügel, der Springer g8 bekommt das Feld f6 nicht.",
+      "5": "Schwarz greift sofort d4 an. Dafür hat der c-Bauer zwei Züge gebraucht.",
+      "6": "Du nimmst den Bauern. Schwarz muss Zeit aufwenden, um ihn zurückzugewinnen, und dein Bauer e5 bleibt stark.",
+      "7": "Schwarz öffnet den Läufer f8, um c5 zurückzunehmen.",
+      "8": "Sf3 deckt e5. Den Bauern c5 musst du nicht halten: Entwicklung geht vor.",
+      "10": "Ld3 zielt auf h7 und macht die Rochade frei.",
+      "12": "Rochade. Danach halten Lf4 und Te1 den Bauern e5."
+     },
+     "plan": "Lf4 und Te1 stützen e5, Sbd2–b3 greift den Läufer c5 an. Die Stellung ist etwa ausgeglichen, aber dein Raumvorteil durch e5 macht Schwarz das Leben schwer."
+    }
+   ]
+  },
+  {
+   "id": "w-pirc",
+   "side": "w",
+   "group": "Weiß: Halboffene Eröffnungen",
+   "title": "Pirc und Modern: 150er-Angriff",
+   "priority": 2,
+   "intro": "Gegen 1…d6 und 1…g6 baust du mit d4 und Sc3 ein großes Zentrum und spielst den 150er-Angriff: Le3, Dd2 und f3. Der Plan ist immer gleich: Lh6 tauscht den wichtigen Läufer g7, und h4–h5 öffnet die h-Linie gegen den schwarzen König. f3 hält e4 fest, damit Schwarz mit …b5–b4 oder …Sg4 nichts erreicht. Ob Schwarz mit 1…d6 oder 1…g6 beginnt, ist für dich fast egal: Der Aufbau bleibt derselbe.",
+   "ideas": [
+    "Aufbau: d4, Sc3, Le3, Dd2, f3, dann Lh6 und h4–h5.",
+    "f3 deckt e4 und nimmt dem Springer f6 und dem Läufer c8 das Feld g4.",
+    "Lange Rochade, wenn Schwarz kurz rochiert hat: Dann laufen deine Bauern am Königsflügel frei.",
+    "Gegen …b5 immer an e4 denken: …b4 vertreibt den Springer c3, danach hängt e4 ohne f3."
+   ],
+   "lines": [
+    {
+     "id": "w-pi-main",
+     "name": "1…d6 2.d4 Sf6 3.Sc3 g6 4.Le3 Lg7 5.Dd2 O-O 6.O-O-O c6 7.f3",
+     "frequency": "mittel",
+     "moves": [
+      "e4",
+      "d6",
+      "d4",
+      "Nf6",
+      "Nc3",
+      "g6",
+      "Be3",
+      "Bg7",
+      "Qd2",
+      "O-O",
+      "O-O-O",
+      "c6",
+      "f3"
+     ],
+     "notes": {
+      "0": "Der Königsbauer besetzt das Zentrum und öffnet Dame und Läufer f1 den Weg.",
+      "1": "Pirc: Schwarz lässt dich das Zentrum bauen und will es später angreifen.",
+      "2": "Zweiter Zentrumsbauer: Du nimmst dir das Zentrum, das Schwarz dir anbietet.",
+      "3": "Greift e4 an.",
+      "4": "Sc3 deckt e4 und entwickelt.",
+      "5": "Der Läufer soll nach g7.",
+      "6": "Le3 und Dd2: der 150er-Angriff. Später tauscht Lh6 den wichtigen Läufer g7.",
+      "8": "Dd2 unterstützt Lh6 und bereitet die lange Rochade vor.",
+      "10": "Lange Rochade: Jetzt kannst du mit den Bauern am Königsflügel angreifen, ohne den eigenen König zu entblößen.",
+      "12": "f3 deckt e4 fest und nimmt dem Springer f6 das Feld g4. Danach folgen h4–h5 und Lh6."
+     },
+     "plan": "h4–h5 öffnet die h-Linie, Lh6 tauscht den Läufer g7. Mit Dame und Turm auf der h-Linie wird der schwarze König schwach. Schwarz kontert mit …b5 und …Da5: Kb1 und Sce2 halten deinen König sicher."
+    },
+    {
+     "id": "w-pi-c6",
+     "name": "4…c6 5.Dd2 b5 6.f3",
+     "frequency": "selten",
+     "moves": [
+      "e4",
+      "d6",
+      "d4",
+      "Nf6",
+      "Nc3",
+      "g6",
+      "Be3",
+      "c6",
+      "Qd2",
+      "b5",
+      "f3"
+     ],
+     "notes": {
+      "0": "Der Königsbauer besetzt das Zentrum und öffnet Dame und Läufer f1 den Weg.",
+      "1": "Pirc: Schwarz lässt dich das Zentrum bauen und will es später angreifen.",
+      "2": "Zweiter Zentrumsbauer: Du nimmst dir das Zentrum, das Schwarz dir anbietet.",
+      "3": "Greift e4 an.",
+      "4": "Sc3 deckt e4 und entwickelt.",
+      "5": "Der Läufer soll nach g7.",
+      "6": "Le3 und Dd2: der 150er-Angriff. Später tauscht Lh6 den wichtigen Läufer g7.",
+      "7": "Schwarz bereitet …b5 vor und sucht Gegenspiel am Damenflügel.",
+      "8": "Dein Aufbau bleibt gleich: Dd2, dann f3 und Lh6.",
+      "9": "Droht …b4: Dann muss der Springer c3 weg, und …Sxe4 gewinnt einen Bauern.",
+      "10": "f3 deckt e4. Jetzt droht …b4 nichts mehr."
+     },
+     "plan": "Sge2, Lh6 und h4, oft auch g4. Lang rochierst du nur, wenn der schwarze Angriff mit …b4 und …Da5 nicht zu schnell ist. Sonst bleibt dein König erst einmal in der Mitte."
+    },
+    {
+     "id": "w-pi-modern",
+     "name": "1…g6 2.d4 Lg7 3.Sc3 d6 4.Le3 a6 5.Dd2 Sd7 6.f3 b5 7.h4",
+     "frequency": "mittel",
+     "moves": [
+      "e4",
+      "g6",
+      "d4",
+      "Bg7",
+      "Nc3",
+      "d6",
+      "Be3",
+      "a6",
+      "Qd2",
+      "Nd7",
+      "f3",
+      "b5",
+      "h4"
+     ],
+     "notes": {
+      "0": "Der Königsbauer besetzt das Zentrum und öffnet Dame und Läufer f1 den Weg.",
+      "1": "Modern: Schwarz stellt erst den Läufer nach g7 und wartet mit …Sf6.",
+      "2": "Großes Zentrum mit d4.",
+      "3": "Der Läufer drückt auf d4.",
+      "4": "Sc3 deckt e4. Nach …d6 und …Sf6 bist du im Pirc.",
+      "6": "Le3 deckt d4 und bereitet Dd2 vor.",
+      "7": "Schwarz bereitet …b5 vor.",
+      "8": "Dd2: derselbe Aufbau wie gegen Pirc.",
+      "10": "f3 hält e4 fest, bevor Schwarz mit …b5–b4 und …Lb7 dagegen drückt.",
+      "12": "h4 greift sofort am Königsflügel an: h4–h5 öffnet die h-Linie."
+     },
+     "plan": "h5, Lh6 und O-O-O. Schwarz spielt …c5 und …Lb7: Achte auf e4 und auf …b4 gegen den Springer c3 (dann Sce2 oder Sd1)."
+    }
+   ]
+  },
+  {
+   "id": "w-nimzowitsch",
+   "side": "w",
+   "group": "Weiß: Seltene Antworten",
+   "title": "Nimzowitsch-Verteidigung 1…Sc6",
+   "priority": 1,
+   "intro": "1…Sc6 kam in deinen Partien 36-mal vor. Du antwortest mit 2.Sf3: Nach 2…e5 spielst du 3.Lc4 und bist direkt in deinem Italiener. Gegen 2…d5, 2…d6 und 2…Sf6 baust du mit d4 ein Zentrum und entwickelst normal. Schwarz verliert mit dem frühen Springerzug oft Zeit, wenn du ihn mit d4–d5 oder Lb5 bedrängst.",
+   "ideas": [
+    "2.Sf3 hält dir den Weg ins Italienische offen: 2…e5 3.Lc4.",
+    "Gegen …Lg4 hebt Le2 die Fesselung auf, h3 fragt den Läufer.",
+    "d4–d5 vertreibt den Springer c6 und gewinnt Raum.",
+    "Lb5 fesselt den Springer c6. Nach Lxc6+ hat Schwarz Doppelbauern."
+   ],
+   "lines": [
+    {
+     "id": "w-ni-d5",
+     "name": "2.Sf3 d5 3.exd5 Dxd5 4.Sc3 Da5 5.d4 Lg4 6.Lb5",
+     "frequency": "mittel",
+     "moves": [
+      "e4",
+      "Nc6",
+      "Nf3",
+      "d5",
+      "exd5",
+      "Qxd5",
+      "Nc3",
+      "Qa5",
+      "d4",
+      "Bg4",
+      "Bb5"
+     ],
+     "notes": {
+      "0": "Der Königsbauer besetzt das Zentrum und öffnet Dame und Läufer f1 den Weg.",
+      "1": "Nimzowitsch-Verteidigung: Schwarz entwickelt zuerst den Springer.",
+      "2": "Sf3 entwickelt und hält dir Italienisch offen: Nach 2…e5 folgt 3.Lc4.",
+      "3": "Schwarz greift e4 an.",
+      "4": "Du nimmst. Schlägt die Dame zurück, kommt Sc3 mit Tempo.",
+      "6": "Sc3 greift die Dame an: Entwicklung mit Tempo.",
+      "8": "d4 besetzt das Zentrum und öffnet den Läufer c1.",
+      "9": "Schwarz fesselt den Springer f3 und erhöht den Druck auf d4.",
+      "10": "Lb5 fesselt seinerseits den Springer c6. Nach Lxc6+ hat Schwarz Doppelbauern."
+     },
+     "plan": "h3 fragt den Läufer g4, dann O-O und Ld2 gegen die Dame a5. Mit Lxc6+ zur richtigen Zeit bekommt Schwarz Doppelbauern auf der c-Linie."
+    },
+    {
+     "id": "w-ni-d6",
+     "name": "2.Sf3 d6 3.d4 Sf6 4.Sc3 Lg4 5.Le2 e6 6.O-O",
+     "frequency": "mittel",
+     "moves": [
+      "e4",
+      "Nc6",
+      "Nf3",
+      "d6",
+      "d4",
+      "Nf6",
+      "Nc3",
+      "Bg4",
+      "Be2",
+      "e6",
+      "O-O"
+     ],
+     "notes": {
+      "0": "Der Königsbauer besetzt das Zentrum und öffnet Dame und Läufer f1 den Weg.",
+      "1": "Nimzowitsch-Verteidigung: Schwarz entwickelt zuerst den Springer.",
+      "2": "Sf3 entwickelt und hält dir Italienisch offen: Nach 2…e5 folgt 3.Lc4.",
+      "3": "Schwarz bereitet …e5 oder …Lg4 vor.",
+      "4": "Großes Zentrum mit d4.",
+      "5": "Greift e4 an.",
+      "6": "Sc3 deckt e4.",
+      "7": "Fesselt den Springer f3, der d4 deckt.",
+      "8": "Le2 hebt die Fesselung auf: Der Springer f3 kann wieder ziehen.",
+      "10": "Rochade. Danach gewinnen d5 oder h3 Raum."
+     },
+     "plan": "h3 vertreibt den Läufer g4, d4–d5 vertreibt den Springer c6 und gewinnt Raum. Die Engine sieht Weiß klar besser."
+    },
+    {
+     "id": "w-ni-nf6",
+     "name": "2.Sf3 Sf6 3.e5 Sd5 4.d4 d6 5.c4 Sb6 6.exd6",
+     "frequency": "selten",
+     "moves": [
+      "e4",
+      "Nc6",
+      "Nf3",
+      "Nf6",
+      "e5",
+      "Nd5",
+      "d4",
+      "d6",
+      "c4",
+      "Nb6",
+      "exd6"
+     ],
+     "notes": {
+      "0": "Der Königsbauer besetzt das Zentrum und öffnet Dame und Läufer f1 den Weg.",
+      "1": "Nimzowitsch-Verteidigung: Schwarz entwickelt zuerst den Springer.",
+      "2": "Sf3 entwickelt und hält dir Italienisch offen: Nach 2…e5 folgt 3.Lc4.",
+      "3": "Greift e4 an.",
+      "4": "e5 vertreibt den Springer mit Tempo, wie gegen Aljechin.",
+      "6": "d4 baut das Zentrum aus und stützt e5.",
+      "7": "Schwarz greift e5 an.",
+      "8": "c4 vertreibt den Springer d5 ein zweites Mal.",
+      "10": "Du tauschst auf d6. Nach 6…cxd6? vertreibt 7.d5 den Springer c6, und du hast viel Raum."
+     },
+     "plan": "Nach 6…exd6 folgen Le2, Sc3 und O-O. Du hast mehr Raum im Zentrum, und der Springer b6 steht schlecht."
+    }
+   ]
+  },
+  {
+   "id": "w-alekhine",
+   "side": "w",
+   "group": "Weiß: Seltene Antworten",
+   "title": "Aljechin-Verteidigung 1…Sf6 2.e5",
+   "priority": 2,
+   "intro": "1…Sf6 lädt deinen Bauern nach e5 ein. Du nimmst die Einladung an: 2.e5 vertreibt den Springer mit Tempo. Danach spielst du ruhig d4 und Sf3, ohne mit c4 und f4 zu viele Bauern nach vorn zu schicken. Achte auf die Falle nach 4…dxe5 5.Sxe5 Sd7?: Dann gewinnt 6.Sxf7! mit Königsangriff.",
+   "ideas": [
+    "Aufbau: e5, d4, Sf3, Le2, O-O und dann c4 gegen den Springer d5.",
+    "Der Springer f3 deckt e5. Gegen …Lg4 hebt Le2 die Fesselung auf.",
+    "Nach …dxe5 nimmst du mit dem Springer zurück: Von e5 zielt er auf f7."
+   ],
+   "lines": [
+    {
+     "id": "w-alj-main",
+     "name": "2.e5 Sd5 3.d4 d6 4.Sf3 Lg4 5.Le2 e6 6.O-O Le7 7.c4",
+     "frequency": "mittel",
+     "moves": [
+      "e4",
+      "Nf6",
+      "e5",
+      "Nd5",
+      "d4",
+      "d6",
+      "Nf3",
+      "Bg4",
+      "Be2",
+      "e6",
+      "O-O",
+      "Be7",
+      "c4"
+     ],
+     "notes": {
+      "0": "Der Königsbauer besetzt das Zentrum und öffnet Dame und Läufer f1 den Weg.",
+      "1": "Aljechin-Verteidigung: Schwarz lockt deine Bauern nach vorn, um sie später anzugreifen.",
+      "2": "e5 vertreibt den Springer mit Tempo.",
+      "4": "d4 stützt e5 und besetzt das Zentrum.",
+      "5": "Schwarz greift e5 an.",
+      "6": "Sf3, die ruhige moderne Variante: Der Springer deckt e5, und du überdehnst deine Bauern nicht.",
+      "7": "Schwarz fesselt den Springer f3, der e5 deckt.",
+      "8": "Le2 hebt die Fesselung auf.",
+      "10": "Rochade. Danach vertreibt c4 den Springer.",
+      "12": "c4 vertreibt den Springer d5 mit Tempo und gewinnt Raum."
+     },
+     "plan": "Nach …Sb6 folgen h3, Sc3 und exd6 oder Le3. Du hast mehr Raum und eine bequeme Stellung."
+    },
+    {
+     "id": "w-alj-dxe5",
+     "name": "4…dxe5 5.Sxe5 Sd7? 6.Sxf7! Kxf7 7.Dh5+ Ke6 8.c4",
+     "frequency": "selten",
+     "moves": [
+      "e4",
+      "Nf6",
+      "e5",
+      "Nd5",
+      "d4",
+      "d6",
+      "Nf3",
+      "dxe5",
+      "Nxe5",
+      "Nd7",
+      "Nxf7",
+      "Kxf7",
+      "Qh5+",
+      "Ke6",
+      "c4"
+     ],
+     "notes": {
+      "0": "Der Königsbauer besetzt das Zentrum und öffnet Dame und Läufer f1 den Weg.",
+      "1": "Aljechin-Verteidigung: Schwarz lockt deine Bauern nach vorn, um sie später anzugreifen.",
+      "2": "e5 vertreibt den Springer mit Tempo.",
+      "4": "d4 stützt e5 und besetzt das Zentrum.",
+      "5": "Schwarz greift e5 an.",
+      "6": "Sf3, die ruhige moderne Variante: Der Springer deckt e5, und du überdehnst deine Bauern nicht.",
+      "7": "Schwarz nimmt auf e5.",
+      "8": "Mit dem Springer zurück: Er steht stark auf e5 und zielt auf f7.",
+      "9": "Falle! Schwarz will den Springer e5 tauschen, aber f7 ist jetzt zu schwach.",
+      "10": "Das Opfer: Nimmt der König, kommt Dh5+ mit Angriff.",
+      "12": "Schach und zugleich Angriff auf den Springer d5. Nach 7…g6? holt 8.Dxd5+ die Figur zurück.",
+      "13": "Der König muss nach vorn, um den Springer d5 zu decken.",
+      "14": "c4 greift den Springer d5 an, d4–d5+ folgt. Der schwarze König steht mitten im Brett: Die Engine sieht Weiß klar vorn, obwohl du eine Figur weniger hast."
+     },
+     "plan": "Nach 8…S5f6 9.d5+ Kd6 setzen Df7 und Lf4 den Angriff fort. Halte das Spiel offen und bring alle Figuren mit Tempo ins Spiel: Sc3, Lf4 und die lange Rochade."
+    },
+    {
+     "id": "w-alj-g6",
+     "name": "4…g6 5.Lc4 Sb6 6.Lb3 Lg7 7.De2",
+     "frequency": "selten",
+     "moves": [
+      "e4",
+      "Nf6",
+      "e5",
+      "Nd5",
+      "d4",
+      "d6",
+      "Nf3",
+      "g6",
+      "Bc4",
+      "Nb6",
+      "Bb3",
+      "Bg7",
+      "Qe2"
+     ],
+     "notes": {
+      "0": "Der Königsbauer besetzt das Zentrum und öffnet Dame und Läufer f1 den Weg.",
+      "1": "Aljechin-Verteidigung: Schwarz lockt deine Bauern nach vorn, um sie später anzugreifen.",
+      "2": "e5 vertreibt den Springer mit Tempo.",
+      "4": "d4 stützt e5 und besetzt das Zentrum.",
+      "5": "Schwarz greift e5 an.",
+      "6": "Sf3, die ruhige moderne Variante: Der Springer deckt e5, und du überdehnst deine Bauern nicht.",
+      "7": "Schwarz stellt den Läufer nach g7 und greift e5 von dort an.",
+      "8": "Lc4 greift den Springer d5 an und zielt auf f7.",
+      "10": "Zurück nach b3: Der Läufer bleibt auf der Diagonale gegen f7.",
+      "12": "De2 deckt e5 ein drittes Mal und bereitet die Rochade vor."
+     },
+     "plan": "O-O, h3 und Sc3. Gegen …dxe5 nimmst du mit dxe5 zurück. Typisch ist auch a4–a5 gegen den Springer b6."
+    }
+   ]
+  },
+  {
+   "id": "w-owen",
+   "side": "w",
+   "group": "Weiß: Seltene Antworten",
+   "title": "Owen-Verteidigung 1…b6",
+   "priority": 3,
+   "intro": "Mit 1…b6 stellt Schwarz den Läufer nach b7 und greift e4 an. Du nimmst mit 2.d4 das Zentrum, deckst e4 mit Ld3 und entwickelst mit Sf3, c3 und De2. Schwarz hat kaum Raum, und mit e4–e5 vertreibst du später den Springer f6.",
+   "ideas": [
+    "e4 immer ausreichend decken: Ld3, später De2 oder Sbd2.",
+    "c3 stützt d4 gegen …c5.",
+    "e4–e5 vertreibt den Springer f6 und gewinnt Raum."
+   ],
+   "lines": [
+    {
+     "id": "w-ow-main",
+     "name": "2.d4 Lb7 3.Ld3 e6 4.Sf3 c5 5.c3 Sf6 6.De2",
+     "frequency": "selten",
+     "moves": [
+      "e4",
+      "b6",
+      "d4",
+      "Bb7",
+      "Bd3",
+      "e6",
+      "Nf3",
+      "c5",
+      "c3",
+      "Nf6",
+      "Qe2"
+     ],
+     "notes": {
+      "0": "Der Königsbauer besetzt das Zentrum und öffnet Dame und Läufer f1 den Weg.",
+      "1": "Owen-Verteidigung: Der Läufer soll nach b7 und e4 angreifen.",
+      "2": "Das Zentrum besetzen.",
+      "3": "Der Läufer greift e4 an.",
+      "4": "Ld3 deckt e4 und entwickelt.",
+      "6": "Sf3 entwickelt und deckt d4.",
+      "8": "c3 stützt d4. Nach …cxd4 nimmst du mit dem Bauern zurück.",
+      "9": "Zweiter Angriff auf e4.",
+      "10": "De2 deckt e4 ein zweites Mal."
+     },
+     "plan": "O-O, Sbd2 und Te1. Mit e4–e5 vertreibst du später den Springer f6. Die Engine sieht Weiß klar besser."
+    }
+   ]
+  },
+  {
+   "id": "w-rare-misc",
+   "side": "w",
+   "group": "Weiß: Seltene Antworten",
+   "title": "Seltenes: 1…a6, 1…g5, 1…h6 und Co.",
+   "priority": 3,
+   "intro": "Gegen seltene Züge wie 1…a6, 1…h6, 1…g5, 1…a5 oder 1…Sh6 brauchst du keine Theorie. Du spielst d4, Sf3, Ld3 und O-O und nimmst das Zentrum. Schwarz verliert mit Randzügen Zeit. Geschenke nimmst du an, wenn sie sicher sind, zum Beispiel 1…g5 2.d4 Lg7 3.Lxg5.",
+   "ideas": [
+    "Zentrum zuerst: d4, dann Sf3 und Ld3 oder Lc4.",
+    "Greift Schwarz e4 mit …Lb7 und …Sf6 an, decken Ld3 und Sbd2.",
+    "Ungedeckte Bauern wie g5 nimmst du, wenn d4 dabei gedeckt bleibt."
+   ],
+   "lines": [
+    {
+     "id": "w-rm-a6",
+     "name": "1…a6 2.d4 b5 3.Sf3 Lb7 4.Ld3 e6 5.O-O Sf6 6.Sbd2",
+     "frequency": "selten",
+     "moves": [
+      "e4",
+      "a6",
+      "d4",
+      "b5",
+      "Nf3",
+      "Bb7",
+      "Bd3",
+      "e6",
+      "O-O",
+      "Nf6",
+      "Nbd2"
+     ],
+     "notes": {
+      "0": "Der Königsbauer besetzt das Zentrum und öffnet Dame und Läufer f1 den Weg.",
+      "1": "Schwarz bereitet …b5 und …Lb7 vor.",
+      "2": "Das Zentrum besetzen.",
+      "4": "Sf3 entwickelt und bereitet die Rochade vor.",
+      "5": "Der Läufer greift e4 an.",
+      "6": "Ld3 deckt e4.",
+      "8": "Rochade.",
+      "9": "Zweiter Angriff auf e4.",
+      "10": "Sbd2 deckt e4 ein zweites Mal."
+     },
+     "plan": "Te1, c3 und a4: Mit a4 greifst du den Bauern b5 an. e4–e5 vertreibt später den Springer f6. Die Engine sieht Weiß deutlich besser."
+    },
+    {
+     "id": "w-rm-g5",
+     "name": "1…g5 2.d4 Lg7 3.Lxg5 c5 4.c3 cxd4 5.cxd4 Db6 6.Sf3",
+     "frequency": "selten",
+     "moves": [
+      "e4",
+      "g5",
+      "d4",
+      "Bg7",
+      "Bxg5",
+      "c5",
+      "c3",
+      "cxd4",
+      "cxd4",
+      "Qb6",
+      "Nf3"
+     ],
+     "notes": {
+      "0": "Der Königsbauer besetzt das Zentrum und öffnet Dame und Läufer f1 den Weg.",
+      "1": "Ein Flankenzug ohne Deckung.",
+      "2": "d4 nimmt das Zentrum und öffnet den Läufer c1 gegen g5.",
+      "3": "Schwarz greift d4 an und lässt g5 hängen.",
+      "4": "Ein Bauer gratis. d4 bleibt durch die Dame gedeckt.",
+      "5": "Schwarz sucht Gegenspiel gegen d4.",
+      "6": "c3 stützt d4.",
+      "8": "Mit dem Bauern zurück.",
+      "9": "Doppelangriff auf d4 und b2.",
+      "10": "Sf3 deckt d4 ein zweites Mal und entwickelt."
+     },
+     "plan": "Sc3, Le2 und O-O. Du hast einen Bauern mehr und das bessere Zentrum: Entwicklung geht vor Bauernjagd."
+    }
+   ]
   }
  ]
 }

@@ -132,7 +132,7 @@
   "white": "Mit d4 und c3 das Zentrum besetzen, Raum nutzen.",
   "black": "…d6, …Sf6, …O-O und den Bauern e5 halten.",
   "trap": null,
-  "inRepertoire": false
+  "inRepertoire": true
  },
  {
   "id": "blackburne-shilling",
@@ -759,7 +759,7 @@
   "white": "4.d4 Sxe4 5.d5 und den Springer vertreiben.",
   "black": "…Sxe4, …Se7 und …Sg6, später …d6 und …Le7.",
   "trap": null,
-  "inRepertoire": true
+  "inRepertoire": false
  },
  {
   "id": "kings-pawn",
@@ -1224,7 +1224,7 @@
   "white": "3.Sf3, d4, Lxf4 und Druck auf f7.",
   "black": "3…d5 4.exd5 Sf6, oder 3…g5 um den Bauern zu halten (scharf).",
   "trap": null,
-  "inRepertoire": false
+  "inRepertoire": true
  },
  {
   "id": "kings-gambit-declined",
@@ -2430,7 +2430,7 @@
   "white": "e3, Sf3, Tc1, Ld3, O-O, Minoritätsangriff nach cxd5.",
   "black": "…O-O, …h6, …Sbd7, …c6, Figurentausch mit …Se4 oder …dxc4 und …e5.",
   "trap": null,
-  "inRepertoire": true
+  "inRepertoire": false
  },
  {
   "id": "qgd-elephant-trap",
@@ -3352,7 +3352,7 @@
   "white": "Sc3, g3, Lg2, d3, Sf3 oder e4 (Botwinnik-Aufbau).",
   "black": "…Sf6, …Sc6, …Lb4 oder …d5, später …Le7/…Lc5 und O-O.",
   "trap": null,
-  "inRepertoire": true
+  "inRepertoire": false
  },
  {
   "id": "english-symmetrical",
@@ -3386,7 +3386,7 @@
   "white": "Sc3, g3, Lg2 oder d4 und Übergang in 1.d4-Systeme.",
   "black": "…e6, …g6 oder …e5, je nach Aufbau.",
   "trap": null,
-  "inRepertoire": true
+  "inRepertoire": false
  },
  {
   "id": "reti",
@@ -3404,7 +3404,7 @@
   "white": "g3, Lg2, O-O, b3, Lb2, Druck auf d5 und e5.",
   "black": "…d4 (Raum) oder …e6/…c6 und solides Zentrum.",
   "trap": null,
-  "inRepertoire": false
+  "inRepertoire": true
  },
  {
   "id": "zukertort",
@@ -3505,7 +3505,7 @@
    ],
    "text": "4.Sc3?? Dh4+ 5.g3 Dxg3+! 6.hxg3 Lxg3# – Matt. Der Bauer f2 fehlt, darum ist die Diagonale zum König offen. Richtig ist 4.Sf3, das h4 deckt."
   },
-  "inRepertoire": true
+  "inRepertoire": false
  },
  {
   "id": "larsen",
@@ -3537,7 +3537,7 @@
   "white": "Lb2, a3, e3, Sf3, c4.",
   "black": "…e5 mit Tempo gegen den b4-Bauern (…Lxb4), …d5, …Sf6.",
   "trap": null,
-  "inRepertoire": true
+  "inRepertoire": false
  },
  {
   "id": "hungarian-opening",
@@ -3553,7 +3553,7 @@
   "white": "Lg2, Sf3, O-O, d3/c4, e4.",
   "black": "…d5, …e5 oder …Sf6 und einfacher Zentrumsaufbau.",
   "trap": null,
-  "inRepertoire": true
+  "inRepertoire": false
  },
  {
   "id": "van-geet",
@@ -3585,7 +3585,7 @@
   "white": "Lg2, c4, Druck auf d5 und b7.",
   "black": "…d5 und …Lxg4 oder …e5, einfach entwickeln, den schwachen weißen Königsflügel ausnutzen.",
   "trap": null,
-  "inRepertoire": true
+  "inRepertoire": false
  },
  {
   "id": "italian-two-knights-ng5-na5",
@@ -3642,7 +3642,7 @@
   "white": "d5, Te1 und Angriff auf den König in der Mitte.",
   "black": "…Lf6 und …Se7, Material zurückgeben und rochieren.",
   "trap": null,
-  "inRepertoire": false
+  "inRepertoire": true
  },
  {
   "id": "ruy-bird",
@@ -3918,7 +3918,7 @@
   "white": "Sc3, Le3, Ld3, Sge2, O-O.",
   "black": "…cxd6 oder …exd6, …g6, …Lg7, …O-O, …Sc6.",
   "trap": null,
-  "inRepertoire": true
+  "inRepertoire": false
  },
  {
   "id": "qgd-ragozin",
@@ -3941,7 +3941,7 @@
   "white": "Lg5, cxd5, e3, Dc2/Db3.",
   "black": "…h6, …dxc4 oder …O-O, …c5, Tausch auf c3.",
   "trap": null,
-  "inRepertoire": true
+  "inRepertoire": false
  },
  {
   "id": "qgd-cambridge-springs",
@@ -3968,7 +3968,7 @@
   "white": "Sd2 (deckt g5 indirekt), Dc2 oder cxd5.",
   "black": "…Lb4, …Se4, Druck auf c3 und g5.",
   "trap": null,
-  "inRepertoire": true
+  "inRepertoire": false
  },
  {
   "id": "london-kings-indian-setup",

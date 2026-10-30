@@ -86,3 +86,6 @@ select, input[type=text], input[type=number] { font: inherit; color: var(--text)
 /* Brett-Rückmeldung */
 .board-wrap.flash-good { box-shadow: 0 0 0 4px var(--accent); }
 .board-wrap.flash-bad { box-shadow: 0 0 0 4px var(--bad); }
+
+/* Platzhalter, solange eine Seite ihre Daten lädt */
+#view:empty::before { content: "Lädt …"; color: var(--muted); }

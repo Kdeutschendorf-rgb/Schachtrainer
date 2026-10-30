@@ -1,4 +1,5 @@
-"""Hilfsskript (Repertoire Schwarz): baut app/data/repertoire_black.json aus b_source.py.
+"""Hilfsskript (Repertoire Schwarz): baut app/data/repertoire_black.json aus b_source.py
+(+ b_source_flank.py, falls vorhanden: Kapitel gegen Flankeneröffnungen, werden hinten angehängt).
 
 Quellformat je Linie: "pgn" = englische SAN, Notiz in {…} direkt hinter dem Zug, zu dem sie gehört.
 Fehlt einer Linie die Notiz zu einem Zug, wird sie aus einer anderen Linie mit gleicher Stellung + gleichem Zug
@@ -19,7 +20,34 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 OUT = os.path.join(ROOT, "app", "data", "repertoire_black.json")
 sys.path.insert(0, HERE)
-from b_source import CHAPTERS  # noqa: E402
+from b_source import CHAPTERS as _MAIN  # noqa: E402
+
+
+def _load_flank():
+    """Kapitel gegen Flankeneröffnungen aus b_source_flank.py (wird parallel gepflegt, darf fehlen)."""
+    path = os.path.join(HERE, "b_source_flank.py")
+    if not os.path.exists(path):
+        return []
+    import importlib.util
+    try:
+        spec = importlib.util.spec_from_file_location("b_source_flank", path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        chapters = mod.CHAPTERS
+    except Exception as e:  # noqa: BLE001 – Datei wird evtl. gerade geschrieben
+        print("ABBRUCH: b_source_flank.py ist vorhanden, lässt sich aber nicht importieren (%s: %s). "
+              "Wahrscheinlich wird sie gerade geschrieben – kurz warten und erneut bauen."
+              % (type(e).__name__, e))
+        sys.exit(2)
+    return list(chapters)
+
+
+CHAPTERS = list(_MAIN) + _load_flank()
+_ids = [c["id"] for c in CHAPTERS]
+_dups = sorted({i for i in _ids if _ids.count(i) > 1})
+if _dups:
+    print("ABBRUCH: doppelte Kapitel-IDs in b_source.py/b_source_flank.py: %s" % ", ".join(_dups))
+    sys.exit(2)
 
 TOKEN = re.compile(r"\{[^}]*\}|[^\s{}]+")
 # englische Figurenkürzel in deutschen Texten (z. B. "Nf3", "Bxc4", "Qh5", "Rf1")

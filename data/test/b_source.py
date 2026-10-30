@@ -6,7 +6,7 @@ Stellung + gleichem Zug. Bauen: .venv/bin/python -I data/test/b_build.py
 """
 
 G_E4 = "Schwarz: 1.e4 e5"
-G_D4 = "Schwarz: 1.d4 d5"
+G_D4 = "Schwarz: gegen 1.d4"
 G_OTHER = "Schwarz: andere erste Züge"
 
 CHAPTERS = []
@@ -736,8 +736,8 @@ CHAPTERS.append({
 # 1.d4 d5: Damengambit abgelehnt
 # ---------------------------------------------------------------------------------------------
 INTRO_D4 = ("Gegen 1.d4 spielst du ab jetzt 1…d5 statt des Englund-Gambits 1…e5. Das Englund-Gambit kostet "
-            "einen Bauern, und gegen Gegner, die 2.dxe5 Sc6 3.Sf3 De7 4.Df4 oder 4.Lf4 kennen, stehst du "
-            "schlechter. Mit 1…d5 bekommst du gesunde Stellungen mit klaren Plänen. ")
+            "einen Bauern: In deinen Partien standest du damit nach Zug 10 im Mittel klar schlechter, und ab "
+            "etwa 1300 kennen die Gegner die Fallen. Mit 1…d5 bekommst du gesunde Stellungen mit klaren Plänen. ")
 
 CHAPTERS.append({
     "id": "b-qgd", "group": G_D4, "priority": 1,
@@ -805,20 +805,20 @@ CHAPTERS.append({
          "pgn": "d4 d5 c4 e6 Nc3 Nf6 "
                 "Nf3 {Weiß entwickelt zuerst den Königsspringer.} "
                 "Be7 {Solide: Läufer nach e7, dann rochieren.} "
-                "Bg5 O-O e3 h6 {Frag den Läufer.} "
+                "Bg5 O-O {König in Sicherheit, der Sf6 ist durch den Le7 gedeckt.} e3 h6 {Frag den Läufer.} "
                 "Bh4 b6 {Bereitet …Lb7 vor: Der Läufer zielt über die lange Diagonale auf e4.}",
          "plan": "Spiele …Lb7, …Sbd7 und …c5. Tausche bei Gelegenheit mit …Se4 die Leichtfiguren."},
         {"id": "b-qgd-bf4", "name": "3.Sc3 Sf6 4.Lf4 Le7 5.e3 O-O 6.Sf3 c5", "frequency": "mittel",
          "pgn": "d4 d5 c4 e6 Nc3 Nf6 "
                 "Bf4 {Weiß entwickelt den Läufer vor die Bauernkette.} "
-                "Be7 e3 O-O Nf3 c5 {Der Befreiungszug: Du greifst d4 an, bevor Weiß alles fertig hat.}",
-         "plan": "Nach dxc5 nimmst du mit dem Läufer zurück (…Lxc5), dann …Sc6 und …Dа5 oder …dxc4. Freies "
+                "Be7 {Solide entwickeln, dann rochieren.} e3 O-O {König in Sicherheit.} Nf3 c5 {Der Befreiungszug: Du greifst d4 an, bevor Weiß alles fertig hat.}",
+         "plan": "Nach dxc5 nimmst du mit dem Läufer zurück (…Lxc5), dann …Sc6 und …Da5 oder …dxc4. Freies "
                  "Spiel für deine Figuren."},
         {"id": "b-qgd-catalan", "name": "2.c4 e6 3.Sf3 Sf6 4.g3 Le7 (Katalanisch)", "frequency": "selten",
          "pgn": "d4 d5 c4 e6 "
-                "Nf3 Nf6 "
+                "Nf3 Nf6 {Entwickeln und d5 noch einmal decken.} "
                 "g3 {Katalanisch: Der Läufer soll nach g2.} "
-                "Be7 Bg2 O-O O-O dxc4 {Nimm den Bauern c4: Weiß muss Zeit aufwenden, um ihn zurückzuholen.}",
+                "Be7 {Solide: Läufer nach e7, dann rochieren.} Bg2 O-O {König in Sicherheit.} O-O dxc4 {Nimm den Bauern c4: Weiß muss Zeit aufwenden, um ihn zurückzuholen.}",
          "plan": "Spiele …a6 und …b5 oder …Sc6, um den Bauern c4 zu halten, oder gib ihn für schnelle "
                  "Entwicklung (…c5, …Sc6) zurück."},
     ],

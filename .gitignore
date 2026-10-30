@@ -4,3 +4,4 @@ tools/
 data/backups/
 __pycache__/
 *.log
+data/progress.json
