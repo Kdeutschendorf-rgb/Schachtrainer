@@ -1,5 +1,5 @@
 // Lädt die Taktik-Daten einmal pro Seitenaufruf und hält den Index im Speicher.
-import { loadData } from '../ui.js';
+import { loadData, loadPlayerData } from '../ui.js';
 import { buildIndex, normalizeOwn } from './logic.js';
 
 let cache = null;
@@ -9,8 +9,8 @@ export function loadTacticsData() {
   if (!cache) {
     cache = Promise.all([
       loadData('puzzles.json').then(buildIndex),
-      loadData('my_puzzles.json').catch(() => []),          // darf fehlen
-      loadData('analysis_summary.json').catch(() => null),  // darf fehlen
+      loadPlayerData('my_puzzles.json').catch(() => []),          // darf fehlen
+      loadPlayerData('analysis_summary.json').catch(() => null),  // darf fehlen
     ]).then(([index, own, summary]) => ({
       index,
       own: normalizeOwn(own),

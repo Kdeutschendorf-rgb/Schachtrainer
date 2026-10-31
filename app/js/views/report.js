@@ -1,8 +1,8 @@
-// Bericht: deine Partien (aus data/analysis_summary.json, gebaut von analysis/build_app_data.py)
+// Bericht: deine Partien (aus data/players/<name>/analysis_summary.json, gebaut von analysis/build_app_data.py)
 // und dein Trainingsfortschritt (aus dem Store). Diagramme sind selbst gezeichnetes SVG.
-// Optional oben: data/coach_report.json (schreibt Claude bei der Wochenauswertung).
+// Optional oben: data/players/<name>/coach_report.json (schreibt Claude bei der Wochenauswertung).
 
-import { h, clear, loadCss, loadData, toast, figurine, fetchJson } from '../ui.js';
+import { h, clear, loadCss, loadPlayerData, figurine } from '../ui.js';
 import * as store from '../store.js';
 import { todayStr, addDays } from '../srs.js';
 import { themeName, MISTAKE_TAGS_DE, sanDe } from '../coach.js';
@@ -258,33 +258,8 @@ function renderHeader(summary, onSync) {
     onSync);
 }
 
-function renderSync(isAlive) {
-  const btn = h('button.primary', 'Neue Partien von chess.com holen');
-  const status = h('div.small.muted.rp-sync-status');
-  btn.addEventListener('click', async () => {
-    btn.disabled = true;
-    btn.textContent = 'Hole Partien …';
-    status.textContent = 'Neue Partien werden geladen und mit der Engine analysiert. Das kann ein paar Minuten dauern.';
-    let res;
-    try {
-      res = await fetch('api/sync', { method: 'POST' }).then(r => r.json());
-    } catch (err) {
-      res = { ok: false, message: 'Der Server antwortet nicht.' };
-    }
-    if (!isAlive()) return;
-    btn.disabled = false;
-    btn.textContent = 'Neue Partien von chess.com holen';
-    const msg = res?.message || (res?.error ? 'Synchronisieren fehlgeschlagen.' : 'Fertig.');
-    status.textContent = msg;
-    if (res?.ok !== false && res?.new > 0) {
-      toast(`${msg} Der Bericht wird neu geladen.`, 'good', 4000);
-      store.flush();
-      setTimeout(() => { if (isAlive()) location.reload(); }, 1500);
-    } else {
-      toast(msg, res?.ok === false ? 'bad' : 'info');
-    }
-  });
-  return h('div.rp-sync', btn, status);
+function renderSync() {
+  return h('div.small.muted.rp-sync-status', 'Neue Partien von chess.com werden jeden Montag automatisch ausgewertet.');
 }
 
 function renderCoachReport(cr) {
@@ -673,14 +648,13 @@ export async function mount(el) {
   el.append(root);
 
   const [summary, coachReport] = await Promise.all([
-    loadData('analysis_summary.json').catch(() => null),
-    // Optional; immer frisch laden, Claude schreibt die Datei zwischendurch neu
-    fetchJson('data/coach_report.json', { cache: 'no-store' }).catch(() => null),
+    loadPlayerData('analysis_summary.json').catch(() => null),
+    loadPlayerData('coach_report.json').catch(() => null),   // optional, schreibt Claude bei der Wochenauswertung
   ]);
   if (!alive) return () => {};
 
   const prog = store.all() || {};
-  const sync = renderSync(() => alive);
+  const sync = renderSync();
   const parts = [
     renderHeader(summary, sync),
     renderCoachReport(coachReport),
@@ -689,8 +663,7 @@ export async function mount(el) {
   if (summary) {
     parts.push(renderElo(summary));
   } else {
-    parts.push(h('div.card', h('div.feedback.info', 'Noch keine Auswertung deiner Partien. Hol oben deine Partien von chess.com oder führe ',
-      h('code', '.venv/bin/python -I analysis/build_app_data.py'), ' aus.')));
+    parts.push(h('div.card', h('div.feedback.info', 'Für deinen chess.com-Namen gibt es noch keine Auswertung deiner Partien. Dein Trainingsfortschritt steht trotzdem unten.')));
   }
   parts.push(renderTraining(prog));
   if (summary) {

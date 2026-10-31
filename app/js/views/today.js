@@ -3,7 +3,7 @@
 // (dynamisch importiert, ein Ausfall überspringt nur den Block). Die Planberechnung
 // (computePlan) ist reine Logik ohne DOM und lässt sich mit jsc testen.
 
-import { h, clear, loadCss, progressBar, formatTime, loadData } from '../ui.js';
+import { h, clear, loadCss, progressBar, formatTime, loadPlayerData } from '../ui.js';
 import * as store from '../store.js';
 import { todayStr, addDays } from '../srs.js';
 import { tipOfTheDay, themeName } from '../coach.js';
@@ -210,7 +210,7 @@ function settings() {
 export async function mount(el) {
   loadCss('css/today.css');
   let summary = null;
-  try { summary = await loadData('analysis_summary.json'); } catch { summary = null; }
+  try { summary = await loadPlayerData('analysis_summary.json'); } catch { summary = null; }
 
   const root = h('div.td-root');
   el.append(root);
@@ -236,7 +236,7 @@ export async function mount(el) {
   function renderElo() {
     if (!rapidNow) {
       return h('div.td-elo', h('div.small.muted', 'Rapid-Elo'),
-        h('div.muted', 'Noch keine Partie-Analyse. Im Bericht kannst du Partien von chess.com holen.'));
+        h('div.muted', settings().chesscomName ? 'Für deinen chess.com-Namen gibt es noch keine Auswertung.' : 'Trag unter „Plan anpassen“ deinen chess.com-Namen ein.'));
     }
     const s = settings();
     const goal = s.goalRapid || defaultGoal(rapidNow, rapidPeak);
@@ -261,7 +261,7 @@ export async function mount(el) {
 
     const hero = h('div.card.td-hero',
       h('div.td-hello',
-        h('h1', `${greeting()}, Keanu!`),
+        h('h1', settings().displayName ? `${greeting()}, ${settings().displayName}!` : `${greeting()}!`),
         h('div.muted', dateLine()),
         h('div.td-streak', streak ? `🔥 ${streak} ${streak === 1 ? 'Tag' : 'Tage'} in Folge trainiert` : 'Heute startest du eine neue Serie.'),
         doneToday >= 1 ? h('div.small.td-done', `Heute schon ${Math.round(doneToday)} Minuten trainiert. Stark!`) : null),
@@ -314,7 +314,18 @@ export async function mount(el) {
           x.plan = { ...DEFAULT_PLAN, ...(x.plan || {}), [k]: Math.max(0, Math.min(30, Math.round(Number(e.target.value) || 0))) };
         }),
       })));
+    const text = (key, attrs) => h('input', { type: 'text', value: s[key] || '', ...attrs,
+      onchange: e => save(x => { const v = e.target.value.trim(); if (v) x[key] = v; else delete x[key]; }) });
+    const user = store.currentUser();
     return h('div.card.td-settings',
+      h('h2', 'Profil'),
+      h('div.td-settings-grid',
+        h('label', h('span', 'Vorname'), text('displayName')),
+        h('label', h('span', 'chess.com-Name'), text('chesscomName', { autocapitalize: 'off' }))),
+      h('div.row',
+        h('span.small.muted', user ? `Angemeldet als ${user.email}, Fortschritt wird abgeglichen.` : 'Ohne Konto: Fortschritt nur auf diesem Gerät.'),
+        h('span.spacer'),
+        h('button', { onclick: () => store.signOut() }, user ? 'Abmelden' : 'Anmelden')),
       h('h2', 'Plan anpassen'),
       h('div.td-settings-grid',
         h('label', h('span', 'Trainingszeit pro Tag'), minutesSel),

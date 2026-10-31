@@ -4,6 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Schachtrainer</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="theme-color" content="#1d1f21">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Schach">
   <link rel="stylesheet" href="vendor/chessground.base.css">
   <link rel="stylesheet" href="vendor/chessground.brown.css">
   <link rel="stylesheet" href="vendor/chessground.cburnett.css">
@@ -24,6 +29,7 @@
   </header>
   <main id="view"></main>
   <div id="toasts"></div>
+  <script src="vendor/supabase.js"></script>
   <script type="module" src="js/main.js"></script>
 </body>
 </html>

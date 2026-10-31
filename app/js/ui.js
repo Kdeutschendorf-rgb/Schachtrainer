@@ -1,4 +1,5 @@
 // Kleine DOM-Helfer, die alle Module teilen.
+import * as store from './store.js';
 
 // h('div.card', {onclick}, 'Text', child) → Element. Klassen per Punkt im Tag.
 export function h(tag, attrs, ...children) {
@@ -91,6 +92,17 @@ const dataCache = new Map();
 export function loadData(name) {
   if (!dataCache.has(name)) dataCache.set(name, fetchJson(`data/${name}`));
   return dataCache.get(name);
+}
+
+// Persönliche Daten (Analyse, eigene Aufgaben, Coach-Bericht) liegen unter data/players/<chess.com-Name>/.
+// Gibt es für den Namen keine Auswertung, schlägt das Laden fehl und die Seiten zeigen die neutrale Version.
+export function loadPlayerData(name) {
+  const player = String(store.get('settings').chesscomName || '').trim().toLowerCase();
+  if (!/^[a-z0-9_-]+$/.test(player)) return Promise.reject(new Error('Kein chess.com-Name eingetragen'));
+  return loadData('players.json').then(list => {
+    if (!list[player]) throw new Error(`Keine Auswertung für ${player}`);
+    return loadData(`players/${player}/${name}`);
+  });
 }
 
 // SAN mit Figurensymbolen anzeigen: 'Nf3' → '♘f3'. Sprachneutral, daher überall in Zuglisten.

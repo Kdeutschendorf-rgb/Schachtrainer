@@ -19,7 +19,8 @@ let state = null;
 let saveTimer = null;
 let pushTimer = null;
 let dirty = false;            // lokale Änderungen, die noch nicht in Supabase sind
-let user = null;              // eingeloggter Supabase-Nutzer oder null (Gast)
+let user = null;
+let stale = false;            // ein anderes Gerät hat einen neueren Stand gespeichert              // eingeloggter Supabase-Nutzer oder null (Gast)
 const client = window.supabase?.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const DEFAULTS = () => ({
@@ -89,6 +90,7 @@ export async function signOut() {
 export const currentUser = () => user;
 export const isOnline = () => navigator.onLine;
 export const hasPending = () => dirty;
+export const isStale = () => stale;
 
 // ---------- Laden und Abgleich ----------
 
@@ -114,7 +116,10 @@ async function onVisible() {
   if (dirty) { pushNow(); return; }
   try {
     const remote = await readRemote();
-    if (remote && (remote._updatedAt || 0) > (state._updatedAt || 0) && !document.querySelector('.today-running')) location.reload();
+    if (!remote || (remote._updatedAt || 0) <= (state._updatedAt || 0)) return;
+    stale = true;
+    // Auf der Startseite ohne laufendes Training sofort neu laden, sonst beim nächsten Seitenwechsel (main.js)
+    if (/^#?\/?(heute)?$/.test(location.hash) && !document.querySelector('.td-run-head')) location.reload();
   } catch { /* offline */ }
 }
 

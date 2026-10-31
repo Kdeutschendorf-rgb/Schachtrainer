@@ -89,3 +89,10 @@ select, input[type=text], input[type=number] { font: inherit; color: var(--text)
 
 /* Platzhalter, solange eine Seite ihre Daten lädt */
 #view:empty::before { content: "Lädt …"; color: var(--muted); }
+
+/* Anmeldung */
+body.logged-out #nav, body.logged-out #streak { display: none; }
+.login { max-width: 380px; margin: 40px auto; display: flex; flex-direction: column; gap: 12px; }
+.login-field { display: flex; flex-direction: column; gap: 4px; }
+.login-field input { font: inherit; color: var(--text); background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px; }
+.login-msg { color: var(--bad, #e66); min-height: 1em; }
