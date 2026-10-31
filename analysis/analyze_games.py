@@ -15,7 +15,8 @@ import chess.engine
 import chess.pgn
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ENGINE = os.path.join(ROOT, "tools", "stockfish", "stockfish-macos-universal")
+# In der GitHub Action kommt Stockfish aus dem System (Umgebungsvariable STOCKFISH)
+ENGINE = os.environ.get("STOCKFISH") or os.path.join(ROOT, "tools", "stockfish", "stockfish-macos-universal")
 OUT = os.path.join(ROOT, "data", "analysis")
 ME = "keanu098"
 VALUES = {chess.PAWN: 1, chess.KNIGHT: 3, chess.BISHOP: 3, chess.ROOK: 5, chess.QUEEN: 9, chess.KING: 0}

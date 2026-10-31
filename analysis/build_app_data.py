@@ -4,7 +4,7 @@ Aufruf:  .venv/bin/python -I analysis/build_app_data.py [--out DIR] [--rep-white
 Liest:   data/analysis/games.json, mistakes.json, my_puzzles.json (von analyze_games.py),
          data/raw/*.pgn (Züge für die Repertoire-Abdeckung),
          app/data/repertoire_white.json, repertoire_black.json (dürfen fehlen)
-Schreibt: app/data/analysis_summary.json und app/data/my_puzzles.json
+Schreibt: app/data/players/keanu098/analysis_summary.json und my_puzzles.json
 """
 import argparse
 import datetime
@@ -20,6 +20,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ANALYSIS = os.path.join(ROOT, "data", "analysis")
 RAW = os.path.join(ROOT, "data", "raw")
 APP_DATA = os.path.join(ROOT, "app", "data")
+PLAYER_DATA = os.path.join(APP_DATA, "players", "keanu098")   # persönliche Daten, siehe app/data/players.json
 ME = "keanu098"
 TCS = ("rapid", "blitz", "bullet", "daily")
 TC_DE = {"rapid": "Rapid", "blitz": "Blitz", "bullet": "Bullet", "daily": "Täglich"}
@@ -607,7 +608,7 @@ def build(args):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--out", default=APP_DATA, help="Zielordner (Standard: app/data)")
+    ap.add_argument("--out", default=PLAYER_DATA, help="Zielordner (Standard: app/data/players/keanu098)")
     ap.add_argument("--rep-white", default=os.path.join(APP_DATA, "repertoire_white.json"))
     ap.add_argument("--rep-black", default=os.path.join(APP_DATA, "repertoire_black.json"))
     args = ap.parse_args()

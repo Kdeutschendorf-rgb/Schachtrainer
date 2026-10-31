@@ -190,7 +190,7 @@ def main():
     try:
         new_games = analyse_new(pgns)
         append_raw(pgns)
-        bad.build(argparse.Namespace(out=bad.APP_DATA,
+        bad.build(argparse.Namespace(out=bad.PLAYER_DATA,
                                      rep_white=os.path.join(bad.APP_DATA, "repertoire_white.json"),
                                      rep_black=os.path.join(bad.APP_DATA, "repertoire_black.json")))
     except Exception as exc:   # letzte Zeile muss trotzdem JSON sein (server.py liest sie)
