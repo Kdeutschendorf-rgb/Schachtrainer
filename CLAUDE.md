@@ -8,29 +8,38 @@ Dieser Ordner ist **kein Schulfach**: Die Ordner- und Dateiregeln aus dem Schulo
 Antworten und Texte auf Deutsch, Ansprache mit „du“. In Fließtext deutsche Notation (K, D, T, L, S: „Sf3“),
 in JSON-Zügen englische SAN.
 
-## Server starten
+## Wie die App läuft
 
-- Doppelklick auf `start.command` oder im Terminal: `.venv/bin/python server.py` → http://localhost:8765
-- Erst prüfen, ob er schon läuft (`curl -s -o /dev/null -w '%{http_code}' http://localhost:8765/`).
+- Online unter https://kdeutschendorf-rgb.github.io/Schachtrainer/ (GitHub Pages, Repo `Kdeutschendorf-rgb/Schachtrainer`).
+  Jeder Push auf `main` veröffentlicht `app/` neu (`.github/workflows/pages.yml`, trägt die Version in `app/sw.js` ein).
+  **Vor jedem Push Keanu fragen.** gh: `tools/gh_2.103.3_macOS_arm64/bin/gh`, beim Push als Credential-Helper.
+- Offline-App (Service Worker `app/sw.js`, Dateiliste `app/precache.json` aus `scripts/build_precache.sh`),
+  Engine: Stockfish 18 lite als WASM im Browser (`app/js/engine.js`).
+- Fortschritt: im Browser (localStorage) und in Supabase, Tabelle `progress` (eine Zeile pro Nutzer, `data` jsonb),
+  Abgleich in `app/js/store.js`. Login mit E-Mail und Passwort oder als Gast (nur ein Gerät).
+  Den Fortschritt kann Claude nicht direkt lesen; Keanu kann im Bericht nachsehen oder Zahlen schicken.
+- Lokal testen: `.venv/bin/python server.py` → http://localhost:8765 (Offline-Modus dort nur mit `?sw`).
   Einen laufenden Server nicht beenden oder neu starten, ohne dass Keanu es will.
 - Python immer als `.venv/bin/python -I`. Engine-Jobs mit höchstens 2 Threads.
+- Freunde: Jeder trägt seinen chess.com-Namen ein. Persönliche Daten liegen unter `app/data/players/<name klein>/`
+  und werden nur geladen, wenn der Name in `app/data/players.json` steht; sonst zeigt die App eine neutrale Version.
 
 ## Wo die Daten liegen
 
 | Datei | Inhalt |
 |---|---|
-| `data/progress.json` | Gesamter Trainingsfortschritt der App (schreibt die App über `PUT /api/progress`, Sicherungen in `data/backups/`) |
-| `app/data/analysis_summary.json` | Auswertung aller chess.com-Partien (Elo-Verlauf, Eröffnungen, Fehler, Zeit, `focus`, `insights`) |
-| `app/data/my_puzzles.json` | Aufgaben aus eigenen Fehlern (für die Taktik) |
-| `app/data/coach_report.json` | Deine Wochenauswertung, erscheint oben im Bericht (optional) |
+| Supabase `progress` | Gesamter Trainingsfortschritt (Aufbau siehe unten) |
+| `app/data/players/keanu098/analysis_summary.json` | Auswertung aller chess.com-Partien (Elo-Verlauf, Eröffnungen, Fehler, Zeit, `focus`, `insights`) |
+| `app/data/players/keanu098/my_puzzles.json` | Aufgaben aus eigenen Fehlern (für die Taktik) |
+| `app/data/players/keanu098/coach_report.json` | Deine Wochenauswertung, erscheint oben im Bericht (optional) |
 | `data/analysis/games.json`, `mistakes.json`, `my_puzzles.json` | Rohdaten der Engine-Analyse jeder Partie bzw. jedes Fehlers |
 | `data/raw/*.pgn` | Partien (Download und `chesscom_sync.pgn` aus dem Sync) |
 | `app/data/repertoire_white.json`, `repertoire_black.json` | Eröffnungsrepertoire |
 | `app/data/openings_catalog.json`, `lichess_openings.json` | Eröffnungskatalog und Namensliste |
 
-`data/progress.json` ist so aufgebaut:
+Der Fortschritt ist so aufgebaut:
 
-- `settings`: `dailyMinutes`, `plan` (Anteile der Blöcke), `adaptive`, `goalRapid`, `startRapid`
+- `settings`: `displayName`, `chesscomName`, `dailyMinutes`, `plan` (Anteile der Blöcke), `adaptive`, `goalRapid`, `startRapid`
 - `sessions`: `[{date, startedAt, minutes, planned, completed, blocks: [{id, type, mode, minutes, done, correct, skipped?, failed?, details?}]}]`
 - `activity`: `{'YYYY-MM-DD': {minutes, puzzles, puzzlesSolved, openingReviews, openingCorrect, openingNew, openingLines, openingQuiz, openingQuizRight, visionTasks, visionSolved, endgames, endgamesSolved}}`
 - `tactics`: `rating`, `rd`, `history: [[id, ok, datum, wertungDanach, sekunden]]`, `themeStats: {thema: [richtig, gesamt]}`, `cards`, `rush.best`
@@ -39,17 +48,16 @@ in JSON-Zügen englische SAN.
 
 ## Wochenauswertung (wenn Keanu danach fragt)
 
-1. Neue Partien holen: In der App unter „Bericht“ auf „Neue Partien von chess.com holen“ klicken lassen, oder selbst
-   `.venv/bin/python -I analysis/sync.py` ausführen (holt die letzten 2 Monate, analysiert nur neue Partien mit
-   höchstens 2 Engine-Prozessen, baut danach die App-Daten neu). Probelauf ohne Schreiben: `--dry-run`.
-   Nicht starten, solange `pgrep -f analyze_games.py` etwas findet.
-2. Lesen: `data/progress.json` (was wurde trainiert: `sessions`, `activity`, Taktik-Wertung, fällige Eröffnungskarten)
-   und `app/data/analysis_summary.json` (`elo.series.rapid`, `trend`, `insights`, `focus`, `openings`, `time`,
+1. Neue Partien holt jeden Montag die GitHub Action `.github/workflows/weekly.yml` (sync.py mit System-Stockfish,
+   committet und veröffentlicht). Vorher also `git pull`. Von Hand geht es mit `.venv/bin/python -I analysis/sync.py`
+   (Probelauf: `--dry-run`), nicht starten, solange `pgrep -f analyze_games.py` etwas findet.
+2. Lesen: den Fortschritt, falls Keanu ihn schickt (was wurde trainiert: `sessions`, `activity`, Taktik-Wertung, fällige Eröffnungskarten)
+   und `app/data/players/keanu098/analysis_summary.json` (`elo.series.rapid`, `trend`, `insights`, `focus`, `openings`, `time`,
    `repertoire`). Für Details zu einzelnen Fehlern `data/analysis/mistakes.json` nach `tc == "rapid"` und Datum filtern.
 3. Auswerten: Rapid-Elo der Woche, Trainingstage und Minuten, Trefferquoten, wiederkehrende Fehlermuster
    (Fehler-Tags, Phase, Eröffnung), Repertoire-Lücken (`repertoire.w.gaps`, `deviations`), verlassene Partien.
    Konkret und ehrlich, mit Zahlen. Jede Schachbehauptung mit python-chess oder der Engine prüfen.
-4. `app/data/coach_report.json` schreiben (UTF-8, gültiges JSON):
+4. `app/data/players/keanu098/coach_report.json` schreiben (UTF-8, gültiges JSON):
    ```json
    {
      "date": "2026-11-06",
@@ -60,14 +68,13 @@ in JSON-Zügen englische SAN.
      "notes": "Optional: längerer Text, Absätze mit \n"
    }
    ```
-   Der Bericht zeigt ihn beim nächsten Öffnen oben an. Wenn es hilft, auch `settings.plan` in `data/progress.json`
-   vorschlagen (z. B. mehr Eröffnung), aber den Fortschritt nur ändern, wenn Keanu zustimmt und die App geschlossen ist
-   (sonst überschreibt die App die Datei beim nächsten Speichern).
+   Erscheint nach dem Push (vorher fragen) im Bericht. Plan-Änderungen (z. B. mehr Eröffnung) schlägt Keanu selbst
+   unter „Plan anpassen“ ein.
 
 ## App-Daten neu bauen
 
 `.venv/bin/python -I analysis/build_app_data.py` liest `data/analysis/*.json`, `data/raw/*.pgn` und die Repertoire-Dateien
-und schreibt `app/data/analysis_summary.json` und `app/data/my_puzzles.json`. Dauert unter einer Sekunde.
+und schreibt `analysis_summary.json` und `my_puzzles.json` nach `app/data/players/keanu098/`. Dauert unter einer Sekunde.
 Nötig nach Änderungen am Repertoire (für die Repertoire-Abdeckung) oder an der Analyse.
 Die volle Neuanalyse aller Partien (`analysis/analyze_games.py <pgn>`) dauert lange und nutzt viele Kerne: nur auf Wunsch.
 
