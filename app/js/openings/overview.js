@@ -41,15 +41,14 @@ export function renderOverview(el, { model, go, openChapter }) {
       button({ label: t.due ? `Wiederholen (${t.due})` : 'Nichts fällig', primary: !!t.due, disabled: !t.due, onClick: () => go('wiederholen') }),
       button({ label: 'Neue Linie lernen', primary: !t.due && !!next, disabled: !model.lines.length, onClick: () => go('lernen') }),
       button({ label: 'Explorer', onClick: () => go('explorer') }),
-      button({ label: 'Alle Eröffnungen', onClick: () => go('katalog') }),
-      button({ label: 'Quiz', onClick: () => go('quiz') })),
+      button({ label: 'Alle Eröffnungen', onClick: () => go('katalog') })),
     nextInfo,
     h('label.row.small.muted.op-setting', 'Neue Züge pro Tag:', limitInput, h('span', '(Standard 12, weniger = entspannter)'))));
 
   if (!model.chapters.length) {
     el.append(emptyState('Noch kein Repertoire',
-      'Sobald die Repertoire-Dateien da sind, findest du hier deine Kapitel. Bis dahin kannst du im Katalog stöbern oder das Quiz spielen.',
-      h('div.row', button({ label: 'Alle Eröffnungen', onClick: () => go('katalog') }), button({ label: 'Quiz', onClick: () => go('quiz') }))));
+      'Sobald die Repertoire-Dateien da sind, findest du hier deine Kapitel. Bis dahin kannst du im Katalog stöbern.',
+      h('div.row', button({ label: 'Alle Eröffnungen', onClick: () => go('katalog') }))));
     return;
   }
 

@@ -90,7 +90,11 @@ export async function fetchJson(url, opts) {
 // Einmal geladene Daten aus app/data cachen (z. B. puzzles.json).
 const dataCache = new Map();
 export function loadData(name) {
-  if (!dataCache.has(name)) dataCache.set(name, fetchJson(`data/${name}`));
+  if (!dataCache.has(name)) {
+    const p = fetchJson(`data/${name}`);
+    p.catch(() => dataCache.delete(name));   // Fehlschlag (z. B. offline) nicht merken
+    dataCache.set(name, p);
+  }
   return dataCache.get(name);
 }
 

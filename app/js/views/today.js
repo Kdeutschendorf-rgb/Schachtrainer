@@ -131,7 +131,7 @@ export function computePlan(args = {}) {
     .sort((a, b) => b[1] - a[1]).slice(0, 2).map(([t]) => themeName(t));
   const why = {
     warmup: 'Leichte Aufgaben, um in Schwung zu kommen.',
-    openings: due ? `${due} fällige Karten, danach neue Züge aus deinem Repertoire.` : 'Neue Züge aus deinem Repertoire, danach Quiz.',
+    openings: due ? `${due} fällige Karten, danach neue Züge aus deinem Repertoire.` : 'Neue Linien aus deinem Repertoire, Zug für Zug.',
     tactics: topThemes.length ? `Gewertet, mit Schwerpunkt ${topThemes.join(' und ')}.` : 'Gewertete Aufgaben, gemischt nach deinen Schwächen.',
     vision: 'Blind rechnen, Drohungen erkennen, Schach–Schlagen–Drohen.',
     finish: finishModule === 'own' ? 'Stellungen aus deinen eigenen Partien.' : 'Grundtechnik im Endspiel.',

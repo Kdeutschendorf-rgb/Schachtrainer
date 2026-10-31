@@ -3,7 +3,7 @@
 import * as L from '../../app/js/openings/logic.js';
 import { addDays } from '../../app/js/srs.js';
 
-const DIR = '/Users/keanudeutschendorf/Schachtrainer/data/test/';
+const DIR = decodeURIComponent(import.meta.url.replace(/^file:\/\//, '').replace(/data\/test\/[^/]*$/, '')) + 'data/test/';
 const white = JSON.parse(read(DIR + 'repertoire_test.json'));
 const black = JSON.parse(read(DIR + 'repertoire_test_black.json'));
 const lichess = JSON.parse(read(DIR + 'lichess_test.json'));

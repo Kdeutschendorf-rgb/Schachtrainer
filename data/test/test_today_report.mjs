@@ -2,10 +2,11 @@
 // /System/Library/Frameworks/JavaScriptCore.framework/Versions/Current/Helpers/jsc -m data/test/test_today_report.mjs
 import { install, tick, findButton, Element } from './fake_dom.mjs';
 
-const ROOT = '/Users/keanudeutschendorf/Schachtrainer/';
+const ROOT = decodeURIComponent(import.meta.url.replace(/^file:\/\//, '').replace(/data\/test\/[^/]*$/, '')) + '';
 const fetchMap = {
-  'data/analysis_summary.json': ROOT + 'app/data/analysis_summary.json',
-  'data/my_puzzles.json': ROOT + 'app/data/my_puzzles.json',
+  'data/players.json': ROOT + 'app/data/players.json',
+  'data/players/keanu098/analysis_summary.json': ROOT + 'app/data/players/keanu098/analysis_summary.json',
+  'data/players/keanu098/my_puzzles.json': ROOT + 'app/data/players/keanu098/my_puzzles.json',
   'data/puzzles.json': ROOT + 'app/data/puzzles.json',
   'data/openings_catalog.json': ROOT + 'app/data/openings_catalog.json',
   'data/lichess_openings.json': ROOT + 'app/data/lichess_openings.json',
@@ -23,6 +24,7 @@ function container() { const el = new Element('main'); doc.body.append(el); retu
 
 const store = await import('../../app/js/store.js');
 await store.init();
+store.update('settings', s => { s.chesscomName = 'Keanu098'; });
 const coach = await import('../../app/js/coach.js');
 const today = await import('../../app/js/views/today.js');
 
@@ -60,7 +62,7 @@ const el = container();
 const unmount = await today.mount(el, {});
 await tick(10);
 ok(el.textContent.includes('Training starten'), 'Startknopf');
-ok(el.textContent.includes('1141'), 'Rapid-Elo angezeigt');
+ok(el.textContent.includes('Rapid-Elo (chess.com)'), 'Rapid-Elo angezeigt');
 ok(el.textContent.includes('Ziel 1300'), 'Standardziel 1300');
 noJunk(el, 'Heute');
 findButton(el, 'Plan anpassen').click();
@@ -96,7 +98,7 @@ const el2 = container();
 const unmount2 = await report.mount(el2, {});
 await tick(10);
 const txt = el2.textContent;
-for (const s of ['Elo-Verlauf', 'Dein Training', 'Ergebnisse nach Eröffnung', 'Repertoire-Abdeckung', 'Deine Fehler', 'Genauigkeit über die Zeit', 'Zeitverluste', 'Entwicklung', 'Neue Partien von chess.com holen']) {
+for (const s of ['Elo-Verlauf', 'Dein Training', 'Ergebnisse nach Eröffnung', 'Repertoire-Abdeckung', 'Deine Fehler', 'Genauigkeit über die Zeit', 'Zeitverluste', 'Entwicklung', 'jeden Montag automatisch']) {
   ok(txt.includes(s), 'Bericht enthält ' + s);
 }
 ok(el2.querySelectorAll('svg').length >= 3, 'mindestens 3 SVG-Diagramme: ' + el2.querySelectorAll('svg').length);
@@ -117,7 +119,7 @@ noJunk(tip, 'Tooltip');
 unmount2?.();
 
 // Bericht mit Coach-Report und ohne Analyse
-fetchMap['data/coach_report.json'] = ROOT + 'data/test/coach_report_test.json';
+fetchMap['data/players/keanu098/coach_report.json'] = ROOT + 'data/test/coach_report_test.json';
 const el3 = container();
 await report.mount(el3, {});
 await tick(10);

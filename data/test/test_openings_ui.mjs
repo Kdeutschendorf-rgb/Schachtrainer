@@ -2,7 +2,7 @@
 // /System/Library/Frameworks/JavaScriptCore.framework/Versions/Current/Helpers/jsc -m data/test/test_openings_ui.mjs
 import { install, tick, findButton, Element } from './fake_dom.mjs';
 
-const DIR = '/Users/keanudeutschendorf/Schachtrainer/data/test/';
+const DIR = decodeURIComponent(import.meta.url.replace(/^file:\/\//, '').replace(/data\/test\/[^/]*$/, '')) + 'data/test/';
 const fetchMap = {
     'data/repertoire_white.json': DIR + 'repertoire_test.json',
     'data/repertoire_black.json': DIR + 'repertoire_test_black.json',
@@ -141,41 +141,11 @@ ok(el.textContent.includes('Nicht im Repertoire'), 'Explorer: Abweichung erkannt
 ok(el.textContent.includes('Beste Antwort'), 'Explorer: Engine-Antwort: ' + el.textContent.slice(-300));
 noJunk(el); cleanup(); el.remove();
 
-// ---------- Katalog fehlt, Quiz mit Lichess-Daten ----------
+// ---------- Katalog fehlt ----------
 el = container();
 cleanup = await view.mount(el, { tab: 'katalog' });
 ok(el.textContent.includes('openings_catalog.json gibt es noch nicht'), 'Katalog-Hinweis: ' + el.textContent.slice(0, 300));
 noJunk(el); cleanup(); el.remove();
-el = container();
-cleanup = await view.mount(el, { tab: 'quiz' });
-ok(el.textContent.includes('Wie heißt') || el.textContent.includes('Finde den Hauptzug'), 'Quiz-Frage');
-noJunk(el); cleanup(); el.remove();
-
-// Quiz beantworten (Tasten 1–4 bzw. Zug am Brett)
-{
-  const { createQuiz } = await import('../../app/js/openings/quiz.js');
-  const { loadQuizPool } = await import('../../app/js/openings/data.js');
-  const pool = await loadQuizPool();
-  el = container();
-  let answers = 0;
-  const q = createQuiz(el, { pool, onAnswer: () => answers++ });
-  for (let i = 0; i < 6; i++) {
-    if (el.textContent.includes('Wie heißt')) doc.key('1');
-    else {
-      const arrowless = q.board.chess.moves({ verbose: true })[0];
-      userMove(q.board, arrowless.from + arrowless.to);   // vermutlich falsch → Pfeil
-      await tick(5);
-      const shape = q.board.cg.state.drawable.autoShapes.find(s => s.dest);
-      if (shape) userMove(q.board, shape.orig + shape.dest);
-    }
-    await tick(5);
-    doc.key('Enter');
-  }
-  ok(answers === 6, 'Quiz: 6 Antworten gezählt (' + answers + ')');
-  const qs = store.get('openings').quiz;
-  ok(qs.right + qs.wrong === 6, 'Quiz-Fortschritt gespeichert');
-  noJunk(el); q.destroy(); el.remove();
-}
 
 // Katalog mit Falle
 fetchMap['data/openings_catalog.json'] = DIR + 'catalog_test.json';

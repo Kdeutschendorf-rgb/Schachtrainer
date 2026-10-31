@@ -4,7 +4,7 @@
 import { install, tick, findButton, Element } from './fake_dom.mjs';
 import { Chess } from '../../app/vendor/chess.js';
 
-const ROOT = '/Users/keanudeutschendorf/Schachtrainer/';
+const ROOT = decodeURIComponent(import.meta.url.replace(/^file:\/\//, '').replace(/data\/test\/[^/]*$/, '')) + '';
 let engineCalls = 0;
 
 // Was das Schein-DOM nicht kann, der Browser aber schon. Wie im echten DOM wird null zu „null“,

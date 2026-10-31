@@ -1,15 +1,14 @@
-// Eröffnungen: Übersicht, Lernen, Wiederholen (SRS), Explorer, Katalog, Quiz, Sparring.
+// Eröffnungen: Übersicht, Lernen, Wiederholen (SRS), Explorer, Katalog, Sparring.
 // Unterseiten über Routen-Parameter, z. B. #/eroeffnungen?tab=lernen&line=<id>, ?tab=katalog&id=<id>,
 // ?tab=explorer&side=b&chapter=<id>, ?tab=sparring&line=<id>.
-// Dazu runBlock() für den Tagesplan: fällige Karten → neue Züge bis zum Tageslimit → Quiz.
+// Dazu runBlock() für den Tagesplan: fällige Karten → neue Züge bis zum Tageslimit → weitere neue Linien → gelernte Linien üben.
 
 import { h, clear, loadCss, countdown, toast } from '../ui.js';
 import { pickDueLine, pickNewLine, newLineQueue, canLearn, totals, dueLines } from '../openings/logic.js';
-import { loadModel, loadCatalog, loadQuizPool, progress, fileProblem, FILES } from '../openings/data.js';
+import { loadModel, loadCatalog, progress, fileProblem, FILES } from '../openings/data.js';
 import { createLineTrainer } from '../openings/trainer.js';
 import { createExplorer } from '../openings/explorer.js';
 import { createCatalog } from '../openings/catalog.js';
-import { createQuiz } from '../openings/quiz.js';
 import { createSparring } from '../openings/sparring.js';
 import { renderOverview } from '../openings/overview.js';
 import { repertoireNotice, emptyState, button } from '../openings/widgets.js';
@@ -20,7 +19,6 @@ const TABS = [
   ['wiederholen', 'Wiederholen'],
   ['explorer', 'Explorer'],
   ['katalog', 'Alle Eröffnungen'],
-  ['quiz', 'Quiz'],
   ['sparring', 'Sparring'],
 ];
 
@@ -105,7 +103,7 @@ export async function mount(el, params = {}) {
               button({ label: 'Trotzdem eine Linie lernen', onClick: () => startLearn(queue[0]) }))));
         } else {
           content.append(emptyState('Alles gelernt', 'Du hast alle Linien in diesem Bereich gelernt. Jetzt heißt es wiederholen und sparren.',
-            h('div.row', button({ label: 'Wiederholen', primary: true, onClick: () => go('wiederholen') }), button({ label: 'Quiz', onClick: () => go('quiz') }))));
+            h('div.row', button({ label: 'Wiederholen', primary: true, onClick: () => go('wiederholen') }))));
         }
         return;
       }
@@ -145,10 +143,9 @@ export async function mount(el, params = {}) {
           session.lines ? 'Alles wiederholt!' : 'Nichts fällig',
           session.lines
             ? `${session.lines} Linie${session.lines === 1 ? '' : 'n'}, ${session.correct} von ${session.total} Zügen auf Anhieb richtig.`
-            : 'Gerade ist keine Karte fällig. Lerne eine neue Linie oder spiel das Quiz.',
+            : 'Gerade ist keine Karte fällig. Lerne eine neue Linie.',
           h('div.row',
             next ? button({ label: 'Neue Linie lernen', primary: true, onClick: () => go('lernen') }) : null,
-            button({ label: 'Quiz', onClick: () => go('quiz') }),
             button({ label: 'Übersicht', onClick: () => go('uebersicht') }))));
         return;
       }
@@ -209,24 +206,10 @@ export async function mount(el, params = {}) {
     setSub(createCatalog(wrap, {
       catalog, focusId: params.id,
       onSelect: id => setUrl('katalog', { id }),
-      onQuiz: () => go('quiz'),
     }));
     return cleanup;
   }
 
-  // ----- Quiz -----
-  if (tab === 'quiz') {
-    const pool = await loadQuizPool();
-    if (!root.isConnected) return cleanup;
-    if (!pool) {
-      content.append(fileNotice(fileProblem(FILES.lichess) ? FILES.lichess : FILES.catalog, 'Eröffnungsquiz'));
-      return cleanup;
-    }
-    const wrap = h('div');
-    content.append(wrap);
-    setSub(createQuiz(wrap, { pool }));
-    return cleanup;
-  }
 
   // ----- Sparring -----
   if (tab === 'sparring') {
@@ -272,14 +255,13 @@ export async function mount(el, params = {}) {
 export function runBlock(el, { minutes = 10, mode = 'review', onDone } = {}) {
   loadCss('css/openings.css');
   const started = Date.now();
-  const stats = { lines: 0, newLines: 0, newCards: 0, moves: 0, correct: 0, quiz: 0, quizRight: 0 };
+  const stats = { lines: 0, newLines: 0, newCards: 0, moves: 0, correct: 0 };
   let finished = false;
   let alive = true;
   let timeUp = false;
   let busy = false;        // läuft gerade eine Aufgabe (darf noch fertig werden)?
   let sub = null;
   let model = null;
-  let pool;                // undefined = noch nicht geladen, null = fehlt
 
   const phaseEl = h('span.op-block-phase', 'Eröffnungen');
   const timeNote = h('span.muted.small');
@@ -308,8 +290,8 @@ export function runBlock(el, { minutes = 10, mode = 'review', onDone } = {}) {
     const summary = {
       type: 'openings', mode,
       minutes: Math.round((Date.now() - started) / 6000) / 10,
-      done: stats.moves + stats.quiz,
-      correct: stats.correct + stats.quizRight,
+      done: stats.moves,
+      correct: stats.correct,
       details: { ...stats },
     };
     onDone?.(summary);
@@ -325,14 +307,20 @@ export function runBlock(el, { minutes = 10, mode = 'review', onDone } = {}) {
     if (due) return runLine(due, 'review');
     const fresh = pickNewLine(model, prog);
     if (fresh) return runLine(fresh, 'learn');
-    return runQuiz();
+    // Tageslimit erreicht: im Block trotzdem weitere neue Linien zeigen, danach Gelerntes üben
+    const more = newLineQueue(model, prog)[0];
+    if (more) return runLine(more, 'learn', 'Eröffnungen · Weitere neue Linie');
+    const old = practiceLine();
+    if (old) return runLine(old, 'review', 'Eröffnungen · Gelernte Linie üben');
+    clear(stage).append(h('div.feedback.warn', 'Keine Eröffnungslinien gefunden. Der Block endet gleich.'));
+    setTimeout(finish, 3000);
   }
 
-  function runLine(line, lineMode) {
+  function runLine(line, lineMode, label) {
     const t = totals(model, progress());
-    phaseEl.textContent = lineMode === 'review'
+    phaseEl.textContent = label || (lineMode === 'review'
       ? `Eröffnungen · Wiederholen (${t.due} fällig)`
-      : `Eröffnungen · Neue Linie (${t.newToday}/${t.newPerDay} neue Züge heute)`;
+      : `Eröffnungen · Neue Linie (${t.newToday}/${t.newPerDay} neue Züge heute)`);
     busy = true;
     clear(stage);
     const wrap = h('div');
@@ -351,36 +339,14 @@ export function runBlock(el, { minutes = 10, mode = 'review', onDone } = {}) {
     }));
   }
 
-  async function runQuiz() {
-    if (pool === undefined) pool = await loadQuizPool();
-    if (!alive || finished) return;
-    clear(stage);
-    if (!pool) {
-      stage.append(h('div.feedback.warn', 'Heute gibt es keine fälligen Eröffnungszüge, und die Quiz-Daten fehlen noch. Der Block endet gleich.'));
-      setTimeout(finish, 3000);
-      return;
-    }
-    phaseEl.textContent = 'Eröffnungen · Quiz';
-    const wrap = h('div');
-    stage.append(wrap);
-    setSub(createQuiz(wrap, {
-      pool,
-      // Neue Frage nur, solange Zeit übrig ist
-      onQuestion: () => {
-        if (timeUp) { setTimeout(finish, 0); return false; }   // finish prüft alive selbst
-        busy = true;
-        return true;
-      },
-      onAnswer: right => {
-        stats.quiz++;
-        if (right) stats.quizRight++;
-        busy = false;
-        // Bei abgelaufener Zeit die Auflösung kurz zeigen, dann beenden.
-        if (timeUp) setTimeout(finish, 1800);
-      },
-      // Keine brauchbare Frage: nichts mehr zu tun, Block endet
-      onEmpty: () => { busy = false; setTimeout(finish, 3000); },
-    }));
+  // Alles gelernt und nichts fällig: gelernte Linien üben, die am längsten zurückliegen, jede nur einmal pro Block.
+  const practiced = new Set();
+  function practiceLine() {
+    const learned = progress().learnedLines || {};
+    const line = model.lines.filter(l => learned[l.id] && !practiced.has(l.id))
+      .sort((a, b) => String(learned[a.id]).localeCompare(String(learned[b.id])))[0] || null;
+    if (line) practiced.add(line.id);
+    return line;
   }
 
   // Jeder Schritt mit Fehlerbehandlung: Ein Fehler beendet den Block sauber (onDone kommt trotzdem).
