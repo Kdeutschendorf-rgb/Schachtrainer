@@ -145,3 +145,7 @@ button.rp-leg.on { color: var(--text); border-color: var(--muted); }
 .rp-train-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-top: 16px; }
 .rp-mini { background: var(--panel-2); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
 .rp-sessions { margin-top: 16px; }
+@media (max-width: 380px) {
+  .rp-heat { grid-template-columns: 20px repeat(18, 11px); grid-template-rows: repeat(7, 11px); gap: 2px; }
+  .rp-heat .rp-cell { width: 11px; height: 11px; }
+}

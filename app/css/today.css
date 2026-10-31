@@ -69,3 +69,16 @@
 .td-sum-stats > div { background: var(--panel-2); border-radius: 8px; padding: 10px 12px; }
 .td-sum-table { width: 100%; border-collapse: collapse; }
 .td-sum-table td { padding: 6px 8px; border-top: 1px solid var(--line); }
+@media (max-width: 700px) {
+  /* Laufendes Training: kompakter Kopf, damit das Brett ganz zu sehen ist */
+  .td-run-head { position: static; gap: 8px; padding: 10px 12px; }
+  .td-run-title { font-size: 1rem; flex-basis: 100%; }
+  .td-run-head button { padding: 5px 10px; font-size: .85rem; }
+  .td-steps { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .td-steps::-webkit-scrollbar { display: none; }
+  .td-step { flex: 0 0 auto; white-space: nowrap; }
+}
+@media (max-width: 700px) {
+  body:has(.td-run-head) #nav { display: none; }
+  body:has(.td-run-head) { padding-bottom: env(safe-area-inset-bottom); }
+}

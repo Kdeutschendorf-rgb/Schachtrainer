@@ -2,12 +2,13 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Schachtrainer</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <meta name="theme-color" content="#1d1f21">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Schach">
   <link rel="stylesheet" href="vendor/chessground.base.css">
   <link rel="stylesheet" href="vendor/chessground.brown.css">
@@ -18,12 +19,12 @@
   <header class="topbar">
     <a class="brand" href="#/heute">♞ Schachtrainer</a>
     <nav id="nav">
-      <a href="#/heute" data-route="heute">Heute</a>
-      <a href="#/eroeffnungen" data-route="eroeffnungen">Eröffnungen</a>
-      <a href="#/taktik" data-route="taktik">Taktik</a>
-      <a href="#/rechnen" data-route="rechnen">Vorausdenken</a>
-      <a href="#/endspiele" data-route="endspiele">Endspiele</a>
-      <a href="#/bericht" data-route="bericht">Bericht</a>
+      <a href="#/heute" data-route="heute"><span class="nav-icon">🏠</span><span class="nav-long">Heute</span><span class="nav-short">Heute</span></a>
+      <a href="#/eroeffnungen" data-route="eroeffnungen"><span class="nav-icon">📖</span><span class="nav-long">Eröffnungen</span><span class="nav-short">Eröffn.</span></a>
+      <a href="#/taktik" data-route="taktik"><span class="nav-icon">⚔️</span><span class="nav-long">Taktik</span><span class="nav-short">Taktik</span></a>
+      <a href="#/rechnen" data-route="rechnen"><span class="nav-icon">🧠</span><span class="nav-long">Vorausdenken</span><span class="nav-short">Rechnen</span></a>
+      <a href="#/endspiele" data-route="endspiele"><span class="nav-icon">♟️</span><span class="nav-long">Endspiele</span><span class="nav-short">Endspiel</span></a>
+      <a href="#/bericht" data-route="bericht"><span class="nav-icon">📈</span><span class="nav-long">Bericht</span><span class="nav-short">Bericht</span></a>
     </nav>
     <span id="streak" class="streak" title="Tage in Folge trainiert"></span>
   </header>
