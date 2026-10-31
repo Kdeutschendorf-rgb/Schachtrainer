@@ -88,6 +88,7 @@ if (profile) {
     if (profile.chesscomName) s.chesscomName = profile.chesscomName;
   });
 }
+store.registerPlayer(store.get('settings').chesscomName);
 window.addEventListener('hashchange', render);
 render();
 

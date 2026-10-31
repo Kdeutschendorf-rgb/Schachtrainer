@@ -137,3 +137,4 @@ select { max-width: 100%; }
   .op-tabs::-webkit-scrollbar, .tk-modes::-webkit-scrollbar, .rp-nav::-webkit-scrollbar { display: none; }
   main .op-tabs > *, main .tk-modes > *, main .rp-nav > * { flex: 0 0 auto; white-space: nowrap; }
 }
+.touch .kbd-hint { display: none; }

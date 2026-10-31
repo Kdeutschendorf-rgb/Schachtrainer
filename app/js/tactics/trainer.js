@@ -53,7 +53,7 @@ export function createTrainer(el, opts = {}) {
     resultLine, metaEl,
     h('div.tk-replay', h('div.row', navPrev, navNext, h('span.small.muted', 'Lösung nachspielen')), movesEl),
     analysisEl,
-    h('div.row', analyseBtn, lichessLink, h('span.spacer'), h('span.small.muted.tk-key', 'Leertaste'), nextBtn));
+    h('div.row', analyseBtn, lichessLink, h('span.spacer'), h('span.small.muted.tk-key.kbd-hint', 'Leertaste'), nextBtn));
 
   const side = h('div.side.tk-side',
     opts.header || null,

@@ -17,8 +17,10 @@ import chess.pgn
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # In der GitHub Action kommt Stockfish aus dem System (Umgebungsvariable STOCKFISH)
 ENGINE = os.environ.get("STOCKFISH") or os.path.join(ROOT, "tools", "stockfish", "stockfish-macos-universal")
-OUT = os.path.join(ROOT, "data", "analysis")
-ME = "keanu098"
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))   # -I: Nachbarmodul player.py
+import player   # noqa: E402
+OUT = player.ANALYSIS
+ME = player.NAME
 VALUES = {chess.PAWN: 1, chess.KNIGHT: 3, chess.BISHOP: 3, chess.ROOK: 5, chess.QUEEN: 9, chess.KING: 0}
 PIECE_DE = {chess.PAWN: "Bauer", chess.KNIGHT: "Springer", chess.BISHOP: "Läufer",
             chess.ROOK: "Turm", chess.QUEEN: "Dame", chess.KING: "König"}
@@ -68,7 +70,7 @@ def phase(board, ply):
 def load_openings():
     """EPD -> (eco, name) aus der Lichess-Eröffnungsliste."""
     book = {}
-    folder = os.path.join(ROOT, "data", "raw", "openings")
+    folder = player.OPENINGS_TSV
     for f in sorted(os.listdir(folder)):
         if not f.endswith(".tsv"):
             continue

@@ -26,8 +26,9 @@ import analyze_games as ag      # noqa: E402  (Analyse-Funktionen wiederverwende
 import build_app_data as bad    # noqa: E402
 
 API = "https://api.chess.com/pub/player/%s/games/archives" % ag.ME
-USER_AGENT = "Schachtrainer/1.0 (lokaler Trainer, Spieler Keanu098)"
+USER_AGENT = "Schachtrainer/1.0 (Trainings-App, github.com/Kdeutschendorf-rgb/Schachtrainer)"
 SYNC_PGN = os.path.join(bad.RAW, "chesscom_sync.pgn")
+WORKERS = 2
 
 # Die API liefert englische Termination-Texte; analyze_games.py erwartet die deutschen aus dem Download.
 TERMINATION_DE = [
@@ -77,7 +78,7 @@ def key_of(headers):
 
 def known_keys():
     keys = set()
-    for path in sorted(os.listdir(bad.RAW)):
+    for path in sorted(os.listdir(bad.RAW) if os.path.isdir(bad.RAW) else []):
         if not path.endswith(".pgn"):
             continue
         with open(os.path.join(bad.RAW, path), encoding="utf-8", errors="replace") as fh:
@@ -138,7 +139,7 @@ def analyse_new(pgns):
     book = ag.load_openings()
     jobs = [(start + i, text, book) for i, text in enumerate(pgns)]
     new_games = []
-    with Pool(min(2, len(jobs))) as pool:     # höchstens 2 Engines mit je 1 Thread
+    with Pool(min(WORKERS, len(jobs))) as pool:     # je Engine 1 Thread
         for n, (s, m, p) in enumerate(pool.imap_unordered(ag.analyse_game, jobs), 1):
             new_games.append(s)
             mistakes.extend(m)
@@ -156,6 +157,7 @@ def analyse_new(pgns):
 
 
 def append_raw(pgns):
+    os.makedirs(bad.RAW, exist_ok=True)
     need_sep = os.path.exists(SYNC_PGN) and os.path.getsize(SYNC_PGN) > 0
     with open(SYNC_PGN, "a", encoding="utf-8") as fh:
         for text in pgns:
@@ -167,6 +169,8 @@ def main():
     ap = argparse.ArgumentParser(description="Neue chess.com-Partien holen und analysieren")
     ap.add_argument("--dry-run", action="store_true", help="nur abrufen und zählen, nichts schreiben")
     ap.add_argument("--months", type=int, default=2, help="wie viele Monatsarchive (Standard 2)")
+    ap.add_argument("--max-games", type=int, default=0, help="höchstens so viele neue Partien (die neuesten), 0 = alle")
+    ap.add_argument("--workers", type=int, default=2, help="Engine-Prozesse (Standard 2)")
     args = ap.parse_args()
 
     if not args.dry_run and analysis_running():
@@ -174,6 +178,8 @@ def main():
         return 0
     try:
         pgns, total, months = fetch_new(max(1, args.months))
+        if args.max_games and len(pgns) > args.max_games:
+            pgns = pgns[-args.max_games:]
     except (urllib.error.URLError, OSError, ValueError) as exc:
         sys.stderr.write("chess.com nicht erreichbar: %s\n" % exc)
         emit(0, "chess.com ist gerade nicht erreichbar (%s)." % exc)
@@ -188,8 +194,11 @@ def main():
         return 0
 
     try:
+        global WORKERS
+        WORKERS = max(1, args.workers)
         new_games = analyse_new(pgns)
         append_raw(pgns)
+        os.makedirs(bad.PLAYER_DATA, exist_ok=True)
         bad.build(argparse.Namespace(out=bad.PLAYER_DATA,
                                      rep_white=os.path.join(bad.APP_DATA, "repertoire_white.json"),
                                      rep_black=os.path.join(bad.APP_DATA, "repertoire_black.json")))

@@ -23,6 +23,12 @@ in JSON-Zügen englische SAN.
 - Python immer als `.venv/bin/python -I`. Engine-Jobs mit höchstens 2 Threads.
 - Freunde: Jeder trägt seinen chess.com-Namen ein. Persönliche Daten liegen unter `app/data/players/<name klein>/`
   und werden nur geladen, wenn der Name in `app/data/players.json` steht; sonst zeigt die App eine neutrale Version.
+  Angemeldete Nutzer melden ihren Namen in der Supabase-Tabelle `players` (`supabase_players.sql`). Die Action
+  `.github/workflows/weekly.yml` läuft täglich: `analysis/update_players.py` wertet neue Namen aus (3 Monate, max. 200
+  Partien, max. 5 Spieler pro Lauf), montags alle Spieler. Welcher Spieler: Umgebungsvariable `SCHACH_PLAYER`
+  (`analysis/player.py`); Keanus Rohdaten liegen in `data/analysis/` und `data/raw/`, alle anderen in `data/players/<name>/`.
+- Abgleich zwischen Geräten: Waren zwei Geräte gleichzeitig offline, führt `app/js/merge.js` die Stände zusammen
+  (Karten: zuletzt geübt gewinnt, Verlauf und Sitzungen vereinigt, Tageszähler Maximum). Test: `data/test/test_merge.mjs`.
 
 ## Wo die Daten liegen
 

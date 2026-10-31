@@ -663,7 +663,7 @@ export async function mount(el) {
   if (summary) {
     parts.push(renderElo(summary));
   } else {
-    parts.push(h('div.card', h('div.feedback.info', 'Für deinen chess.com-Namen gibt es noch keine Auswertung deiner Partien. Dein Trainingsfortschritt steht trotzdem unten.')));
+    parts.push(h('div.card', h('div.feedback.info', store.all().settings?.chesscomName ? 'Deine Partien werden ausgewertet, morgen früh steht hier die Auswertung. Dein Trainingsfortschritt steht schon unten.' : 'Trag auf der Startseite unter „Plan anpassen“ deinen chess.com-Namen ein, dann werden deine Partien ausgewertet.')));
   }
   parts.push(renderTraining(prog));
   if (summary) {

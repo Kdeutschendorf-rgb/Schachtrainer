@@ -1,6 +1,11 @@
 // Kleine DOM-Helfer, die alle Module teilen.
 import * as store from './store.js';
 
+// Handy und iPad ohne Tastatur: Tasten-Hinweise wie „Hinweis (h)“ oder „Weiter ⏎“ weglassen.
+export const TOUCH = typeof matchMedia === 'function' && matchMedia('(hover: none) and (pointer: coarse)').matches;
+export const keyless = text => (TOUCH ? String(text).replace(/\s*\((h|Leertaste|←|→)\)/g, '').replace(/\s*⏎/g, '') : String(text));
+if (TOUCH) document.documentElement.classList.add('touch');
+
 // h('div.card', {onclick}, 'Text', child) → Element. Klassen per Punkt im Tag.
 export function h(tag, attrs, ...children) {
   const [name, ...classes] = tag.split('.');
@@ -20,7 +25,7 @@ export function h(tag, attrs, ...children) {
   }
   for (const c of children.flat(Infinity)) {
     if (c == null || c === false) continue;
-    el.append(c instanceof Node ? c : document.createTextNode(String(c)));
+    el.append(c instanceof Node ? c : document.createTextNode(keyless(c)));
   }
   return el;
 }

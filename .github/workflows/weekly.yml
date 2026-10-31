@@ -1,8 +1,9 @@
-# Jeden Montag: neue chess.com-Partien holen, mit Stockfish analysieren, App-Daten neu bauen, veröffentlichen.
-name: Wöchentliche Analyse
+# Jeden Morgen: neue Spieler aus der App auswerten. Montags zusätzlich neue Partien aller Spieler.
+# Danach App-Daten committen und die Seite neu veröffentlichen.
+name: Partie-Analyse
 on:
   schedule:
-    - cron: '0 4 * * 1'
+    - cron: '0 4 * * *'
   workflow_dispatch:
 permissions:
   contents: write
@@ -10,7 +11,7 @@ permissions:
 jobs:
   analyse:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 150
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -23,7 +24,12 @@ jobs:
       - name: Partien holen und analysieren
         env:
           STOCKFISH: /usr/games/stockfish
-        run: python analysis/sync.py
+        run: |
+          if [ "$(date +%u)" = 1 ] || [ "${{ github.event_name }}" = workflow_dispatch ]; then
+            python analysis/update_players.py --weekly
+          else
+            python analysis/update_players.py
+          fi
       - name: Speichern und Seite neu veröffentlichen
         env:
           GH_TOKEN: ${{ github.token }}
@@ -32,6 +38,6 @@ jobs:
           if git diff --cached --quiet; then echo "Keine neuen Partien"; exit 0; fi
           git config user.name "Schachtrainer-Bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "Wöchentliche Analyse $(date +%d.%m.%Y)"
+          git commit -m "Partie-Analyse $(date +%d.%m.%Y)"
           git push
           gh workflow run pages.yml

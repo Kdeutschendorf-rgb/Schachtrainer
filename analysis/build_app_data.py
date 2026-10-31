@@ -4,24 +4,27 @@ Aufruf:  .venv/bin/python -I analysis/build_app_data.py [--out DIR] [--rep-white
 Liest:   data/analysis/games.json, mistakes.json, my_puzzles.json (von analyze_games.py),
          data/raw/*.pgn (Züge für die Repertoire-Abdeckung),
          app/data/repertoire_white.json, repertoire_black.json (dürfen fehlen)
-Schreibt: app/data/players/keanu098/analysis_summary.json und my_puzzles.json
+Schreibt: app/data/players/<name>/analysis_summary.json und my_puzzles.json (Spieler: analysis/player.py)
 """
 import argparse
 import datetime
 import glob
 import json
 import os
+import sys
 import re
 from collections import Counter, defaultdict
 
 import chess
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ANALYSIS = os.path.join(ROOT, "data", "analysis")
-RAW = os.path.join(ROOT, "data", "raw")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))   # -I: Nachbarmodul player.py
+import player   # noqa: E402
+ANALYSIS = player.ANALYSIS
+RAW = player.RAW
 APP_DATA = os.path.join(ROOT, "app", "data")
-PLAYER_DATA = os.path.join(APP_DATA, "players", "keanu098")   # persönliche Daten, siehe app/data/players.json
-ME = "keanu098"
+PLAYER_DATA = player.APP   # persönliche Daten, siehe app/data/players.json
+ME = player.NAME
 TCS = ("rapid", "blitz", "bullet", "daily")
 TC_DE = {"rapid": "Rapid", "blitz": "Blitz", "bullet": "Bullet", "daily": "Täglich"}
 PHASES = ("eroeffnung", "mittelspiel", "endspiel")
@@ -140,10 +143,10 @@ def san_tokens(movetext, limit=40):
     return out
 
 
-def read_raw_games(folder=RAW):
+def read_raw_games(folder=None):
     """→ {key: [SAN, ...]} aus allen PGN-Dateien in data/raw/."""
     moves = {}
-    for path in sorted(glob.glob(os.path.join(folder, "*.pgn"))):
+    for path in sorted(glob.glob(os.path.join(folder or RAW, "*.pgn"))):
         with open(path, encoding="utf-8", errors="replace") as fh:
             text = fh.read()
         for block in re.split(r"\n(?=\[Event )", text):
@@ -608,7 +611,7 @@ def build(args):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--out", default=PLAYER_DATA, help="Zielordner (Standard: app/data/players/keanu098)")
+    ap.add_argument("--out", default=PLAYER_DATA, help="Zielordner (Standard: app/data/players/<name>)")
     ap.add_argument("--rep-white", default=os.path.join(APP_DATA, "repertoire_white.json"))
     ap.add_argument("--rep-black", default=os.path.join(APP_DATA, "repertoire_black.json"))
     args = ap.parse_args()

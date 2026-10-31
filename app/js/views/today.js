@@ -236,7 +236,7 @@ export async function mount(el) {
   function renderElo() {
     if (!rapidNow) {
       return h('div.td-elo', h('div.small.muted', 'Rapid-Elo'),
-        h('div.muted', settings().chesscomName ? 'Für deinen chess.com-Namen gibt es noch keine Auswertung.' : 'Trag unter „Plan anpassen“ deinen chess.com-Namen ein.'));
+        h('div.muted', !settings().chesscomName ? 'Trag unter „Plan anpassen“ deinen chess.com-Namen ein.' : store.currentUser() ? 'Deine Partien werden ausgewertet. Morgen früh ist die Auswertung da.' : 'Für die Auswertung deiner Partien brauchst du ein Konto.'));
     }
     const s = settings();
     const goal = s.goalRapid || defaultGoal(rapidNow, rapidPeak);
@@ -281,7 +281,7 @@ export async function mount(el) {
       h('div.td-start-row',
         h('button.primary.td-start', { onclick: () => startTraining(plan), disabled: !plan.blocks.length },
           doneToday >= 1 ? 'Noch eine Runde trainieren' : 'Training starten'),
-        h('span.small.muted', 'oder Enter drücken')));
+        h('span.small.muted.kbd-hint', 'oder Enter drücken')));
 
     const tip = h('div.card.td-tip', h('div.small.muted', 'Tipp des Tages'),
       h('div', tipOfTheDay({ date: day, focus: summary?.focus })));
@@ -315,7 +315,11 @@ export async function mount(el) {
         }),
       })));
     const text = (key, attrs) => h('input', { type: 'text', value: s[key] || '', ...attrs,
-      onchange: e => save(x => { const v = e.target.value.trim(); if (v) x[key] = v; else delete x[key]; }) });
+      onchange: e => {
+        const v = e.target.value.trim();
+        save(x => { if (v) x[key] = v; else delete x[key]; });
+        if (key === 'chesscomName') store.registerPlayer(v);
+      } });
     const user = store.currentUser();
     return h('div.card.td-settings',
       h('h2', 'Profil'),

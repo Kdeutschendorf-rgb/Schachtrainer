@@ -1,6 +1,6 @@
 // Modul 5: Taktik. Ansicht mit Modi (#/taktik?modus=…) und Block für den Tagesplan (runBlock).
 // Logik in ../tactics/logic.js (ohne DOM), Brett und Ablauf in ../tactics/trainer.js.
-import { h, clear, loadCss, countdown, toast } from '../ui.js';
+import { h, clear, loadCss, countdown, toast, TOUCH } from '../ui.js';
 import * as store from '../store.js';
 import { todayStr } from '../srs.js';
 import { loadTacticsData } from '../tactics/data.js';
@@ -317,7 +317,7 @@ export function runBlock(el, { minutes = 5, mode = 'main', onDone } = {}) {
         timeUp = true;
         const ph = trainer.phase();
         if (ph === 'idle') return finishBlock();
-        noteEl.textContent = ph === 'finished' ? 'Zeit um. Weiter mit der Leertaste.' : 'Zeit um. Lös diese Aufgabe noch zu Ende.';
+        noteEl.textContent = ph === 'finished' ? TOUCH ? 'Zeit um.' : 'Zeit um. Weiter mit der Leertaste.' : 'Zeit um. Lös diese Aufgabe noch zu Ende.';
         trainer.refresh();
       },
     });
