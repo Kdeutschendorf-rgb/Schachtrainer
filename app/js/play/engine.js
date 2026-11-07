@@ -2,7 +2,7 @@
 
 import { Chess } from '../../vendor/chess.js';
 import { analyse, bestMove } from '../engine.js';
-import { botStyle, chooseMove, winPct, classify, moveAccuracy, phaseOf } from './logic.js';
+import { botStyle, chooseMove, winPct, classify, moveAccuracy, phaseOf, motifs } from './logic.js';
 
 // Zug des Bots als UCI
 export async function botMove(fen, elo) {
@@ -51,17 +51,28 @@ export async function analyseGame({ sans, color, id, date }, { onProgress, alive
     const playedUci = (() => { const c = new Chess(fens[i]); const m = c.move(sans[i]); return m.from + m.to + (m.promotion || ''); })();
     const loss = playedUci === bestUci ? 0 : Math.max(0, before - after);
     const cls = classify(loss);
+    // Fehlerart wie in der chess.com-Analyse
+    const tags = cls ? motifs(Chess, fens[i + 1], evals[i + 1].pv, color) : [];
+    if (cls) {
+      const mateFor = sc => sc.mate != null && (color === 'w' ? sc.mate > 0 : sc.mate < 0);
+      const mateAgainst = sc => sc.mate != null && (color === 'w' ? sc.mate < 0 : sc.mate > 0);
+      if (mateFor(evals[i].score) && !mateFor(evals[i + 1].score)) tags.push('matt_verpasst');
+      if (mateAgainst(evals[i + 1].score)) tags.push('matt_zugelassen');
+      if (i > 0 && before - winPct(evals[i - 1].score, color) >= 20) tags.push('chance_verpasst');
+    }
     accSum += moveAccuracy(loss);
     accN++;
     if (cls) counts[cls]++;
-    moves.push({ ply: i, san: sans[i], cls, loss: Math.round(loss), best: bestUci, bestSan: evals[i].san?.[0] || null, fen: fens[i] });
+    moves.push({ ply: i, san: sans[i], cls, tags, loss: Math.round(loss), best: bestUci, bestSan: evals[i].san?.[0] || null, fen: fens[i], phase: phaseOf(fens[i], i) });
     // Fehler und Patzer werden zu eigenen Aufgaben (Format wie my_puzzles.json)
     if ((cls === 'blunder' || cls === 'mistake') && evals[i].pv.length) {
       puzzles.push({
         id: `bot${id}_${i}`, fen: fens[i], moves: evals[i].pv.slice(0, 3), played: sans[i], cls,
-        phase: phaseOf(fens[i], i), tags: [], tc: 'bot', date, winBest: Math.round(before * 10) / 10, winSecond: Math.round(after * 10) / 10,
+        phase: phaseOf(fens[i], i), tags, tc: 'bot', date, winBest: Math.round(before * 10) / 10, winSecond: Math.round(after * 10) / 10,
       });
     }
   }
-  return { accuracy: accN ? Math.round(accSum / accN * 10) / 10 : null, counts, moves, puzzles };
+  // Fehler der Partie (für Schwerpunkt und Wochenbericht)
+  const errors = moves.filter(m => m.cls === 'blunder' || m.cls === 'mistake').map(m => ({ cls: m.cls, tags: m.tags, phase: m.phase }));
+  return { accuracy: accN ? Math.round(accSum / accN * 10) / 10 : null, counts, moves, puzzles, errors };
 }

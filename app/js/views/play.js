@@ -230,7 +230,7 @@ export async function mount(el) {
       // Speichern: Genauigkeit, Aufgaben für die Taktik, Eröffnungs-Abweichung als fällige Karte
       store.update('play', d => {
         const g = d.games.find(x => x.id === record.id);
-        if (g) { g.accuracy = res.accuracy; g.counts = res.counts; }
+        if (g) { g.accuracy = res.accuracy; g.counts = res.counts; g.errors = res.errors; }
         const ids = new Set(d.puzzles.map(p => p.id));
         d.puzzles.push(...res.puzzles.filter(p => !ids.has(p.id)));
         d.puzzles = d.puzzles.slice(-MAX_PUZZLES);

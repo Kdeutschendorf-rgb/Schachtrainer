@@ -230,8 +230,12 @@ def line_text(sans):
     return " ".join(out)
 
 
-def recent_games(games, raw_moves, n=30, plies=30):
-    """Die letzten Partien mit den ersten Zügen, für den Partie-Check der App (Vergleich mit dem Repertoire)."""
+def recent_games(games, raw_moves, mistakes=(), n=60, plies=30):
+    """Die letzten Partien mit den ersten Zügen (Partie-Check) und ihren Fehlern (Wochenbericht)."""
+    by_game = defaultdict(list)
+    for m in mistakes:
+        if m.get("cls") in ("blunder", "mistake"):
+            by_game[m["game"]].append(m)
     out = []
     for g in games[-n:][::-1]:
         sans = raw_moves.get(game_key(g.get("date"), g.get("end"), g.get("opponent")))
@@ -239,8 +243,35 @@ def recent_games(games, raw_moves, n=30, plies=30):
             continue
         out.append({"date": iso(g["date"]), "tc": g["tc"], "color": g["color"], "opponent": g.get("opponent"),
                     "result": g["result"], "myElo": g.get("myElo"), "opening": g.get("opening"),
-                    "moves": sans[:plies]})
+                    "moves": sans[:plies], "accuracy": g.get("accuracy"),
+                    "errors": [{"cls": m["cls"], "tags": m.get("tags") or [], "phase": m.get("phase")} for m in by_game[g["game"]]]})
     return out
+
+
+def recent_focus(games, mistakes, days=30):
+    """Fehlerthemen der letzten Tage als Rohgewichte. Die App mischt sie (zusammen mit Bot-Partien) als Ergänzung
+    unter den Schwerpunkt aus allen Partien: je mehr neue Fehler, desto stärker, höchstens 40 %."""
+    if not games:
+        return {"themes": {}, "n": 0, "since": None}
+    last = max(iso(g["date"]) for g in games)
+    since = (datetime.date.fromisoformat(last) - datetime.timedelta(days=days)).isoformat()
+    recent_ids = {g["game"] for g in games if iso(g["date"]) >= since}
+    themes = defaultdict(float)
+    n = 0.0
+    for m in mistakes:
+        w = CLS_WEIGHT.get(m["cls"], 0)
+        if not w or m["game"] not in recent_ids:
+            continue
+        if m.get("tc") == "rapid":
+            w *= 1.5
+        n += w
+        for t in m.get("tags") or []:
+            for theme, tw in TAG_THEMES.get(t, {}).items():
+                themes[theme] += w * tw
+        pt = PHASE_THEMES.get(m.get("phase"))
+        if pt:
+            themes[pt] += 0.3 * w
+    return {"themes": {k: round(v, 2) for k, v in themes.items()}, "n": round(n, 1), "since": since}
 
 
 def repertoire_coverage(games, raw_moves, reps):
@@ -610,7 +641,8 @@ def build(args):
     reps = {"w": load_repertoire(args.rep_white, "w"), "b": load_repertoire(args.rep_black, "b")}
     raw_moves = read_raw_games()
     summary["repertoire"] = repertoire_coverage(games, raw_moves, reps)
-    summary["recentGames"] = recent_games(games, raw_moves)
+    summary["recentGames"] = recent_games(games, raw_moves, mistakes)
+    summary["recentFocus"] = recent_focus(games, mistakes)
     summary["insights"] = insights(summary)
     clean = clean_puzzles(puzzles)
     summary["ownPuzzles"] = len(clean)

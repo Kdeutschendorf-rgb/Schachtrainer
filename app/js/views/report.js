@@ -4,6 +4,9 @@
 
 import { h, clear, loadCss, loadPlayerData, figurine } from '../ui.js';
 import * as store from '../store.js';
+import { weeklyReport, de1 } from '../report/weekly.js';
+import { loadModel } from '../openings/data.js';
+import { followGame } from '../openings/logic.js';
 import { todayStr, addDays } from '../srs.js';
 import { themeName, MISTAKE_TAGS_DE, sanDe } from '../coach.js';
 import { countDueCards } from './today.js';
@@ -260,6 +263,25 @@ function renderHeader(summary, onSync) {
 
 function renderSync() {
   return h('div.small.muted.rp-sync-status', 'Neue Partien von chess.com werden jeden Montag automatisch ausgewertet.');
+}
+
+// Wochenbericht (automatisch aus Partien und Training der letzten 7 Tage)
+function renderWeek(rep) {
+  const de = d => d.split('-').reverse().join('.');
+  const list = (title, items, cls) => (items.length
+    ? h('div.rp-cr-col', h('h3', title), h('ul.rp-list' + (cls ? '.' + cls : ''), items.map(x => h('li', x)))) : null);
+  const s = rep.stats;
+  return h('section.card.rp-week#rp-week',
+    h('div.row', h('h2', 'Diese Woche'), h('span.small.muted', `${de(rep.from)} bis ${de(rep.to)}`)),
+    h('div.rp-cr-head', rep.headline),
+    h('div.row.rp-week-stats',
+      h('span.pill', `${s.minutes} min Training`),
+      h('span.pill', `${s.games} ${s.games === 1 ? 'Partie' : 'Partien'}${s.games ? ` (${s.rapid} Rapid, ${s.bot} Bot)` : ''}`),
+      s.errNow != null ? h('span.pill', `${de1(s.errNow)} grobe Fehler pro Partie`) : null),
+    h('div.rp-cr-grid',
+      list('Das läuft gut', rep.good, 'good'),
+      list('Daran arbeiten wir', rep.todo, 'bad'),
+      list('Plan für die nächste Woche', rep.plan, 'plan')));
 }
 
 function renderCoachReport(cr) {
@@ -655,8 +677,19 @@ export async function mount(el) {
 
   const prog = store.all() || {};
   const sync = renderSync();
+  // Eröffnungs-Abweichungen der Woche (Rapid und Bots) für den Wochenbericht
+  let deviations = null;
+  try {
+    const model = await loadModel();
+    const from = new Date(Date.now() - 6 * 864e5).toISOString().slice(0, 10);
+    const games = [...(summary?.recentGames || []).filter(g => g.tc === 'rapid'), ...(prog.play?.games || [])].filter(g => g.date >= from);
+    if (games.length) deviations = { games: games.length, mine: games.filter(g => followGame(model, g.color, g.moves || []).kind === 'ich').length };
+  } catch { /* ohne Repertoire kein Eröffnungsteil */ }
+  if (!alive) return () => {};
+  const week = renderWeek(weeklyReport({ summary, playGames: prog.play?.games || [], activity: prog.activity || {}, deviations }));
   const parts = [
     renderHeader(summary, sync),
+    week,
     renderCoachReport(coachReport),
     renderKpis(summary, prog),
   ];
@@ -677,7 +710,7 @@ export async function mount(el) {
     { onclick: () => sec.scrollIntoView({ behavior: 'smooth', block: 'start' }) }, sec.querySelector('h2')?.textContent || ''))) : null;
 
   // append(null) würde den Text „null“ einfügen, daher alles Leere herausfiltern
-  clear(root).append(...[...parts.slice(0, 3), nav, ...parts.slice(3)].filter(Boolean));
+  clear(root).append(...[...parts.slice(0, 4), nav, ...parts.slice(4)].filter(Boolean));
 
   return () => { alive = false; };
 }

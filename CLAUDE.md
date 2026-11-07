@@ -109,6 +109,9 @@ Die volle Neuanalyse aller Partien (`analysis/analyze_games.py <pgn>`) dauert la
   Lerntiefe einstellbar (Standard 8 Züge, `openings.settings.depth`), Linien werden dafür gekürzt.
 - Spielen (`views/play.js`, `play/`): Bots mit eigener Wertung (`play.rating`, Start = chess.com-Rapid), Partie wird
   danach analysiert; Fehler werden eigene Taktikaufgaben (`play.puzzles`), Repertoire-Abweichungen fällige Karten.
+- Trainingsschwerpunkt (`tactics/focus.js`): Basis = Fehler aller chess.com-Partien (`focus.themes`), Ergänzung =
+  Fehler der letzten 30 Tage (`recentFocus`) plus Bot-Partien (`play.games[].errors`), Anteil höchstens 40 %.
+- Wochenbericht „Diese Woche“ im Bericht (`report/weekly.js`), automatisch aus Partien und Training der letzten 7 Tage.
 - Endspiele: Coach für die Grundmatts (`endgames/coach.js`, Käfig = erreichbare Felder des Königs, erklärt Engine-Züge).
 - Vorausdenken: Drohungen nur, wenn der letzte Gegnerzug sie erzeugt (`vision/logic.js` → `threatFromLastMove`);
   im Mix kommt „Blind rechnen“ dreimal so oft.

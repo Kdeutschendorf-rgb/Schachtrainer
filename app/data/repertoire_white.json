@@ -1395,6 +1395,54 @@
       "8": "Deckt das Schach mit Entwicklung. Der Läufer c5 hängt weiter, und Sc3 kommt mit Tempo gegen die Dame."
      },
      "plan": "Sc3, Ld3 und Dd2: Jede Figur kommt mit Tempo gegen die schwarze Dame. Schwarz hat seinen Bauern zurück, aber die Entwicklung ist katastrophal."
+    },
+    {
+     "id": "w-qf6-bc5-qd8",
+     "name": "2…Df6 3.Sc3 Lc5 4.Sd5 Dd8 5.Sxe5",
+     "frequency": "selten",
+     "moves": [
+      "e4",
+      "e5",
+      "Nf3",
+      "Qf6",
+      "Nc3",
+      "Bc5",
+      "Nd5",
+      "Qd8",
+      "Nxe5"
+     ],
+     "notes": {
+      "0": "Wie immer: 1.e4.",
+      "2": "Greift e5 an.",
+      "4": "Entwickelt und deckt e4.",
+      "6": "Mit Tempo gegen die Dame, Sd5 droht auch Sxc7+.",
+      "8": "Der Bauer e5 war nur noch von der Dame gedeckt. Jetzt fehlt er: Bauer gewonnen."
+     },
+     "plan": "Du bist einen Bauern vorn und stehst aktiv. Entwickle mit d4, Ld3 und kurzer Rochade."
+    },
+    {
+     "id": "w-qf6-bc5-qb6",
+     "name": "2…Df6 3.Sc3 Lc5 4.Sd5 Db6? 5.Sxb6",
+     "frequency": "selten",
+     "moves": [
+      "e4",
+      "e5",
+      "Nf3",
+      "Qf6",
+      "Nc3",
+      "Bc5",
+      "Nd5",
+      "Qb6",
+      "Nxb6"
+     ],
+     "notes": {
+      "0": "Wie immer: 1.e4.",
+      "2": "Greift e5 an.",
+      "4": "Entwickelt und deckt e4.",
+      "6": "Mit Tempo gegen die Dame.",
+      "8": "Falle! Die Dame auf b6 hängt einfach: Der Springer d5 greift b6 an. Du gewinnst die Dame für einen Springer."
+     },
+     "plan": "Mit Dame gegen Läufer gewinnst du leicht: Entwickeln, rochieren, Figuren tauschen."
     }
    ]
   },
@@ -2132,6 +2180,27 @@
       "12": "Ld3 zielt auf h7 und macht die Rochade frei."
      },
      "plan": "O-O, h3 und Te1. Schwarz spielt …Sa6–c7 und …b5: Halte d5 mit Sc3 und antworte mit a4 oder Lf4. Die Engine sieht Weiß besser."
+    },
+    {
+     "id": "w-fr-c6",
+     "name": "1…e6 2.d4 c6 3.Sc3",
+     "frequency": "mittel",
+     "moves": [
+      "e4",
+      "e6",
+      "d4",
+      "c6",
+      "Nc3",
+      "d5",
+      "Bd3"
+     ],
+     "notes": {
+      "0": "Wie immer: 1.e4.",
+      "2": "Das große Zentrum.",
+      "4": "Deckt e4 und entwickelt. Schwarz hat mit …c6 Zeit für einen langsamen Aufbau verwendet.",
+      "6": "Deckt e4 noch einmal. Nach …dxe4 Sxe4 stehen deine Figuren sehr aktiv."
+     },
+     "plan": "Sf3, kurze Rochade, Te1: Du hast mehr Raum und schnellere Entwicklung."
     }
    ]
   },
@@ -2362,6 +2431,51 @@
       "12": "h4 greift sofort am Königsflügel an: h4–h5 öffnet die h-Linie."
      },
      "plan": "h5, Lh6 und O-O-O. Schwarz spielt …c5 und …Lb7: Achte auf e4 und auf …b4 gegen den Springer c3 (dann Sce2 oder Sd1)."
+    },
+    {
+     "id": "w-pirc-e6",
+     "name": "1…d6 2.d4 e6 3.Sf3",
+     "frequency": "mittel",
+     "moves": [
+      "e4",
+      "d6",
+      "d4",
+      "e6",
+      "Nf3",
+      "Nf6",
+      "Bd3"
+     ],
+     "notes": {
+      "0": "Wie immer: 1.e4.",
+      "2": "Das große Zentrum.",
+      "4": "Einfach entwickeln. Schwarz spielt sehr passiv.",
+      "6": "Der Läufer deckt e4. Danach kurze Rochade und c4 oder Sc3."
+     },
+     "plan": "Kurz rochieren, c4 und Sc3: Du hast mehr Raum. Spielt Schwarz …e5, kann d5 mit Raumvorteil kommen."
+    },
+    {
+     "id": "w-modern-e6",
+     "name": "1…g6 2.d4 Lg7 3.Sc3 e6 4.Le3",
+     "frequency": "mittel",
+     "moves": [
+      "e4",
+      "g6",
+      "d4",
+      "Bg7",
+      "Nc3",
+      "e6",
+      "Be3",
+      "d5",
+      "Nf3"
+     ],
+     "notes": {
+      "0": "Wie immer: 1.e4.",
+      "2": "Das große Zentrum.",
+      "4": "Entwickelt und deckt e4.",
+      "6": "Wie im 150er-Angriff: Der Läufer deckt d4 und bereitet Dd2 vor.",
+      "8": "Entwickelt. Nach …dxe4 Sxe4 stehen deine Figuren aktiv im Zentrum."
+     },
+     "plan": "Dd2 und lange Rochade wie im 150er-Angriff, oder einfach Ld3 und kurze Rochade."
     }
    ]
   },

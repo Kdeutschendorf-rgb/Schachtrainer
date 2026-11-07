@@ -89,3 +89,40 @@ export const TIME_CONTROLS = [
   { id: '5+3', label: '5 + 3', base: 300, inc: 3 },
   { id: 'frei', label: 'Ohne Uhr', base: 0, inc: 0 },
 ];
+
+// Was nach einem eigenen Fehler passiert (Widerlegung = pv ab der Stellung nach dem Fehler, UCI).
+// Gleiche Einordnung wie analysis/analyze_games.py → motifs(), damit Bot- und chess.com-Fehler zusammenpassen.
+const VALUES = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
+function material(chess, color) {
+  let s = 0;
+  for (const row of chess.board()) for (const p of row) if (p && p.color === color) s += VALUES[p.type];
+  return s;
+}
+export function motifs(Chess, fenAfter, pv, myColor) {
+  const tags = [];
+  if (!pv?.length) return tags;
+  const b = new Chess(fenAfter);
+  const from = pv[0].slice(0, 2), to = pv[0].slice(2, 4);
+  const captured = b.get(to);
+  let m;
+  try { m = b.move({ from, to, promotion: pv[0][4] || 'q' }); } catch { return tags; }
+  if (!m) return tags;
+  if (b.inCheck()) tags.push('schach');
+  // Gabel: die gezogene Figur greift danach mindestens zwei wertvolle Steine (oder König) an
+  const attacked = [];
+  for (const row of b.board()) for (const p of row) {
+    if (!p || p.color !== myColor || !(VALUES[p.type] >= 3 || p.type === 'k')) continue;
+    if (b.attackers(p.square, m.color).includes(to)) attacked.push(p.square);
+  }
+  if (attacked.length >= 2) tags.push('gabel');
+  if (captured && captured.color === myColor && VALUES[captured.type] >= 3) tags.push('figur_eingestellt');
+  // Materialverlust über die ersten 4 Halbzüge der Widerlegung
+  const b2 = new Chess(fenAfter);
+  const other = myColor === 'w' ? 'b' : 'w';
+  const before = material(b2, myColor) - material(b2, other);
+  for (const u of pv.slice(0, 4)) {
+    try { if (!b2.move({ from: u.slice(0, 2), to: u.slice(2, 4), promotion: u[4] || 'q' })) break; } catch { break; }
+  }
+  if (before - (material(b2, myColor) - material(b2, other)) >= 2) tags.push('materialverlust');
+  return tags;
+}

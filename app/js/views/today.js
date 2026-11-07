@@ -4,6 +4,7 @@
 // (computePlan) ist reine Logik ohne DOM und lässt sich mit jsc testen.
 
 import { h, clear, loadCss, progressBar, formatTime, loadPlayerData } from '../ui.js';
+import { trainingFocus } from '../tactics/focus.js';
 import * as store from '../store.js';
 import { todayStr, addDays } from '../srs.js';
 import { tipOfTheDay, themeName } from '../coach.js';
@@ -212,6 +213,9 @@ export async function mount(el) {
   loadCss('css/today.css');
   let summary = null;
   try { summary = await loadPlayerData('analysis_summary.json'); } catch { summary = null; }
+  // Schwerpunkt: alle Partien als Basis, neue Partien (auch gegen Bots) als Ergänzung
+  const focus = summary?.focus || store.get('play').games?.length
+    ? { ...(summary?.focus || {}), themes: trainingFocus(summary, store.get('play').games).themes } : null;
 
   const root = h('div.td-root');
   el.append(root);
@@ -229,7 +233,7 @@ export async function mount(el) {
     const s = settings();
     return computePlan({
       dailyMinutes: s.dailyMinutes, base: s.plan, adaptive: s.adaptive !== false,
-      dueCards: countDueCards(store.get('openings')).due, focus: summary?.focus,
+      dueCards: countDueCards(store.get('openings')).due, focus,
       ownPuzzles: summary?.ownPuzzles ?? 0,
     });
   }
@@ -285,7 +289,7 @@ export async function mount(el) {
         h('span.small.muted.kbd-hint', 'oder Enter drücken')));
 
     const tip = h('div.card.td-tip', h('div.small.muted', 'Tipp des Tages'),
-      h('div', tipOfTheDay({ date: day, focus: summary?.focus })));
+      h('div', tipOfTheDay({ date: day, focus })));
 
     // append(null) würde den Text „null“ einfügen, daher filtern
     root.append(...[hero, planCard, showSettings ? renderSettings() : null,
@@ -376,7 +380,7 @@ export async function mount(el) {
 
   function startTraining(plan) {
     if (runner || !plan.blocks.length) return;
-    runner = createRunner(root, plan, { focus: summary?.focus, onExit: () => { runner = null; renderHome(); } });
+    runner = createRunner(root, plan, { focus, onExit: () => { runner = null; renderHome(); } });
   }
 
   const keyHandler = e => {

@@ -725,6 +725,78 @@
       "9": "Dieselbe Stellung wie nach 2.Dh5 Sc6 3.Lc4 g6 4.Df3 Sf6 5.Se2 Lg7."
      },
      "plan": "Weiter wie in der Linie 2.Dh5: …d6, …Sd4 mit Tempo gegen die Dame, dann …O-O."
+    },
+    {
+     "id": "b-sch-qf3-d3",
+     "name": "2.Df3 Sc6 3.Lc4 Sf6 4.d3 Sd4",
+     "frequency": "mittel",
+     "moves": [
+      "e4",
+      "e5",
+      "Qf3",
+      "Nc6",
+      "Bc4",
+      "Nf6",
+      "d3",
+      "Nd4",
+      "Qd1",
+      "d5"
+     ],
+     "notes": {
+      "1": "Wie immer gegen 1.e4.",
+      "3": "Deckt e5 und entwickelt.",
+      "5": "Deckt f7 gegen das Matt auf f7 und entwickelt mit Tempo.",
+      "7": "Der Springer greift mit Tempo die Dame und den Bauern c2 an. Die Dame muss zurück.",
+      "9": "Jetzt schlägst du im Zentrum zu. Weiß hat mit der Dame nur Zeit verloren, du stehst schon besser."
+     },
+     "plan": "Weiß hat mit der frühen Dame Zeit verloren. Entwickle schnell (…Lc5 oder …Ld6, kurze Rochade) und öffne das Zentrum."
+    },
+    {
+     "id": "b-sch-qf3-ne2",
+     "name": "2.Df3 Sc6 3.Lc4 Sf6 4.Se2 d5",
+     "frequency": "selten",
+     "moves": [
+      "e4",
+      "e5",
+      "Qf3",
+      "Nc6",
+      "Bc4",
+      "Nf6",
+      "Ne2",
+      "d5"
+     ],
+     "notes": {
+      "1": "Wie immer gegen 1.e4.",
+      "3": "Deckt e5 und entwickelt.",
+      "5": "Deckt f7 und entwickelt mit Tempo.",
+      "7": "Der Gegenschlag im Zentrum: Nach 5.exd5 kommt …Lg4 mit Tempo gegen die Dame."
+     },
+     "plan": "Nach 5.exd5 Lg4 6.Db3 Sa5 jagst du den weißen Läufer und hast aktives Spiel."
+    },
+    {
+     "id": "b-sch-qh5-c3",
+     "name": "2.Dh5 Sc6 3.Lc4 g6 4.Df3 Sf6 5.c3 Lg7",
+     "frequency": "mittel",
+     "moves": [
+      "e4",
+      "e5",
+      "Qh5",
+      "Nc6",
+      "Bc4",
+      "g6",
+      "Qf3",
+      "Nf6",
+      "c3",
+      "Bg7"
+     ],
+     "notes": {
+      "1": "Wie immer gegen 1.e4.",
+      "3": "Deckt e5.",
+      "5": "Vertreibt die Dame und deckt f7 indirekt.",
+      "7": "Deckt f7 noch einmal. Jetzt ist das Matt endgültig verhindert.",
+      "9": "Der Läufer kommt auf die lange Diagonale, danach rochierst du kurz."
+     },
+     "plan": "Kurz rochieren, dann …d6 und …Sa5, um den Läufer c4 zu tauschen. Weiß hat mit der Dame Zeit verloren."
     }
    ]
   },
@@ -909,6 +981,69 @@
       "11": "König in Sicherheit, der Turm f8 kommt später nach e8."
      },
      "plan": "Das ist die Hauptlinie deines Italienisch. Weiter mit …a6, …La7, …h6 und …Te8."
+    },
+    {
+     "id": "b-vie-nf3-transpose",
+     "name": "2.Sc3 Sf6 3.Sf3 Sc6 (Vierspringer)",
+     "frequency": "häufig",
+     "moves": [
+      "e4",
+      "e5",
+      "Nc3",
+      "Nf6",
+      "Nf3",
+      "Nc6"
+     ],
+     "notes": {
+      "1": "Wie immer gegen 1.e4.",
+      "3": "Gegen die Wiener Partie entwickelst du sofort den Springer.",
+      "5": "Jetzt ist es der Vierspringer: Dieselbe Stellung wie nach 2.Sf3 Sc6 3.Sc3 Sf6. Ab hier spielst du weiter wie im Kapitel Vierspringer."
+     },
+     "plan": "Weiter wie im Vierspringer, zum Beispiel 4.Lb5 Lb4 oder 4.d4 exd4 5.Sxd4 Lb4."
+    },
+    {
+     "id": "b-vie-d3",
+     "name": "2.Sc3 Sf6 3.d3 d5",
+     "frequency": "mittel",
+     "moves": [
+      "e4",
+      "e5",
+      "Nc3",
+      "Nf6",
+      "d3",
+      "d5",
+      "exd5",
+      "Nxd5"
+     ],
+     "notes": {
+      "1": "Wie immer gegen 1.e4.",
+      "3": "Springer raus, greift e4 an.",
+      "5": "Weiß spielt passiv, also greifst du das Zentrum sofort mit …d5 an.",
+      "7": "Zurückschlagen mit dem Springer. Du hast ein schönes Zentrum mit e5 und aktive Figuren."
+     },
+     "plan": "Entwickle mit …Sc6, …Le7 oder …Lc5 und rochiere kurz. Du stehst mindestens gleich gut."
+    },
+    {
+     "id": "b-bc4-d3-bg5",
+     "name": "2.Lc4 Sc6 3.d3 Sf6 4.Lg5 h6",
+     "frequency": "mittel",
+     "moves": [
+      "e4",
+      "e5",
+      "Bc4",
+      "Nc6",
+      "d3",
+      "Nf6",
+      "Bg5",
+      "h6"
+     ],
+     "notes": {
+      "1": "Wie immer gegen 1.e4.",
+      "3": "Deckt e5 und entwickelt.",
+      "5": "Entwickelt und greift e4 an.",
+      "7": "Fragt den Läufer sofort: Nach 5.Lxf6 Dxf6 hast du das Läuferpaar, nach 5.Lh4 kann später …g5 kommen."
+     },
+     "plan": "Nach 5.Lxf6 Dxf6 entwickelst du mit …Lc5 und …0-0. Das Läuferpaar ist ein langfristiger Vorteil."
     }
    ]
   },
@@ -1690,6 +1825,74 @@
       "11": "Einfach entwickeln und dann rochieren."
      },
      "plan": "Nach …O-O spielst du …f5 oder …Te8 und …Lf8. Du hast mehr Raum im Zentrum."
+    }
+   ]
+  },
+  {
+   "id": "b-e5-rare2",
+   "side": "b",
+   "group": "Schwarz: 1.e4 e5",
+   "title": "Seltene 2. Züge: 2.d3, 2.c3, 2.f3",
+   "priority": 2,
+   "intro": "Diese Züge kommen auf deinem Niveau oft vor: 2.d3 allein in 11 deiner Partien. Sie sind harmlos. Du entwickelst einfach schnell und nimmst das Zentrum.",
+   "ideas": [
+    "Gegen passive Züge wie 2.d3 schnell Springer entwickeln und …d5 vorbereiten.",
+    "2.f3 schwächt den weißen König: Dein Läufer zielt mit …Lc5 auf g1."
+   ],
+   "lines": [
+    {
+     "id": "b-r2-d3",
+     "name": "2.d3 Sf6 3.Sf3 Sc6",
+     "frequency": "häufig",
+     "moves": [
+      "e4",
+      "e5",
+      "d3",
+      "Nf6",
+      "Nf3",
+      "Nc6"
+     ],
+     "notes": {
+      "1": "Wie immer gegen 1.e4.",
+      "3": "Entwickelt und greift e4 an.",
+      "5": "Noch ein Springer. Als Nächstes kommt …d5 oder …Lc5."
+     },
+     "plan": "Mit …d5 übernimmst du das Zentrum. Weiß spielt eine Art umgedrehte Philidor-Verteidigung, du hast ein Tempo mehr."
+    },
+    {
+     "id": "b-r2-c3",
+     "name": "2.c3 Sf6",
+     "frequency": "mittel",
+     "moves": [
+      "e4",
+      "e5",
+      "c3",
+      "Nf6"
+     ],
+     "notes": {
+      "1": "Wie immer gegen 1.e4.",
+      "3": "Greift sofort e4 an. Nach 3.d4 schlägst du mit …Sxe4, nach 3.Sf3 folgt …Sc6 wie in der Ponziani."
+     },
+     "plan": "Nach 3.d4 Sxe4 4.dxe5 entwickelst du mit …Lc5 und …0-0. Der Springer auf e4 steht aktiv."
+    },
+    {
+     "id": "b-r2-f3",
+     "name": "2.f3 Lc5",
+     "frequency": "mittel",
+     "moves": [
+      "e4",
+      "e5",
+      "f3",
+      "Bc5",
+      "Nc3",
+      "Nf6"
+     ],
+     "notes": {
+      "1": "Wie immer gegen 1.e4.",
+      "3": "2.f3 nimmt dem Springer g1 das beste Feld und schwächt den König. Dein Läufer zielt sofort auf die Diagonale nach g1.",
+      "5": "Entwickelt; als Nächstes …d6 oder …d5."
+     },
+     "plan": "Kurz rochieren, dann …d5. Der weiße König bekommt nach f3 nur schwer eine sichere Rochade."
     }
    ]
   },
@@ -2939,6 +3142,88 @@
       "7": "Entwickeln und den Weg f1–c4 kontrollieren."
      },
      "plan": "Spiele …c5, …Sc6 und …Ld6. Du hast mehr Raum im Zentrum, Weiß hat mit den Springern Zeit verloren."
+    }
+   ]
+  },
+  {
+   "id": "b-flank-rare1",
+   "side": "b",
+   "group": "Schwarz: Flankeneröffnungen",
+   "title": "Seltene erste Züge: 1.d3, 1.g3, 1.c3",
+   "priority": 2,
+   "intro": "Gegen alles, was nicht 1.e4 ist, spielst du 1…d5 und baust ein gesundes Zentrum. So musst du kaum etwas Neues lernen.",
+   "ideas": [
+    "1…d5, dann …Sf6, …e6 oder …c5: das Zentrum gehört dir.",
+    "Bietet Weiß nach 1.d3 d5 2.e4 dxe4 3.dxe4 den Damentausch an, ist das gut für dich: Der weiße König kann nicht mehr rochieren."
+   ],
+   "lines": [
+    {
+     "id": "b-r1-d3",
+     "name": "1.d3 d5 2.Sf3 Sf6",
+     "frequency": "häufig",
+     "moves": [
+      "d3",
+      "d5",
+      "Nf3",
+      "Nf6"
+     ],
+     "notes": {
+      "1": "Das Zentrum nehmen, wie gegen 1.d4.",
+      "3": "Entwickelt. Danach …c5 oder …e5 für noch mehr Zentrum."
+     },
+     "plan": "…e5 oder …c5, dann …Sc6 und …Ld6/Le7. Weiß spielt zu passiv für Vorteil."
+    },
+    {
+     "id": "b-r1-d3-e4",
+     "name": "1.d3 d5 2.e4 dxe4",
+     "frequency": "mittel",
+     "moves": [
+      "d3",
+      "d5",
+      "e4",
+      "dxe4",
+      "dxe4",
+      "Qxd1+",
+      "Kxd1"
+     ],
+     "notes": {
+      "1": "Das Zentrum nehmen.",
+      "3": "Schlagen öffnet die d-Linie.",
+      "5": "Damentausch mit Schach: Der weiße König verliert das Rochaderecht."
+     },
+     "plan": "Entwickle mit …Sc6, …e5 und …Le6. Lang rochieren bringt deinen Turm auf die offene d-Linie, gegen den König auf d1."
+    },
+    {
+     "id": "b-r1-g3",
+     "name": "1.g3 d5 2.Lg2 Sf6",
+     "frequency": "häufig",
+     "moves": [
+      "g3",
+      "d5",
+      "Bg2",
+      "Nf6"
+     ],
+     "notes": {
+      "1": "Das Zentrum nehmen.",
+      "3": "Entwickelt. Mit …c6 und …Lf5 oder …Lg4 bekommst du eine solide Stellung."
+     },
+     "plan": "…c6, …Lf5 oder …Lg4, …e6 und kurze Rochade. Der Lg2 beißt auf deinen Bauern d5."
+    },
+    {
+     "id": "b-r1-c3",
+     "name": "1.c3 d5 2.d4 Sf6",
+     "frequency": "mittel",
+     "moves": [
+      "c3",
+      "d5",
+      "d4",
+      "Nf6"
+     ],
+     "notes": {
+      "1": "Das Zentrum nehmen.",
+      "3": "Entwickelt. Weiter mit …c5 wie gegen das London-System."
+     },
+     "plan": "Spiele …c5, …Sc6 und …Db6 oder …Lf5, dieselben Ideen wie gegen das London-System."
     }
    ]
   }
