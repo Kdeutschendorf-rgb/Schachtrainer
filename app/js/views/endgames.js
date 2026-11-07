@@ -6,6 +6,7 @@ import { h, clear, loadCss, countdown, toast, loadData, today, figurine, formatL
 import * as store from '../store.js';
 import * as srs from '../srs.js';
 import * as engine from '../engine.js';
+import * as Coach from '../endgames/coach.js';
 import { createBoard } from '../board.js';
 import * as E from '../vision/endgame.js';
 
@@ -150,6 +151,7 @@ function createPlayer(el, { queue, seconds = 0, standalone = false, onEnd }) {
   let primary = null;
   const sans = [];
   let startPly = 0;
+  let fenBeforeUser = null;
 
   const boardHost = h('div');
   const title = h('h2.eg-title');
@@ -221,7 +223,15 @@ function createPlayer(el, { queue, seconds = 0, standalone = false, onEnd }) {
       ' ', h('span', `Du spielst ${SIDE_DE[p.side]}. ${goalText(p)}`));
     introEl.textContent = p.intro;
     clear(hintsEl); clear(after); setFeedback('');
+    const coached = Coach.COACHED[p.id];
+    if (coached) {
+      hintsEl.append(h('div.card.eg-method',
+        h('b', 'So geht’s, Schritt für Schritt:'),
+        h('ol', coached.steps.map(t => h('li', t))),
+        h('div.small.muted', `Der Käfig zählt die Felder, die der König noch erreichen kann: jetzt ${Coach.cage(p.fen, p.side)}. Jeder gute Zug macht ihn kleiner. Der Hinweis erklärt dir den nächsten Zug.`)));
+    }
     board.setPosition(p.fen, { orientation: p.side === 'w' ? 'white' : 'black' });
+    fenBeforeUser = p.fen;
     board.setOnMove(onUserMove);
     board.setMovable(p.side === 'w' ? 'white' : 'black');
     controls.replaceChildren(
@@ -236,9 +246,22 @@ function createPlayer(el, { queue, seconds = 0, standalone = false, onEnd }) {
   // Hinweise aus der Datei, danach der Engine-Zug als Pfeil
   async function showHint() {
     if (finished || !pos) return;
-    const shown = hintsEl.childElementCount;
+    const shown = hintsEl.querySelectorAll(':scope > .feedback').length;
     hintsUsed++;
-    if (shown < (pos.hints || []).length) {
+    if (Coach.COACHED[pos.id]) {
+      // Grundmatts: den besten Zug zeigen und erklären, warum er gut ist
+      const my = gen;
+      const fen = board.fen();
+      try {
+        const r = await engine.analyse(fen, { movetime: ENGINE_MS });
+        if (my !== gen || !r.bestmove) return;
+        board.setShapes([{ orig: r.bestmove.slice(0, 2), dest: r.bestmove.slice(2, 4), brush: 'blue' }]);
+        hintsEl.querySelectorAll(':scope > .eg-explain').forEach(x => x.remove());
+        hintsEl.append(h('div.feedback.info.eg-explain', Coach.explain(fen, r.bestmove, pos.side)));
+      } catch {
+        toast('Engine nicht erreichbar.', 'bad');
+      }
+    } else if (shown < (pos.hints || []).length) {
       hintsEl.append(h('div.feedback.info', `Hinweis ${shown + 1}: ${pos.hints[shown]}`));
     } else {
       const my = gen;
@@ -256,6 +279,11 @@ function createPlayer(el, { queue, seconds = 0, standalone = false, onEnd }) {
 
   async function onUserMove(m) {
     const my = gen;
+    if (Coach.COACHED[pos.id]) {
+      const r = Coach.review(fenBeforeUser, m.fen, pos.side);
+      setFeedback(r.text, r.kind);
+      hintsEl.querySelectorAll(':scope > .eg-explain').forEach(x => x.remove());
+    }
     userMoves++;
     sans.push(m.san);
     board.setMovable('none');
@@ -289,6 +317,7 @@ function createPlayer(el, { queue, seconds = 0, standalone = false, onEnd }) {
     renderMoves();
     const v2 = E.judgeAfterOpponent(pos, game);
     if (v2.status !== 'continue') return end(v2);
+    fenBeforeUser = board.fen();
     board.setMovable(pos.side === 'w' ? 'white' : 'black');
   }
 

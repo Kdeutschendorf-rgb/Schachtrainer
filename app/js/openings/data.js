@@ -3,6 +3,7 @@
 
 import { fetchJson } from '../ui.js';
 import * as store from '../store.js';
+import { todayStr } from '../srs.js';
 import { buildModel, buildNameIndex, ensureProgress, applyResults, quizPool } from './logic.js';
 
 export const FILES = {
@@ -35,14 +36,25 @@ export function fileProblem(name) {
 }
 
 let model = null;
-// Repertoire-Modell. Wird gecacht, sobald beide Dateien da sind.
+let modelDepth = null;
+export const DEFAULT_DEPTH = 8;   // Lerntiefe in Zügen; auf deinem Niveau weicht der Gegner fast immer früher ab
+
+// Lerntiefe in Zügen (0 = ganze Linie)
+export function learnDepth() {
+  const d = progress().settings.depth;
+  return d === 0 || d > 0 ? d : DEFAULT_DEPTH;
+}
+
+// Repertoire-Modell. Wird gecacht, sobald beide Dateien da sind (und neu gebaut, wenn sich die Lerntiefe ändert).
 export async function loadModel() {
-  if (model && !model.missing.length) return model;
+  const depth = learnDepth();
+  if (model && !model.missing.length && modelDepth === depth) return model;
   const [w, b] = await Promise.all([tryLoad(FILES.white), tryLoad(FILES.black)]);
+  modelDepth = depth;
   model = buildModel([
     { name: FILES.white, side: 'w', json: w },
     { name: FILES.black, side: 'b', json: b },
-  ]);
+  ], { maxPlies: depth * 2 });
   model.problems = [FILES.white, FILES.black].filter(f => problems.has(f)).map(f => ({ file: f, kind: problems.get(f) }));
   if (model.errors.length) console.warn('Repertoire-Fehler:', model.errors);
   if (model.conflicts.length) console.warn('Repertoire-Widersprüche:', model.conflicts);
@@ -89,6 +101,11 @@ export function saveLineResults(results, { learnLineId } = {}) {
   if (learnLineId) counts.openingLines = 1;
   store.logActivity(counts);
   return r;
+}
+
+// Weichen-Training: wann eine Stellung zuletzt geübt wurde (auch wenn sie nicht fällig war)
+export function markPracticed(key) {
+  store.update('openings', d => { (d.practiced ||= {})[key] = todayStr(); });
 }
 
 export function saveQuiz(right) {

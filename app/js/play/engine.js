@@ -1,0 +1,67 @@
+// Engine-Teil vom Spielen: Zug des Bots und Analyse der fertigen Partie (Stockfish im Browser).
+
+import { Chess } from '../../vendor/chess.js';
+import { analyse, bestMove } from '../engine.js';
+import { botStyle, chooseMove, winPct, classify, moveAccuracy, phaseOf } from './logic.js';
+
+// Zug des Bots als UCI
+export async function botMove(fen, elo) {
+  if (elo >= 2000) return bestMove(fen, { elo, movetime: 700 });
+  const style = botStyle(elo);
+  const chess = new Chess(fen);
+  const legal = chess.moves({ verbose: true }).map(m => m.from + m.to + (m.promotion || ''));
+  if (legal.length === 1) return legal[0];
+  const r = await analyse(fen, { depth: style.depth, multipv: style.multipv });
+  // In der Eröffnung liegen viele Züge nah beieinander; dort spielt er prinzipieller (sonst …h6, …a5 und Co.)
+  const opening = Number(fen.split(' ')[5]) <= 8;
+  const s = opening ? { ...style, temp: style.temp * 0.3, blunder: style.blunder * 0.3 } : style;
+  return chooseMove(r.lines, chess.turn(), s, Math.random, legal);
+}
+
+// Partie analysieren: jede Stellung einmal bewerten, dann die eigenen Züge einstufen.
+// → {accuracy, counts: {blunder, mistake, inaccuracy}, moves: [{ply, san, cls, loss, best, bestSan, fen}], puzzles}
+export async function analyseGame({ sans, color, id, date }, { onProgress, alive = () => true, movetime = 300 } = {}) {
+  const chess = new Chess();
+  const fens = [chess.fen()];
+  for (const san of sans) { chess.move(san); fens.push(chess.fen()); }
+  const evals = [];
+  for (let i = 0; i < fens.length; i++) {
+    if (!alive()) return null;
+    const c = new Chess(fens[i]);
+    if (c.isCheckmate()) evals.push({ score: { mate: c.turn() === 'w' ? -1 : 1 }, pv: [] });  // Seite am Zug ist matt
+    else if (c.isGameOver()) evals.push({ score: { cp: 0 }, pv: [] });
+    else {
+      const r = await analyse(fens[i], { movetime });
+      const l = r.lines[0];
+      evals.push({ score: l?.score || { cp: 0 }, pv: l?.pv || [], san: l?.san || [] });
+    }
+    onProgress?.((i + 1) / fens.length);
+  }
+  const moves = [];
+  const puzzles = [];
+  const counts = { blunder: 0, mistake: 0, inaccuracy: 0 };
+  let accSum = 0, accN = 0;
+  for (let i = 0; i < sans.length; i++) {
+    const mover = fens[i].split(' ')[1];
+    if (mover !== color) continue;
+    const before = winPct(evals[i].score, color);
+    const after = winPct(evals[i + 1].score, color);
+    // Spielt man den besten Zug, gibt es keinen Verlust (schützt vor Rechenrauschen)
+    const bestUci = evals[i].pv[0];
+    const playedUci = (() => { const c = new Chess(fens[i]); const m = c.move(sans[i]); return m.from + m.to + (m.promotion || ''); })();
+    const loss = playedUci === bestUci ? 0 : Math.max(0, before - after);
+    const cls = classify(loss);
+    accSum += moveAccuracy(loss);
+    accN++;
+    if (cls) counts[cls]++;
+    moves.push({ ply: i, san: sans[i], cls, loss: Math.round(loss), best: bestUci, bestSan: evals[i].san?.[0] || null, fen: fens[i] });
+    // Fehler und Patzer werden zu eigenen Aufgaben (Format wie my_puzzles.json)
+    if ((cls === 'blunder' || cls === 'mistake') && evals[i].pv.length) {
+      puzzles.push({
+        id: `bot${id}_${i}`, fen: fens[i], moves: evals[i].pv.slice(0, 3), played: sans[i], cls,
+        phase: phaseOf(fens[i], i), tags: [], tc: 'bot', date, winBest: Math.round(before * 10) / 10, winSecond: Math.round(after * 10) / 10,
+      });
+    }
+  }
+  return { accuracy: accN ? Math.round(accSum / accN * 10) / 10 : null, counts, moves, puzzles };
+}

@@ -17,3 +17,6 @@
 .eg-technique h3 { margin-bottom: .3em; }
 .eg-technique p { margin: 0 0 .5em; }
 .eg-summary { max-width: 520px; }
+.eg-method ol { margin: 6px 0; padding-left: 20px; }
+.eg-method li { margin: 3px 0; }
+.eg-explain { margin-top: 6px; }

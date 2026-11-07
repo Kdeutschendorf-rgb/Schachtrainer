@@ -12,7 +12,8 @@ import { tipOfTheDay, themeName } from '../coach.js';
 // Plan (reine Logik)
 
 // Grundplan in Minuten bei 30 Minuten am Tag; MIN_UNITS = Untergrenze beim Umschichten.
-export const DEFAULT_PLAN = { warmup: 4, openings: 10, tactics: 9, vision: 5, finish: 2 };
+// Mittelspiel vor Eröffnung: Die meisten Punkte gehen durch Fehler im Mittelspiel verloren, nicht in der Eröffnung.
+export const DEFAULT_PLAN = { warmup: 4, openings: 8, tactics: 10, vision: 6, finish: 2 };
 const MIN_UNITS = { warmup: 2, openings: 4, tactics: 3, vision: 2, finish: 1 };
 const ORDER = ['warmup', 'openings', 'tactics', 'vision', 'finish'];
 
@@ -339,7 +340,7 @@ export async function mount(el) {
       h('div.td-weights', weightRows),
       h('div.row',
         h('button', { onclick: () => save(x => { delete x.plan; }) }, 'Standard wiederherstellen'),
-        h('span.small.muted', 'Aufwärmen 4 · Eröffnungen 10 · Taktik 9 · Vorausdenken 5 · Abschluss 2')));
+        h('span.small.muted', 'Aufwärmen 4 · Eröffnungen 8 · Taktik 10 · Vorausdenken 6 · Abschluss 2')));
   }
 
   // Letzte 7 Tage als kleine Balken
@@ -366,6 +367,7 @@ export async function mount(el) {
       ['#/taktik', 'Taktik', 'Aufgaben, Rush, eigene Fehler'],
       ['#/rechnen', 'Vorausdenken', 'Blind rechnen, Drohungen, CCT'],
       ['#/endspiele', 'Endspiele', 'Grundstellungen gegen die Engine'],
+      ['#/spielen', 'Spielen', 'Gegen Bots auf deinem Niveau, mit Analyse'],
       ['#/bericht', 'Bericht', 'Deine Partien und dein Fortschritt'],
     ];
     return h('div.td-free', h('h3', 'Frei trainieren'),

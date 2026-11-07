@@ -4,7 +4,7 @@
 
 import { h, clear, progressBar, formatLine } from '../ui.js';
 import { chapterStats, lineStatus, totals, pickNewLine, newLineQueue, canLearn } from './logic.js';
-import { progress, setSetting } from './data.js';
+import { progress, setSetting, learnDepth } from './data.js';
 import { priorityBadge, freqBadge, repertoireNotice, sideName, button, emptyState, put } from './widgets.js';
 
 export function renderOverview(el, { model, go, openChapter }) {
@@ -25,6 +25,8 @@ export function renderOverview(el, { model, go, openChapter }) {
       setSetting('newPerDay', v);
     },
   });
+  const depthSel = h('select', { onchange: e => { setSetting('depth', Number(e.target.value)); location.reload(); } },
+    [[6, '6 Züge'], [8, '8 Züge (Standard)'], [10, '10 Züge'], [0, 'ganze Linien']].map(([v, l]) => h('option', { value: v, selected: v === learnDepth() }, l)));
   const nextInfo = next
     ? h('div.small', h('span.muted', 'Als Nächstes: '), h('b', model.chapterById.get(next.chapterId)?.title || ''), ' – ', next.name)
     : (newLineQueue(model, prog).length
@@ -40,10 +42,12 @@ export function renderOverview(el, { model, go, openChapter }) {
     h('div.row.op-actions',
       button({ label: t.due ? `Wiederholen (${t.due})` : 'Nichts fällig', primary: !!t.due, disabled: !t.due, onClick: () => go('wiederholen') }),
       button({ label: 'Neue Linie lernen', primary: !t.due && !!next, disabled: !model.lines.length, onClick: () => go('lernen') }),
-      button({ label: 'Explorer', onClick: () => go('explorer') }),
-      button({ label: 'Alle Eröffnungen', onClick: () => go('katalog') })),
+      button({ label: 'Weichen üben', onClick: () => go('weichen') }),
+      button({ label: 'Partie-Check', onClick: () => go('partien') })),
     nextInfo,
-    h('label.row.small.muted.op-setting', 'Neue Züge pro Tag:', limitInput, h('span', '(Standard 12, weniger = entspannter)'))));
+    h('label.row.small.muted.op-setting', 'Neue Züge pro Tag:', limitInput, h('span', '(Standard 12, weniger = entspannter)')),
+    h('label.row.small.muted.op-setting', 'Lerntiefe:', depthSel,
+      h('span', 'Weiter hinten weichen Gegner auf deinem Niveau fast immer ab. Breite schlägt Tiefe.'))));
 
   if (!model.chapters.length) {
     el.append(emptyState('Noch kein Repertoire',
@@ -90,6 +94,7 @@ export function renderOverview(el, { model, go, openChapter }) {
       h('div.row.op-chactions',
         st.due ? button({ label: 'Wiederholen', primary: true, onClick: () => go('wiederholen', { chapter: ch.id }) }) : null,
         nextHere ? button({ label: 'Lernen', primary: !st.due, onClick: () => go('lernen', { line: nextHere.id }) }) : null,
+        button({ label: 'Baum', onClick: () => go('baum', { chapter: ch.id }) }),
         button({ label: 'Erkunden', onClick: () => go('explorer', { chapter: ch.id }) }),
         button({ label: open.has(ch.id) ? 'Weniger' : 'Linien', cls: 'op-more', onClick: toggle })),
       body);

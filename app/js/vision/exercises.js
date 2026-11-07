@@ -179,10 +179,11 @@ export async function runThreats(ctx, level) {
 
   // Kandidaten durchprobieren, bis die Engine eine echte Drohung bestätigt
   let found = null;
-  for (let tries = 0; tries < 10 && !found; tries++) {
+  for (let tries = 0; tries < 25 && !found; tries++) {
     const row = pickPuzzle(ctx, r => r[4].split(' ').some(t => L.THREAT_THEMES.includes(t)), L.THREAT_RATINGS[level]);
     if (!row) break;
     const p = L.parsePuzzle(row);
+    if (new Chess(p.fen).inCheck()) continue;       // Gegner zieht nur aus dem Schach: keine echte Drohung
     const after = L.afterFirstMove(p);
     if (after.san.includes('x')) continue;          // Rückschlag-Stellungen sind keine Drohungsübung
     const nullFen = L.nullMoveFen(after.fen);
@@ -196,6 +197,8 @@ export async function runThreats(ctx, level) {
     const baseScore = base.lines[0].score;
     const lines = thr.lines.map(l => ({ ...l, gain: L.threatGain(baseScore, l.score, user) }));
     if (lines[0].gain < L.THREAT_MIN_GAIN) continue;
+    // Die Drohung muss vom letzten Zug kommen, nicht schon vorher dagewesen sein
+    if (!L.threatFromLastMove(after.lastMove, lines[0].pv[0])) continue;
     found = { p, after, nullFen, user, baseScore, lines };
   }
   if (!found) throw new Error('Keine Drohungs-Stellung gefunden.');

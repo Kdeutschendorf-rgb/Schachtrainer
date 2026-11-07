@@ -2273,9 +2273,39 @@
       "10": "Die Dame zieht sich zurück.",
       "11": "Der Gegenschlag greift den Lf4 an und öffnet deinen Lc8. Nicht 6…Lf5? wegen 7.Dxf5 Dxb2 8.Dxd5: Ohne Springer auf f6 ist d5 ungedeckt.",
       "12": "Weiß nimmt den Bauern.",
-      "13": "Mit Tempo gegen die Dame. Du holst den Bauern e5 später mit …Sge7–g6 oder …Sxe5 zurück."
+      "13": "Mit Tempo gegen die Dame. Falle! Schlägt Weiß 8.Dxf5?, kommt 8…Db2!: Du greifst Ta1 und Sb1 an, und der Lf4 kann nicht nach c1 zurück, weil e3 im Weg steht. Du gewinnst den Turm. Wichtig: nur 8…Db2, sonst ist der Läufer einfach weg. Nach dem besten Zug 8.Dc1 spielst du aktiv 8…g5!: 9.Lxg5 Sxe5. Du gibst einen Bauern und bekommst dafür schnelle Entwicklung."
      },
-     "plan": "Entwickle mit …Sge7 und …Sg6 und hol dir den Bauern e5 zurück. Dein Bauer c4 gibt dir Raum am Damenflügel, …b5–b4 ist ein typischer Hebel."
+     "plan": "Nach 8.Dc1 g5! 9.Lxg5 Sxe5: entwickle mit …Sf6 (oder …Se7), lang rochieren ist oft gut. Dein Bauer c4 gibt dir Raum am Damenflügel."
+    },
+    {
+     "id": "b-lon-qc2-bxe5",
+     "name": "2.Lf4 c5 3.e3 Sc6 4.c3 Db6 5.Db3 c4 6.Dc2 e5 7.Lxe5",
+     "frequency": "mittel",
+     "moves": [
+      "d4",
+      "d5",
+      "Bf4",
+      "c5",
+      "e3",
+      "Nc6",
+      "c3",
+      "Qb6",
+      "Qb3",
+      "c4",
+      "Qc2",
+      "e5",
+      "Bxe5",
+      "Bf5",
+      "Qc1",
+      "Nxe5"
+     ],
+     "notes": {
+      "12": "Weiß schlägt mit dem Läufer statt mit dem Bauern. Laut Engine der stärkste Zug.",
+      "13": "Wieder zuerst mit Tempo gegen die Dame. Falle! 8.Dxf5? Db2! gewinnt wie in der Hauptlinie den Turm a1.",
+      "14": "Die Dame weicht aus und deckt b2.",
+      "15": "Jetzt nimmst du den Läufer zurück. Nach 9.dxe5 ist die Stellung ausgeglichen; mit …f6 öffnest du das Zentrum."
+     },
+     "plan": "Nach 9.dxe5 spielst du …f6 oder …0-0-0 und entwickelst schnell. Die Stellung ist ausgeglichen, du hast Raum am Damenflügel."
     },
     {
      "id": "b-lon-qxb6",

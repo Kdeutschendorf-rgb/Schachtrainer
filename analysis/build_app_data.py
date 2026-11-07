@@ -230,6 +230,19 @@ def line_text(sans):
     return " ".join(out)
 
 
+def recent_games(games, raw_moves, n=30, plies=30):
+    """Die letzten Partien mit den ersten Zügen, für den Partie-Check der App (Vergleich mit dem Repertoire)."""
+    out = []
+    for g in games[-n:][::-1]:
+        sans = raw_moves.get(game_key(g.get("date"), g.get("end"), g.get("opponent")))
+        if not sans:
+            continue
+        out.append({"date": iso(g["date"]), "tc": g["tc"], "color": g["color"], "opponent": g.get("opponent"),
+                    "result": g["result"], "myElo": g.get("myElo"), "opening": g.get("opening"),
+                    "moves": sans[:plies]})
+    return out
+
+
 def repertoire_coverage(games, raw_moves, reps):
     result = {"available": any(reps.values()), "files": {}}
     for side, rep in reps.items():
@@ -595,7 +608,9 @@ def build(args):
     }
     summary["focus"] = focus_block(games, mistakes, summary["openings"], summary["time"])
     reps = {"w": load_repertoire(args.rep_white, "w"), "b": load_repertoire(args.rep_black, "b")}
-    summary["repertoire"] = repertoire_coverage(games, read_raw_games(), reps)
+    raw_moves = read_raw_games()
+    summary["repertoire"] = repertoire_coverage(games, raw_moves, reps)
+    summary["recentGames"] = recent_games(games, raw_moves)
     summary["insights"] = insights(summary)
     clean = clean_puzzles(puzzles)
     summary["ownPuzzles"] = len(clean)

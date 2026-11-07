@@ -1,0 +1,25 @@
+/* Spielen gegen Bots */
+.pl-setup { display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; }
+.pl-rating { text-align: right; }
+.pl-settings { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+.pl-settings label { display: flex; flex-direction: column; gap: 4px; }
+.pl-start { font-size: 1.05rem; padding: 10px 20px; }
+.pl-games { width: 100%; border-collapse: collapse; }
+.pl-games td { padding: 6px 8px 6px 0; border-top: 1px solid var(--line); }
+.pl-bar { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.pl-bar.me { border-color: var(--accent-2); }
+.pl-clock { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 1.3rem; padding: 2px 10px; border-radius: 6px; background: var(--panel-2); color: var(--muted); }
+.pl-clock.on { color: var(--text); background: var(--accent-2); }
+.pl-clock.low.on { background: var(--bad); }
+.pl-status { font-weight: 600; min-height: 1.4em; }
+.pl-result.good b { color: var(--accent); }
+.pl-result.bad b { color: var(--bad); }
+.pl-moves { max-height: 180px; overflow-y: auto; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9rem; line-height: 1.6; }
+.pl-report { display: flex; flex-direction: column; gap: 10px; }
+.pl-acc { gap: 18px; }
+.pl-acc .stat { font-size: 1.4rem; }
+.pl-blunder { color: var(--bad); }
+.pl-mistake { color: var(--warn); }
+.pl-inaccuracy { color: var(--info); }
+.pl-mistakes ul { margin: 4px 0 0; padding-left: 18px; }
+.pl-mistakes li { margin: 3px 0; }

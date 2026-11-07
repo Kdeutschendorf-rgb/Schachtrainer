@@ -9,6 +9,7 @@ const ROUTES = {
   rechnen: 'vision',
   endspiele: 'endgames',
   bericht: 'report',
+  spielen: 'play',
 };
 
 const view = document.getElementById('view');

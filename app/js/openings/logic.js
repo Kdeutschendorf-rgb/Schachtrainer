@@ -77,12 +77,14 @@ export function expandLine(moves, side, notes = {}) {
 
 // Repertoire-Dateien zu einem Modell zusammenführen.
 // files: [{ name, side: 'w'|'b', json }] (json darf null sein, wenn die Datei fehlt)
-export function buildModel(files) {
+// maxPlies: Linien nach so vielen Halbzügen abschneiden (Lerntiefe), 0 = ganze Linie.
+export function buildModel(files, { maxPlies = 0 } = {}) {
   const model = {
     chapters: [], lines: [], chapterById: new Map(), lineById: new Map(),
     trees: { w: new Map(), b: new Map() }, keys: new Set(), keyLines: new Map(),
     errors: [], conflicts: [], missing: [],
   };
+  const seen = new Set();
   for (const f of files) {
     if (!f.json) { model.missing.push(f.name); continue; }
     const chapters = Array.isArray(f.json.chapters) ? f.json.chapters : [];
@@ -102,8 +104,14 @@ export function buildModel(files) {
           model.errors.push(`Linie ${ln.id || '(ohne id)'} in ${ch.id} doppelt, ohne id oder ohne Züge`);
           return;
         }
-        const { plies, error } = expandLine(ln.moves, side, ln.notes);
-        if (error) { model.errors.push(`${ln.id}: ${error}`); return; }
+        const expanded = expandLine(ln.moves, side, ln.notes);
+        if (expanded.error) { model.errors.push(`${ln.id}: ${expanded.error}`); return; }
+        const plies = maxPlies > 0 ? expanded.plies.slice(0, maxPlies) : expanded.plies;
+        if (!plies.some(p => p.own)) return;
+        // Durch das Kürzen gleich gewordene Linien nur einmal aufnehmen
+        const sig = side + ':' + plies.map(p => p.san).join(' ');
+        if (seen.has(sig)) return;
+        seen.add(sig);
         const ownKeys = [...new Set(plies.filter(p => p.own).map(p => p.key))];
         const line = {
           id: ln.id, name: ln.name || ln.id, frequency: ln.frequency || 'mittel', moves: plies.map(p => p.san),
@@ -124,6 +132,7 @@ export function buildModel(files) {
       model.chapterById.set(chapter.id, chapter);
     });
   }
+  model.items = positionItems(model);
   // Widersprüche: gleiche Stellung, verschiedene eigene Züge
   for (const side of ['w', 'b']) {
     for (const node of model.trees[side].values()) {
@@ -142,7 +151,13 @@ function addToTree(tree, line) {
     let node = tree.get(key);
     if (!node) tree.set(key, node = { key, fen: p.fenBefore, moves: [] });
     let mv = node.moves.find(m => m.san === p.san);
-    if (!mv) node.moves.push(mv = { san: p.san, uci: p.uci, own: p.own, next: fenKey(p.fenAfter), notes: [], lineIds: [] });
+    if (!mv) node.moves.push(mv = { san: p.san, uci: p.uci, from: p.from, to: p.to, own: p.own, next: fenKey(p.fenAfter), notes: [], lineIds: [] });
+    // Rückverweis: über welche Züge man in die nächste Stellung kommt (für das Weichen-Training)
+    const nextKey = fenKey(p.fenAfter);
+    let next = tree.get(nextKey);
+    if (!next) tree.set(nextKey, next = { key: nextKey, fen: p.fenAfter, moves: [] });
+    next.parents ||= [];
+    if (!next.parents.some(x => x.key === key && x.san === p.san)) next.parents.push({ key, fen: p.fenBefore, san: p.san, uci: p.uci, from: p.from, to: p.to });
     if (p.note && !mv.notes.includes(p.note)) mv.notes.push(p.note);
     if (!mv.lineIds.includes(line.id)) mv.lineIds.push(line.id);
   }
@@ -412,4 +427,115 @@ export function makeMoveQuestion(pool, rnd = Math.random, src) {
 // Prüft einen Quizzug: richtig, wenn dieselbe Stellung entsteht (Zugumstellung zählt).
 export function checkMoveAnswer(q, fenAfter) {
   return fenKey3(fenAfter) === q.targetKey;
+}
+
+// ---------- Weichen-Training (einzelne Stellungen statt ganzer Linien) ----------
+
+// Jede Stellung, in der du am Zug bist, mit dem Gegnerzug davor. Weiche = der Gegner hatte im Repertoire
+// mehrere Möglichkeiten; genau dort musst du wissen, welche Antwort zu welchem Zug gehört.
+// → [{key, side, fen, san, from, to, parent: {fen, san, from, to} | null, branch, lineIds, chapterId}]
+export function positionItems(model) {
+  const out = [];
+  for (const side of ['w', 'b']) {
+    const tree = model.trees[side];
+    for (const node of tree.values()) {
+      for (const mv of node.moves.filter(m => m.own)) {
+        const parents = node.parents || [];
+        // Bevorzugt einen Gegnerzug an einer Weiche als Weg in die Stellung
+        const ranked = parents.map(p => ({ p, n: (tree.get(p.key)?.moves || []).filter(m => !m.own).length }))
+          .sort((a, b) => b.n - a.n);
+        const best = ranked[0];
+        const line = model.lineById.get(mv.lineIds[0]);
+        out.push({
+          key: cardKey(node.fen, mv.san), side, fen: node.fen, san: mv.san, from: mv.from, to: mv.to,
+          parent: best ? { fen: best.p.fen, san: best.p.san, from: best.p.from, to: best.p.to } : null,
+          branch: !!best && best.n >= 2, lineIds: mv.lineIds, chapterId: line?.chapterId || null,
+        });
+      }
+    }
+  }
+  return out;
+}
+
+// Alle Gegnerzüge in der Stellung vor deinem Zug mit deiner jeweiligen Antwort: „spielt er X, spielst du Y“.
+export function branchTable(model, side, parentFen) {
+  const tree = model.trees[side];
+  const node = tree.get(fenKey(parentFen));
+  if (!node) return [];
+  return node.moves.filter(m => !m.own).map(m => ({
+    opp: m.san, answer: (tree.get(m.next)?.moves || []).find(x => x.own)?.san || null,
+  }));
+}
+
+function shuffleWith(arr, seed) {
+  let x = seed || 1;
+  const rnd = () => ((x = (x * 1103515245 + 12345) % 2147483648) / 2147483648);
+  for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; }
+  return arr;
+}
+
+// Übungsstellungen für einen Durchgang.
+// mode 'due': fällige Karten in zufälliger Reihenfolge (keine Linienreihenfolge, die man sich merken könnte).
+// mode 'branches': bekannte Weichen-Stellungen, die am längsten nicht geübt wurden.
+export function drillQueue(model, prog, { mode = 'due', day = todayStr(), limit = 0, seed = Date.now(), filter = {} } = {}) {
+  const cards = prog.cards || {};
+  const seenAt = k => [prog.practiced?.[k] || '', cards[k]?.last || ''].sort().pop();
+  const seenKeys = new Set();
+  let items = (model.items || []).filter(it => {
+    if (seenKeys.has(it.key) || !cards[it.key]) return false;
+    if (filter.side && it.side !== filter.side) return false;
+    if (filter.chapterId && it.chapterId !== filter.chapterId) return false;
+    seenKeys.add(it.key);
+    return true;
+  });
+  if (mode === 'due') items = shuffleWith(items.filter(it => isDue(cards[it.key], day)), seed);
+  else {
+    items = items.filter(it => it.branch)
+      .sort((a, b) => String(seenAt(a.key)).localeCompare(String(seenAt(b.key))));
+    items = shuffleWith(items.slice(0, Math.max(limit || 0, 12)), seed);
+  }
+  return limit ? items.slice(0, limit) : items;
+}
+
+// Ein Durchgang im Weichen-Training: neue Karten werden nicht angelegt, nicht fällige nur bei Fehler zurückgesetzt.
+// (Das macht applyResults schon so.)
+
+// ---------- Partie-Check ----------
+
+// Eine Partie (SAN ab Grundstellung) mit dem Repertoire vergleichen.
+// → {plies: wie viele Halbzüge im Repertoire, kind: 'ich' (du bist abgewichen) | 'gegner' (Zug nicht im Repertoire)
+//    | 'ende' (Linie zu Ende) | 'partie' (Partie zu Ende), played, expected: [SAN], fen (Stellung davor), ownTurn}
+export function followGame(model, side, sans) {
+  const tree = model.trees[side];
+  const chess = new Chess();
+  for (let i = 0; i < sans.length; i++) {
+    const node = tree.get(fenKey(chess.fen()));
+    const ownTurn = chess.turn() === side;
+    if (!node || !node.moves.length) return { plies: i, kind: 'ende', played: sans[i], expected: [], fen: chess.fen(), ownTurn };
+    const hit = node.moves.find(m => m.san === sans[i]);
+    if (!hit) {
+      const exp = node.moves.filter(m => m.own === ownTurn).map(m => m.san);
+      return { plies: i, kind: ownTurn ? 'ich' : 'gegner', played: sans[i], expected: exp, fen: chess.fen(), ownTurn };
+    }
+    try { chess.move(sans[i]); } catch { return { plies: i, kind: 'partie', played: sans[i], expected: [], fen: chess.fen(), ownTurn }; }
+  }
+  return { plies: sans.length, kind: 'partie', played: null, expected: [], fen: chess.fen(), ownTurn: chess.turn() === side };
+}
+
+// ---------- Baum-Übersicht ----------
+
+// Linien eines Kapitels als Baum: gemeinsame Anfänge einmal, Verzweigungen als Kinder.
+// Knoten: {san, own, ply, note, children: [], lineIds: []}; die Wurzel hat san = null.
+export function chapterTrie(chapter) {
+  const root = { san: null, own: false, ply: -1, children: [], lineIds: [] };
+  for (const line of chapter.lines) {
+    let node = root;
+    for (const p of line.plies) {
+      let child = node.children.find(c => c.san === p.san);
+      if (!child) node.children.push(child = { san: p.san, own: p.own, ply: p.i, note: p.note, children: [], lineIds: [] });
+      if (!child.lineIds.includes(line.id)) child.lineIds.push(line.id);
+      node = child;
+    }
+  }
+  return root;
 }

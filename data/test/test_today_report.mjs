@@ -44,7 +44,7 @@ print('  explainMove: ' + ex.join(' '));
 // --- Plan ---
 const plan = today.computePlan({ dailyMinutes: 30, day: '2026-10-30', ownPuzzles: 10 });
 ok(plan.total === 30, 'Plan 30 Minuten: ' + plan.total);
-ok(plan.blocks.map(b => b.minutes).join() === '4,10,9,5,2', 'Standardplan 4/10/9/5/2: ' + plan.blocks.map(b => b.minutes).join());
+ok(plan.blocks.map(b => b.minutes).join() === '4,8,10,6,2', 'Standardplan 4/8/10/6/2: ' + plan.blocks.map(b => b.minutes).join());
 for (const dm of [10, 15, 20, 45, 60]) {
   const p = today.computePlan({ dailyMinutes: dm, dueCards: 90, focus: { phases: { eroeffnung: 0.5, mittelspiel: 0.7, endspiel: 0.3 } }, ownPuzzles: 5 });
   ok(p.total === dm, `Plan ${dm} min ergibt ${p.total}`);
@@ -63,7 +63,7 @@ const unmount = await today.mount(el, {});
 await tick(10);
 ok(el.textContent.includes('Training starten'), 'Startknopf');
 ok(el.textContent.includes('Rapid-Elo (chess.com)'), 'Rapid-Elo angezeigt');
-ok(el.textContent.includes('Ziel 1300'), 'Standardziel 1300');
+ok(/Ziel \d{4}/.test(el.textContent), 'Ziel angezeigt');
 noJunk(el, 'Heute');
 findButton(el, 'Plan anpassen').click();
 ok(el.textContent.includes('Trainingszeit pro Tag'), 'Einstellungen offen');

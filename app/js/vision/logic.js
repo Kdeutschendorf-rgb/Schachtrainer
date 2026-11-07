@@ -305,3 +305,21 @@ export function recentRate(history, n = 20, okIdx = 2) {
   if (!h.length) return null;
   return h.reduce((s, e) => s + (e[okIdx] ? 1 : 0), 0) / h.length;
 }
+
+// Felder strikt zwischen a und b, wenn beide auf einer Reihe, Linie oder Diagonale liegen, sonst []
+export function between(a, b) {
+  const fx = a.charCodeAt(0) - 97, fy = +a[1] - 1, tx = b.charCodeAt(0) - 97, ty = +b[1] - 1;
+  const dx = Math.sign(tx - fx), dy = Math.sign(ty - fy);
+  if (!(fx === tx || fy === ty || Math.abs(tx - fx) === Math.abs(ty - fy))) return [];
+  const out = [];
+  for (let x = fx + dx, y = fy + dy; x !== tx || y !== ty; x += dx, y += dy) out.push(String.fromCharCode(97 + x) + (y + 1));
+  return out;
+}
+
+// Ist die Drohung (Zug nach dem Passen, UCI) durch den letzten Gegnerzug entstanden?
+// Ja, wenn die gezogene Figur selbst droht oder der Zug einer anderen Figur die Linie geöffnet hat.
+export function threatFromLastMove(lastUci, threatUci) {
+  const lastFrom = lastUci.slice(0, 2), lastTo = lastUci.slice(2, 4);
+  const from = threatUci.slice(0, 2), to = threatUci.slice(2, 4);
+  return from === lastTo || between(from, to).includes(lastFrom);
+}

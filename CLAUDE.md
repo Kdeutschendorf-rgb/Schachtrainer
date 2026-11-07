@@ -102,6 +102,16 @@ Die volle Neuanalyse aller Partien (`analysis/analyze_games.py <pgn>`) dauert la
 
 - `app/` ohne Build-Schritt (ES-Module), Hash-Router in `app/js/main.js`, Views in `app/js/views/`.
 - Heute (`views/today.js`): 30-Minuten-Plan aus Blöcken, die über `runBlock` der Module laufen.
+  Standardplan: Aufwärmen 4 · Eröffnungen 8 · Taktik 10 · Vorausdenken 6 · Abschluss 2.
+- Eröffnungen: Wiederholen und Weichen laufen als Stellungstraining (`openings/drill.js`): einzelne Stellungen
+  gemischt, nach dem Zug die Weichentabelle („spielt er X, spielst du Y“). Baum-Übersicht `openings/tree.js`,
+  Partie-Check `openings/gamecheck.js` (letzte 30 Partien aus `analysis_summary.json` → `recentGames` plus Bot-Partien).
+  Lerntiefe einstellbar (Standard 8 Züge, `openings.settings.depth`), Linien werden dafür gekürzt.
+- Spielen (`views/play.js`, `play/`): Bots mit eigener Wertung (`play.rating`, Start = chess.com-Rapid), Partie wird
+  danach analysiert; Fehler werden eigene Taktikaufgaben (`play.puzzles`), Repertoire-Abweichungen fällige Karten.
+- Endspiele: Coach für die Grundmatts (`endgames/coach.js`, Käfig = erreichbare Felder des Königs, erklärt Engine-Züge).
+- Vorausdenken: Drohungen nur, wenn der letzte Gegnerzug sie erzeugt (`vision/logic.js` → `threatFromLastMove`);
+  im Mix kommt „Blind rechnen“ dreimal so oft.
 - Bericht (`views/report.js`), Coach-Texte und Tipp des Tages (`js/coach.js`).
 - Tests ohne Browser mit JavaScriptCore:
   `/System/Library/Frameworks/JavaScriptCore.framework/Versions/Current/Helpers/jsc -m data/test/test_today_report.mjs`

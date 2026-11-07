@@ -9,6 +9,8 @@ import * as L from '../vision/logic.js';
 import { EXERCISES, RUNNERS, setFeedback } from '../vision/exercises.js';
 
 const MIX_ORDER = ['calc', 'threats', 'cct', 'loose'];
+// Reihenfolge im gemischten Block: Blind rechnen (Züge im Kopf sehen) kommt am häufigsten dran
+const MIX_ROTATION = ['calc', 'threats', 'calc', 'cct', 'calc', 'loose'];
 
 // Bereich im Fortschritt: { blind: {level, streak, history}, threats: {...}, cct: {...}, loose: {...} }
 function area(kind) {
@@ -193,7 +195,7 @@ function createSession(el, { mode, seconds, standalone, onEnd }) {
 
   function nextKind() {
     if (mode !== 'mix') return mode;
-    const k = MIX_ORDER[mixIdx % MIX_ORDER.length];
+    const k = MIX_ROTATION[mixIdx % MIX_ROTATION.length];
     mixIdx++;
     return k;
   }

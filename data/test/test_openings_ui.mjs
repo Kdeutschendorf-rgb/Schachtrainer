@@ -89,7 +89,7 @@ el.remove();
 // ---------- Wiederholen: die falsche Karte (c3) ist heute fällig ----------
 el = container();
 cleanup = await view.mount(el, { tab: 'wiederholen' });
-ok(el.textContent.includes('Wiederholung'), 'Wiederholen startet: ' + el.textContent.slice(0, 200));
+ok(el.textContent.includes('Wiederholen') && el.textContent.includes('Gegner zieht'), 'Wiederholen startet als Stellungstraining: ' + el.textContent.slice(0, 200));
 noJunk(el); cleanup(); el.remove();
 
 // ---------- Schwarz-Linie: Gegner beginnt automatisch ----------
