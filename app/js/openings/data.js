@@ -108,6 +108,10 @@ export function markPracticed(key) {
   store.update('openings', d => { (d.practiced ||= {})[key] = todayStr(); });
 }
 
+export function setStage(lineId, stage) {
+  store.update('openings', d => { (d.stages ||= {})[lineId] = stage; });
+}
+
 export function saveQuiz(right) {
   store.update('openings', d => {
     ensureProgress(d);

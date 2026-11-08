@@ -2,45 +2,8 @@
 
 export const START_RATING = 1000;
 
-// Wie der Bot spielt, abhängig von seiner Ziel-Elo.
-// Unter 2000 wählt er aus den besten Engine-Zügen mit Zufall (temp in Centipawns: je höher, desto eher
-// ein schwächerer Zug) und patzt manchmal (blunder = Wahrscheinlichkeit für einen beliebigen Zug).
-// So spielt er wie ein Mensch dieser Stärke: meist vernünftig, ab und zu ein grober Fehler.
-export function botStyle(elo) {
-  const t = Math.max(0, Math.min(1, (elo - 500) / 1500));
-  return {
-    temp: Math.round(200 * (1 - t) ** 1.3 + 10),
-    blunder: Math.round((0.08 * (1 - t) ** 2 + 0.004) * 1000) / 1000,
-    depth: Math.round(5 + 7 * t),
-    multipv: 5,
-  };
-}
-
-// Score aus Sicht der Seite am Zug (Matt als großer Wert)
-export function moverCp(score, color) {
-  const cp = score.mate != null ? (score.mate > 0 ? 10000 - score.mate * 10 : -10000 - score.mate * 10) : score.cp;
-  return color === 'w' ? cp : -cp;
-}
-
-// Zug aus Engine-Linien wählen. lines: [{score, pv}], color: Seite am Zug, rnd: () => [0,1)
-export function chooseMove(lines, color, style, rnd = Math.random, legalUci = []) {
-  const usable = lines.filter(l => l.pv?.length);
-  if (!usable.length) return legalUci[0] || null;
-  if (legalUci.length > 1 && rnd() < style.blunder) {
-    // Patzer: irgendein legaler Zug, aber kein Zug, den die Engine als besten kennt
-    const others = legalUci.filter(u => u !== usable[0].pv[0]);
-    return others[Math.floor(rnd() * others.length)];
-  }
-  const best = moverCp(usable[0].score, color);
-  const weights = usable.map(l => Math.exp(-(best - moverCp(l.score, color)) / Math.max(1, style.temp)));
-  const sum = weights.reduce((a, b) => a + b, 0);
-  let x = rnd() * sum;
-  for (let i = 0; i < usable.length; i++) {
-    x -= weights[i];
-    if (x <= 0) return usable[i].pv[0];
-  }
-  return usable[0].pv[0];
-}
+// Stockfish kennt eine echte Spielstärke-Begrenzung erst ab 1320, darunter spielt er unzusammenhängend.
+export const MIN_BOT_ELO = 1320;
 
 // Elo-Rechnung für die eigene Bot-Wertung. score: 1 Sieg, 0.5 Remis, 0 Niederlage
 export function expected(rating, opp) {

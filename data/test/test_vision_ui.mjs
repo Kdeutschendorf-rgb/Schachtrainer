@@ -62,6 +62,9 @@ noJunk(el, 'Endspiel-Übersicht');
 cleanup(); el.remove();
 
 el = container();
+store.update('endgames', d => { d.stages = { 'kp-sixth-rank': 3 }; });   // Lektionsschritt „allein“ (gespiegelte Stellung)
+const realRandom = Math.random;
+Math.random = () => 0.9;
 cleanup = eg.mount(el, { id: 'kp-sixth-rank' });
 ok(await until(() => el.textContent.includes('König auf der 6. Reihe')), 'Einzelstellung geöffnet');
 ok(el.textContent.includes('Du spielst Weiß'), 'Seite angezeigt');

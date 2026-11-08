@@ -21,7 +21,16 @@ const TAG_PLAN = {
 const dayStr = d => d.toISOString().slice(0, 10);
 export const de1 = x => x.toFixed(1).replace('.', ',');
 
-export function weeklyReport({ summary, playGames = [], activity = {}, deviations = null, today = new Date() }) {
+// Zielverfolgung: Wie viele Punkte pro Woche braucht es bis zum Zieldatum? null, wenn Ziel oder Datum fehlen.
+export function goalPace(now, target, date, today = new Date()) {
+  if (!now || !target || !date) return null;
+  const end = new Date(date + 'T12:00:00');
+  const weeks = (end - today) / (7 * 864e5);
+  if (!(weeks > 0)) return { weeks: 0, left: target - now, perWeek: null, over: true };
+  return { weeks, left: target - now, perWeek: Math.ceil(Math.max(0, target - now) / weeks) };
+}
+
+export function weeklyReport({ summary, playGames = [], activity = {}, deviations = null, goal = null, today = new Date() }) {
   const to = dayStr(today);
   const from = dayStr(new Date(today.getTime() - 6 * 864e5));
   const inWeek = d => d >= from && d <= to;
@@ -72,6 +81,15 @@ export function weeklyReport({ summary, playGames = [], activity = {}, deviation
   else todo.push('Diese Woche noch nicht trainiert.');
   if (puzzles >= 20) good.push(`${puzzles} Taktikaufgaben, davon ${solved} gelöst (${Math.round(100 * solved / puzzles)} %).`);
   if (before != null && now != null && now !== before) (now > before ? good : todo).push(`Rapid-Elo ${before} → ${now} (${now > before ? '+' : ''}${now - before}).`);
+  const pace = goal ? goalPace(now, goal.rapid, goal.date, today) : null;
+  stats.pace = pace;
+  if (pace && pace.left > 0 && !pace.over) {
+    const gained = before != null && now != null ? now - before : null;
+    const text = `Ziel ${goal.rapid} bis ${goal.date.split('-').reverse().join('.')}: noch ${pace.left} Punkte, also ${pace.perWeek} pro Woche.`;
+    if (gained != null && gained >= pace.perWeek) good.push(`${text} Diese Woche waren es ${gained >= 0 ? '+' : ''}${gained}, du liegst im Plan.`);
+    else todo.push(`${text}${gained != null ? ` Diese Woche waren es ${gained >= 0 ? '+' : ''}${gained}.` : ''}`);
+  } else if (pace && pace.left <= 0) good.push(`Ziel ${goal.rapid} erreicht! Zeit für ein neues.`);
+  else if (pace?.over) todo.push(`Das Zieldatum für ${goal.rapid} ist vorbei. Setz unter „Plan anpassen“ ein neues.`);
   if (stats.errNow != null && stats.errBefore != null && week.length >= 2) {
     const a = de1(stats.errNow), b = de1(stats.errBefore);
     if (stats.errNow < stats.errBefore - 0.15) good.push(`Weniger grobe Fehler: ${a} pro Partie (vorher ${b}).`);

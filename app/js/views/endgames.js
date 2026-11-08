@@ -13,6 +13,9 @@ import * as E from '../vision/endgame.js';
 const LEVELS = { 1: 'Grundlagen', 2: 'Wichtige Technik', 3: 'Für Fortgeschrittene' };
 const SIDE_DE = { w: 'Weiß', b: 'Schwarz' };
 const ENGINE_MS = 600;
+// Lektionsschritte: 1 Vorführung, 2 geführt mit Hilfe, 3 allein aus einer anderen Startstellung
+const STEP_DE = { 1: 'Vorführung', 2: 'Geführt', 3: 'Allein' };
+const DEMO_MOVES = 12;
 
 // Bereich im Fortschritt: { cards: {id: srsCard}, stats: {id: [geschafft, versucht]}, history: [[id, ok, datum, hinweise, züge]] }
 function area() {
@@ -20,8 +23,12 @@ function area() {
   d.cards ||= {};
   d.stats ||= {};
   d.history ||= [];
+  d.stages ||= {};
   return d;
 }
+
+const stepOf = (id, d = area()) => d.stages[id] || 1;
+const setStep = (id, step) => store.update('endgames', d => { (d.stages ||= {})[id] = step; });
 
 async function loadPositions() {
   const data = await loadData('endgames.json');
@@ -82,8 +89,8 @@ function renderOverview(el, list) {
   el.append(
     h('div.eg-head',
       h('h1', 'Endspiele'),
-      h('p.muted', 'Die wichtigsten Lernstellungen, gespielt gegen die Engine in voller Stärke. '
-        + 'Was du sicher kannst, kommt seltener wieder, was danebengeht, bald noch einmal.'),
+      h('p.muted', 'Jede Stellung läuft in drei Schritten: Vorführung, geführt mit Hilfe, dann allein aus einer anderen Startstellung. '
+        + 'Was du sicher kannst, kommt seltener wieder.'),
       h('div.row',
         h('a.btn.primary', { href: '#/endspiele?run=1' }, due ? `${due} fällige üben` : fresh ? 'Nächste neue Stellung' : 'Wiederholen'),
         h('span.muted.small', `${list.length} Stellungen · ${list.length - fresh} begonnen · ${due} fällig`))),
@@ -97,7 +104,8 @@ function renderOverview(el, list) {
           h('div.row.small',
             h('span.pill' + (p.goal === 'draw' ? '.eg-draw' : '.eg-win'), p.goal === 'draw' ? 'Remis halten' : 'Gewinnen'),
             h('span.pill', SIDE_DE[p.side]),
-            h('span.pill' + (st.cls ? '.' + st.cls : ''), st.label)),
+            h('span.pill' + (st.cls ? '.' + st.cls : ''), st.label),
+            h('span.pill', `Schritt ${stepOf(p.id, d)}/3`)),
           progressBar(srs.strength(d.cards[p.id])),
           h('div.small.muted', tries ? `${won}/${tries} geschafft` : 'noch nicht gespielt'));
       })))),
@@ -152,6 +160,8 @@ function createPlayer(el, { queue, seconds = 0, standalone = false, onEnd }) {
   const sans = [];
   let startPly = 0;
   let fenBeforeUser = null;
+  let base = null;           // Lernstellung aus der Datei (pos kann eine Variante davon sein)
+  let step = 1;              // Lektionsschritt der laufenden Stellung
 
   const boardHost = h('div');
   const title = h('h2.eg-title');
@@ -208,7 +218,10 @@ function createPlayer(el, { queue, seconds = 0, standalone = false, onEnd }) {
     counter.textContent = `Zug ${Math.min(userMoves, pos.maxMoves)} von ${pos.maxMoves}${hintsUsed ? ` · ${hintsUsed} ${hintsUsed === 1 ? 'Hinweis' : 'Hinweise'}` : ''}`;
   }
 
-  function start(p) {
+  function start(original) {
+    base = original;
+    step = stepOf(original.id);
+    const p = step === 3 ? E.variantOf(original) : original;
     pos = p;
     gen++;
     userMoves = 0;
@@ -217,14 +230,14 @@ function createPlayer(el, { queue, seconds = 0, standalone = false, onEnd }) {
     sans.length = 0;
     const parts = p.fen.split(' ');
     startPly = (Number(parts[5]) - 1) * 2 + (parts[1] === 'b' ? 1 : 0);
-    title.textContent = p.title;
+    title.textContent = `${p.title} · ${STEP_DE[step]}`;
     goalEl.replaceChildren(
       h('span.pill' + (p.goal === 'draw' ? '.eg-draw' : '.eg-win'), p.goal === 'draw' ? 'Remis halten' : 'Gewinnen'),
       ' ', h('span', `Du spielst ${SIDE_DE[p.side]}. ${goalText(p)}`));
-    introEl.textContent = p.intro;
+    introEl.textContent = step === 3 ? 'Eine andere Startstellung, dieselbe Technik. Keine Erklärungen mehr, zeig, dass du es kannst.' : p.intro;
     clear(hintsEl); clear(after); setFeedback('');
     const coached = Coach.COACHED[p.id];
-    if (coached) {
+    if (coached && step < 3) {
       hintsEl.append(h('div.card.eg-method',
         h('b', 'So geht’s, Schritt für Schritt:'),
         h('ol', coached.steps.map(t => h('li', t))),
@@ -232,23 +245,88 @@ function createPlayer(el, { queue, seconds = 0, standalone = false, onEnd }) {
     }
     board.setPosition(p.fen, { orientation: p.side === 'w' ? 'white' : 'black' });
     fenBeforeUser = p.fen;
+    primary = null;
+    renderMoves();
+    if (step === 1) { startDemo(); return; }
+    // Geführt: alle Hinweise stehen von Anfang an da, ohne Abzug
+    if (step === 2 && !coached) hintsEl.append(...(p.hints || []).map((t, i) => h('div.feedback.info', `${i + 1}. ${t}`)));
     board.setOnMove(onUserMove);
     board.setMovable(p.side === 'w' ? 'white' : 'black');
     controls.replaceChildren(
-      h('button', { onclick: showHint }, 'Hinweis (h)'),
-      h('button', { onclick: () => start(p) }, 'Neu starten'),
+      h('button', { onclick: showHint }, step === 2 ? 'Besten Zug zeigen (h)' : 'Hinweis (h)'),
+      h('button', { onclick: () => start(base) }, 'Neu starten'),
       h('button', { onclick: () => giveUp() }, 'Aufgeben'),
     );
-    primary = null;
-    renderMoves();
+  }
+
+  // Vorführung: Die Engine spielt beide Seiten, jeder eigene Zug wird erklärt
+  function startDemo() {
+    const my = gen;
+    let shown = 0;
+    let textIdx = 0;
+    const coached = Coach.COACHED[pos.id];
+    const nextBtn = h('button.primary', 'Nächster Zug ⏎');
+    const finish = () => {
+      if (my !== gen) return;
+      setStep(base.id, 2);
+      toast('Jetzt spielst du selbst, mit Hilfe.');
+      start(base);
+    };
+    const showText = text => {
+      hintsEl.querySelectorAll(':scope > .eg-explain').forEach(x => x.remove());
+      if (text) hintsEl.append(h('div.feedback.info.eg-explain', text));
+    };
+    const stepDemo = async () => {
+      if (my !== gen || finished) return;
+      nextBtn.disabled = true;
+      try {
+        const game = board.chess;
+        if (game.isGameOver() || shown >= Math.min(pos.par || DEMO_MOVES, DEMO_MOVES)) return showEnd();
+        const fen = board.fen();
+        const r = await engine.analyse(fen, { movetime: ENGINE_MS });
+        if (my !== gen || !r.bestmove) return;
+        showText(coached ? Coach.explain(fen, r.bestmove, pos.side) : (pos.hints || [])[Math.min(textIdx++, (pos.hints || []).length - 1)]);
+        board.setShapes([{ orig: r.bestmove.slice(0, 2), dest: r.bestmove.slice(2, 4), brush: 'green' }]);
+        await sleep(700);
+        if (my !== gen) return;
+        board.setShapes([]);
+        const m = board.move(r.bestmove);
+        sans.push(m.san);
+        shown++;
+        renderMoves();
+        if (game.isGameOver()) return showEnd();
+        const reply = await engine.analyse(board.fen(), { movetime: ENGINE_MS });
+        if (my !== gen || !reply.bestmove) return;
+        await sleep(350);
+        if (my !== gen) return;
+        const om = board.move(reply.bestmove);
+        sans.push(om.san);
+        renderMoves();
+        if (game.isGameOver()) return showEnd();
+        nextBtn.disabled = false;
+      } catch {
+        setFeedback('Die Engine antwortet nicht.', 'bad');
+      }
+    };
+    const showEnd = () => {
+      nextBtn.disabled = false;
+      nextBtn.textContent = 'Jetzt selbst spielen ⏎';
+      nextBtn.onclick = finish;
+      setFeedback('So geht die Technik. Jetzt bist du dran.', 'good');
+    };
+    nextBtn.onclick = stepDemo;
+    primary = nextBtn;
+    controls.replaceChildren(nextBtn, h('button', { onclick: finish }, 'Überspringen'));
+    setFeedback('Schau zu: Die Engine zeigt die Technik und erklärt die Züge.', 'info');
   }
 
   // Hinweise aus der Datei, danach der Engine-Zug als Pfeil
   async function showHint() {
     if (finished || !pos) return;
+    if (step === 1) return;
     const shown = hintsEl.querySelectorAll(':scope > .feedback').length;
-    hintsUsed++;
-    if (Coach.COACHED[pos.id]) {
+    if (step === 3) hintsUsed++;
+    if (Coach.COACHED[pos.id] || step === 2) {
       // Grundmatts: den besten Zug zeigen und erklären, warum er gut ist
       const my = gen;
       const fen = board.fen();
@@ -257,7 +335,7 @@ function createPlayer(el, { queue, seconds = 0, standalone = false, onEnd }) {
         if (my !== gen || !r.bestmove) return;
         board.setShapes([{ orig: r.bestmove.slice(0, 2), dest: r.bestmove.slice(2, 4), brush: 'blue' }]);
         hintsEl.querySelectorAll(':scope > .eg-explain').forEach(x => x.remove());
-        hintsEl.append(h('div.feedback.info.eg-explain', Coach.explain(fen, r.bestmove, pos.side)));
+        if (Coach.COACHED[pos.id]) hintsEl.append(h('div.feedback.info.eg-explain', Coach.explain(fen, r.bestmove, pos.side)));
       } catch {
         toast('Engine nicht erreichbar.', 'bad');
       }
@@ -308,6 +386,16 @@ function createPlayer(el, { queue, seconds = 0, standalone = false, onEnd }) {
       }
     }
     const v = E.judgeAfterUser(pos, game, { score, userMoves, lastMove: m });
+    // Geführt: Ein Fehler beendet nichts. Der Zug wird zurückgenommen und du versuchst es noch einmal.
+    if (step === 2 && v.status === 'failed' && !game.isGameOver() && userMoves < pos.maxMoves) {
+      board.undo();
+      sans.pop();
+      userMoves--;
+      setFeedback(`${v.reason} Der Zug ist zurückgenommen, versuch es noch einmal.`, 'warn');
+      board.setMovable(pos.side === 'w' ? 'white' : 'black');
+      renderMoves();
+      return;
+    }
     if (v.status !== 'continue') return end(v);
     await sleep(250);
     if (my !== gen || destroyed) return;
@@ -336,9 +424,12 @@ function createPlayer(el, { queue, seconds = 0, standalone = false, onEnd }) {
     board.flash(ok ? 'good' : 'bad');
     setFeedback(v.reason, ok ? 'good' : 'bad');
     const grade = E.gradeFor({ ok, hints: hintsUsed, userMoves, par: pos.par });
+    // Geführt geschafft → nächstes Mal allein; allein gescheitert → wieder mit Hilfe
+    const stepAfter = step === 2 ? (ok ? 3 : 2) : ok ? 3 : 2;
+    setStep(base.id, stepAfter);
     store.update('endgames', d => {
       d.cards ||= {}; d.stats ||= {}; d.history ||= [];
-      d.cards[pos.id] = srs.review(d.cards[pos.id], grade);
+      d.cards[pos.id] = srs.review(d.cards[pos.id], step === 2 ? Math.min(grade, 2) : grade);
       const s = d.stats[pos.id] || [0, 0];
       d.stats[pos.id] = [s[0] + (ok ? 1 : 0), s[1] + 1];
       d.history.push([pos.id, ok ? 1 : 0, today(), hintsUsed, userMoves]);
@@ -352,13 +443,14 @@ function createPlayer(el, { queue, seconds = 0, standalone = false, onEnd }) {
     after.replaceChildren(h('div.card.eg-technique',
       h('h3', 'Die Technik'),
       h('p', pos.technique),
+      pos.variant ? h('div.small.muted', 'Beschrieben für die Grundstellung, die Technik ist dieselbe.') : null,
       h('div.small.muted', ok
         ? `Nächste Wiederholung: ${card.due === today() ? 'heute' : card.due.split('-').reverse().join('.')}`
         : 'Kommt heute noch einmal dran.')));
     const nextBtn = h('button.primary', { onclick: () => next() },
       timeUp ? 'Block abschließen ⏎' : qi + 1 < queue.length ? 'Nächste Stellung ⏎' : 'Fertig ⏎');
     primary = nextBtn;
-    controls.replaceChildren(nextBtn, h('button', { onclick: () => start(pos) }, 'Nochmal'));
+    controls.replaceChildren(nextBtn, h('button', { onclick: () => start(base) }, 'Nochmal'));
   }
 
   function next() {

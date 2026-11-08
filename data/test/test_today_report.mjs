@@ -98,7 +98,7 @@ const el2 = container();
 const unmount2 = await report.mount(el2, {});
 await tick(10);
 const txt = el2.textContent;
-for (const s of ['Elo-Verlauf', 'Dein Training', 'Ergebnisse nach Eröffnung', 'Repertoire-Abdeckung', 'Deine Fehler', 'Genauigkeit über die Zeit', 'Zeitverluste', 'Entwicklung', 'jeden Montag automatisch']) {
+for (const s of ['Elo-Verlauf', 'Dein Training', 'Ergebnisse nach Eröffnung', 'Repertoire-Abdeckung', 'Deine Fehler', 'Genauigkeit über die Zeit', 'Zeitverluste', 'Entwicklung', 'jeden Morgen automatisch']) {
   ok(txt.includes(s), 'Bericht enthält ' + s);
 }
 ok(el2.querySelectorAll('svg').length >= 3, 'mindestens 3 SVG-Diagramme: ' + el2.querySelectorAll('svg').length);

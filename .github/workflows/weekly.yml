@@ -1,4 +1,4 @@
-# Jeden Morgen: neue Spieler aus der App auswerten. Montags zusätzlich neue Partien aller Spieler.
+# Jeden Morgen: neue Spieler aus der App auswerten und neue Partien aller Spieler holen.
 # Danach App-Daten committen und die Seite neu veröffentlichen.
 name: Partie-Analyse
 on:
@@ -24,12 +24,7 @@ jobs:
       - name: Partien holen und analysieren
         env:
           STOCKFISH: /usr/games/stockfish
-        run: |
-          if [ "$(date +%u)" = 1 ] || [ "${{ github.event_name }}" = workflow_dispatch ]; then
-            python analysis/update_players.py --weekly
-          else
-            python analysis/update_players.py
-          fi
+        run: python analysis/update_players.py --weekly
       - name: Speichern und Seite neu veröffentlichen
         env:
           GH_TOKEN: ${{ github.token }}

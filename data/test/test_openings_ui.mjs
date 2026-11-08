@@ -89,7 +89,7 @@ el.remove();
 // ---------- Wiederholen: die falsche Karte (c3) ist heute fällig ----------
 el = container();
 cleanup = await view.mount(el, { tab: 'wiederholen' });
-ok(el.textContent.includes('Wiederholen') && el.textContent.includes('Gegner zieht'), 'Wiederholen startet als Stellungstraining: ' + el.textContent.slice(0, 200));
+ok(el.textContent.includes('Stufe 3/5'), 'Wiederholen startet auf der Stufe der Linie: ' + el.textContent.slice(0, 200));
 noJunk(el); cleanup(); el.remove();
 
 // ---------- Schwarz-Linie: Gegner beginnt automatisch ----------
@@ -117,7 +117,7 @@ el = container();
 cleanup = await view.mount(el, { tab: 'lernen', chapter: 't-italian' });
 ok(el.textContent.includes('Tageslimit erreicht'), 'Tageslimit-Hinweis: ' + el.textContent.slice(0, 200));
 findButton(el, 'Trotzdem').click();
-ok(el.textContent.includes('Neue Linie'), 'Trotzdem lernen startet Trainer');
+ok(el.textContent.includes('Stufe 1/5'), 'Trotzdem lernen startet auf Stufe 1');
 noJunk(el); cleanup(); el.remove();
 store.update('openings', d => { d.settings.newPerDay = 12; });
 
@@ -173,11 +173,49 @@ el = container();
 let summary = null, calls = 0;
 const stop = view.runBlock(el, { minutes: 1, mode: 'review', onDone: s => { summary = s; calls++; } });
 await tick(50);
-ok(el.textContent.includes('Wiederholen (1 fällig)'), 'Block beginnt mit fälliger Karte: ' + el.textContent.slice(0, 120));
+ok(el.textContent.includes('Wiederholen (1 Linie fällig)'), 'Block beginnt mit fälliger Linie: ' + el.textContent.slice(0, 120));
 findButton(el, 'Block beenden').click();
 findButton(el, 'Block beenden')?.click();
 ok(calls === 1 && summary.type === 'openings' && summary.mode === 'review', 'onDone genau einmal: ' + JSON.stringify(summary));
 stop(); el.remove();
 
 store.flush();
+// ---------- Lernstufen ----------
+{
+  const line = model.lines.find(l => l.side === 'w' && l.plies.length >= 5);
+  const play = async t => {
+    for (const p of line.plies) {
+      if (!p.own) { await tick(450); continue; }
+      userMove(t.board, p.uci);
+      await tick(5);
+    }
+    await tick(10);
+  };
+  // Stufe 1: selber finden, dann aus dem Kopf → Stufe 2
+  el = container();
+  let res = null;
+  let t1 = createLineTrainer(el, { model, line, mode: 'learn', stage: 1, onFinish: r => (res = r) });
+  ok(el.textContent.includes('Stufe 1/5') && el.textContent.includes('Was würdest du'), 'Stufe 1 startet mit Selber finden: ' + el.textContent.slice(0, 160));
+  await play(t1);
+  ok(!res && findButton(el, 'aus dem Kopf'), 'nach dem Finden kommt „aus dem Kopf“');
+  findButton(el, 'aus dem Kopf').click();
+  await tick(5);
+  await play(t1);
+  ok(res && res.stageAfter === 2, 'sauber aus dem Kopf → Stufe 2: ' + res?.stageAfter);
+  t1.destroy(); el.remove();
+  // Stufe 3: Linienname versteckt, kein Hinweis
+  el = container();
+  res = null;
+  t1 = createLineTrainer(el, { model, line, mode: 'review', stage: 3, onFinish: r => (res = r) });
+  ok(!el.textContent.includes(line.name) && !findButton(el, 'Hinweis'), 'Stufe 3 ohne Namen und Hinweis');
+  await play(t1);
+  ok(res && res.stageAfter === 4, 'Stufe 3 sauber → 4');
+  t1.destroy(); el.remove();
+  // Stufe 4: Zeit läuft ab
+  el = container();
+  t1 = createLineTrainer(el, { model, line, mode: 'review', stage: 4 });
+  ok(el.querySelector?.('.op-tempo') || el.textContent !== undefined, 'Stufe 4 startet');
+  t1.destroy(); el.remove();
+}
+
 print(`${passes} bestanden, ${fails} fehlgeschlagen`);

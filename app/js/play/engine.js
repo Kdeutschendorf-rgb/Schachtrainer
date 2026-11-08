@@ -2,20 +2,11 @@
 
 import { Chess } from '../../vendor/chess.js';
 import { analyse, bestMove } from '../engine.js';
-import { botStyle, chooseMove, winPct, classify, moveAccuracy, phaseOf, motifs } from './logic.js';
+import { MIN_BOT_ELO, winPct, classify, moveAccuracy, phaseOf, motifs } from './logic.js';
 
-// Zug des Bots als UCI
-export async function botMove(fen, elo) {
-  if (elo >= 2000) return bestMove(fen, { elo, movetime: 700 });
-  const style = botStyle(elo);
-  const chess = new Chess(fen);
-  const legal = chess.moves({ verbose: true }).map(m => m.from + m.to + (m.promotion || ''));
-  if (legal.length === 1) return legal[0];
-  const r = await analyse(fen, { depth: style.depth, multipv: style.multipv });
-  // In der Eröffnung liegen viele Züge nah beieinander; dort spielt er prinzipieller (sonst …h6, …a5 und Co.)
-  const opening = Number(fen.split(' ')[5]) <= 8;
-  const s = opening ? { ...style, temp: style.temp * 0.3, blunder: style.blunder * 0.3 } : style;
-  return chooseMove(r.lines, chess.turn(), s, Math.random, legal);
+// Zug des Bots als UCI (Stockfish mit begrenzter Spielstärke)
+export function botMove(fen, elo) {
+  return bestMove(fen, { elo: Math.max(MIN_BOT_ELO, elo), movetime: 500 });
 }
 
 // Partie analysieren: jede Stellung einmal bewerten, dann die eigenen Züge einstufen.

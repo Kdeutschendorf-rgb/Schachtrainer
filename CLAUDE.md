@@ -25,7 +25,7 @@ in JSON-Zügen englische SAN.
   und werden nur geladen, wenn der Name in `app/data/players.json` steht; sonst zeigt die App eine neutrale Version.
   Angemeldete Nutzer melden ihren Namen in der Supabase-Tabelle `players` (`supabase_players.sql`). Die Action
   `.github/workflows/weekly.yml` läuft täglich: `analysis/update_players.py` wertet neue Namen aus (3 Monate, max. 200
-  Partien, max. 5 Spieler pro Lauf), montags alle Spieler. Welcher Spieler: Umgebungsvariable `SCHACH_PLAYER`
+  Partien, max. 5 Spieler pro Lauf) und holt neue Partien aller Spieler. Welcher Spieler: Umgebungsvariable `SCHACH_PLAYER`
   (`analysis/player.py`); Keanus Rohdaten liegen in `data/analysis/` und `data/raw/`, alle anderen in `data/players/<name>/`.
 - Abgleich zwischen Geräten: Waren zwei Geräte gleichzeitig offline, führt `app/js/merge.js` die Stände zusammen
   (Karten: zuletzt geübt gewinnt, Verlauf und Sitzungen vereinigt, Tageszähler Maximum). Test: `data/test/test_merge.mjs`.
@@ -54,7 +54,7 @@ Der Fortschritt ist so aufgebaut:
 
 ## Wochenauswertung (wenn Keanu danach fragt)
 
-1. Neue Partien holt jeden Montag die GitHub Action `.github/workflows/weekly.yml` (sync.py mit System-Stockfish,
+1. Neue Partien holt jeden Morgen die GitHub Action `.github/workflows/weekly.yml` (sync.py mit System-Stockfish,
    committet und veröffentlicht). Vorher also `git pull`. Von Hand geht es mit `.venv/bin/python -I analysis/sync.py`
    (Probelauf: `--dry-run`), nicht starten, solange `pgrep -f analyze_games.py` etwas findet.
 2. Lesen: den Fortschritt, falls Keanu ihn schickt (was wurde trainiert: `sessions`, `activity`, Taktik-Wertung, fällige Eröffnungskarten)
@@ -102,19 +102,24 @@ Die volle Neuanalyse aller Partien (`analysis/analyze_games.py <pgn>`) dauert la
 
 - `app/` ohne Build-Schritt (ES-Module), Hash-Router in `app/js/main.js`, Views in `app/js/views/`.
 - Heute (`views/today.js`): 30-Minuten-Plan aus Blöcken, die über `runBlock` der Module laufen.
-  Standardplan: Aufwärmen 4 · Eröffnungen 8 · Taktik 10 · Vorausdenken 6 · Abschluss 2.
-- Eröffnungen: Wiederholen und Weichen laufen als Stellungstraining (`openings/drill.js`): einzelne Stellungen
-  gemischt, nach dem Zug die Weichentabelle („spielt er X, spielst du Y“). Baum-Übersicht `openings/tree.js`,
-  Partie-Check `openings/gamecheck.js` (letzte 30 Partien aus `analysis_summary.json` → `recentGames` plus Bot-Partien).
-  Lerntiefe einstellbar (Standard 8 Züge, `openings.settings.depth`), Linien werden dafür gekürzt.
-- Spielen (`views/play.js`, `play/`): Bots mit eigener Wertung (`play.rating`, Start = chess.com-Rapid), Partie wird
-  danach analysiert; Fehler werden eigene Taktikaufgaben (`play.puzzles`), Repertoire-Abweichungen fällige Karten.
+  Standardplan: Aufwärmen 4 · Eröffnungen 8 · Taktik 10 · Vorausdenken 6 · Besprechung 3 (nur wenn eine Partie offen ist) · Abschluss 2.
+- Eröffnungen: ganze Linien in fünf Stufen (`openings/trainer.js`, `STAGES` in `openings/logic.js`, `openings.stages`):
+  1 selber finden, 2 „Was greift der Gegner an?“, 3 aus dem Kopf, 4 mit Tempo, 5 danach gegen die Engine weiterspielen.
+  Reiter „Fallen“ übt Linien mit „Falle“ in einer Gegnernotiz. Baum-Übersicht `openings/tree.js`, Partie-Check
+  `openings/gamecheck.js` (übt Abweichungen als Stellungen, `openings/drill.js`). Lerntiefe einstellbar (Standard 8 Züge).
+- Spielen (`views/play.js`, `play/`): Bots spielen die gewählte Eröffnung aus dem Repertoire (`play/book.js`), danach
+  Stockfish mit Spielstärke-Begrenzung (ab 1320). Eigene Wertung `play.rating`. Analyse danach: Fehler werden eigene
+  Taktikaufgaben (`play.puzzles`), Repertoire-Abweichungen fällige Karten. „Stellungen zu Ende spielen“ (`play/playout.js`,
+  `analysis_summary.json` → `playouts`).
+- Partie-Besprechung (`views/review.js`, `#/besprechung`): die drei teuersten Momente, auch als Block im Tagesplan.
+- Ziel: `settings.goalRapid` und `settings.goalDate`, angezeigt auf der Startseite und im Wochenbericht.
 - Trainingsschwerpunkt (`tactics/focus.js`): Basis = Fehler aller chess.com-Partien (`focus.themes`), Ergänzung =
   Fehler der letzten 30 Tage (`recentFocus`) plus Bot-Partien (`play.games[].errors`), Anteil höchstens 40 %.
 - Wochenbericht „Diese Woche“ im Bericht (`report/weekly.js`), automatisch aus Partien und Training der letzten 7 Tage.
-- Endspiele: Coach für die Grundmatts (`endgames/coach.js`, Käfig = erreichbare Felder des Königs, erklärt Engine-Züge).
+- Endspiele laufen als Lektion (`endgames.stages`): Vorführung, geführt, allein aus anderer Startstellung (`variantOf`).
+  Coach für die Grundmatts (`endgames/coach.js`, Käfig = erreichbare Felder des Königs, erklärt Engine-Züge).
 - Vorausdenken: Drohungen nur, wenn der letzte Gegnerzug sie erzeugt (`vision/logic.js` → `threatFromLastMove`);
-  im Mix kommt „Blind rechnen“ dreimal so oft.
+  im Mix kommt „Blind rechnen“ am häufigsten (20 Stufen, `CALC_LEVELS`), dazu „Kandidatenzüge“.
 - Bericht (`views/report.js`), Coach-Texte und Tipp des Tages (`js/coach.js`).
 - Tests ohne Browser mit JavaScriptCore:
   `/System/Library/Frameworks/JavaScriptCore.framework/Versions/Current/Helpers/jsc -m data/test/test_today_report.mjs`

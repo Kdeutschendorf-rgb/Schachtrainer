@@ -4,7 +4,7 @@
 // Dazu runBlock() für den Tagesplan: fällige Karten → neue Züge bis zum Tageslimit → weitere neue Linien → gelernte Linien üben.
 
 import { h, clear, loadCss, countdown, toast, loadPlayerData, figurine } from '../ui.js';
-import { pickDueLine, pickNewLine, newLineQueue, canLearn, totals, dueLines, drillQueue } from '../openings/logic.js';
+import { pickDueLine, pickNewLine, newLineQueue, canLearn, totals, dueLines, lineStage } from '../openings/logic.js';
 import { loadModel, loadCatalog, progress, fileProblem, FILES } from '../openings/data.js';
 import { createLineTrainer } from '../openings/trainer.js';
 import { createExplorer } from '../openings/explorer.js';
@@ -22,7 +22,7 @@ const TABS = [
   ['uebersicht', 'Übersicht'],
   ['lernen', 'Lernen'],
   ['wiederholen', 'Wiederholen'],
-  ['weichen', 'Weichen'],
+  ['fallen', 'Fallen'],
   ['baum', 'Baum'],
   ['partien', 'Partie-Check'],
   ['explorer', 'Explorer'],
@@ -62,7 +62,8 @@ function fileNotice(name, what) {
 
 export async function mount(el, params = {}) {
   loadCss('css/openings.css');
-  const tab = TABS.some(t => t[0] === params.tab) ? params.tab : 'uebersicht';
+  // „stellungen“ hat keinen eigenen Reiter: Partie-Check übt damit gezielt einzelne Stellungen
+  const tab = params.tab === 'stellungen' || TABS.some(t => t[0] === params.tab) ? params.tab : 'uebersicht';
   const tabsEl = h('nav.op-tabs');
   const content = h('div.op-content', h('div.muted', 'Lade Repertoire …'));
   const root = h('div.op-root', tabsEl, content);
@@ -119,7 +120,7 @@ export async function mount(el, params = {}) {
       const wrap = h('div');
       content.append(wrap);
       setSub(createLineTrainer(wrap, {
-        model, line, mode: 'learn',
+        model, line, mode: 'learn', stage: 1,
         onExit: () => go('uebersicht'),
         actions: () => {
           const next = pickNewLine(model, progress(), undefined, filter);
@@ -139,55 +140,44 @@ export async function mount(el, params = {}) {
     return cleanup;
   }
 
-  // ----- Wiederholen: fällige Stellungen gemischt -----
-  if (tab === 'wiederholen' && !params.line) {
-    const filter = { chapterId: params.chapter, side: params.side };
-    const items = drillQueue(model, progress(), { mode: 'due', filter });
+  // ----- Stellungen aus dem Partie-Check -----
+  if (tab === 'stellungen') {
+    const want = new Set((params.keys || '').split(','));
+    const seen = new Set();
+    const items = (model.items || []).filter(it => want.has(it.key) && !seen.has(it.key) && seen.add(it.key));
     if (!items.length) {
-      const next = pickNewLine(model, progress());
-      content.append(emptyState('Nichts fällig', 'Gerade ist keine Stellung fällig. Übe die Weichen oder lerne eine neue Linie.',
-        h('div.row',
-          button({ label: 'Weichen üben', primary: true, onClick: () => go('weichen') }),
-          next ? button({ label: 'Neue Linie lernen', onClick: () => go('lernen') }) : null)));
+      content.append(emptyState('Keine Stellungen', 'Diese Stellungen stehen nicht mehr im Repertoire.', button({ label: 'Zum Partie-Check', primary: true, onClick: () => go('partien') })));
       return cleanup;
     }
     const wrap = h('div');
     content.append(wrap);
     setSub(createDrill(wrap, {
-      model, items, title: 'Wiederholen',
-      actions: () => [
-        { label: 'Weichen üben ⏎', primary: true, onClick: () => go('weichen') },
-        { label: 'Übersicht', onClick: () => go('uebersicht') },
-      ],
+      model, items, title: 'Partie-Check',
+      actions: () => [{ label: 'Zum Partie-Check ⏎', primary: true, onClick: () => go('partien') }],
     }));
     return cleanup;
   }
 
-  // ----- Weichen: Stellungen nach verschiedenen Gegnerzügen -----
-  if (tab === 'weichen') {
-    const filter = { chapterId: params.chapter, side: params.side };
-    let items;
-    if (params.keys) {
-      const want = new Set(params.keys.split(','));
-      const seen = new Set();
-      items = (model.items || []).filter(it => want.has(it.key) && !seen.has(it.key) && seen.add(it.key));
-    } else {
-      items = drillQueue(model, progress(), { mode: 'branches', limit: 10, filter });
-    }
-    if (!items.length) {
-      content.append(emptyState('Noch keine Weichen', 'Weichen-Training gibt es für Stellungen, die du schon gelernt hast. Lerne zuerst ein paar Linien.',
-        button({ label: 'Neue Linie lernen', primary: true, onClick: () => go('lernen') })));
+  // ----- Fallen: Linien, in denen der Gegner in eine Falle läuft oder dir eine stellt -----
+  if (tab === 'fallen') {
+    const traps = model.lines.filter(l => l.plies.some(p => !p.own && /Falle/i.test(p.note)));
+    if (!traps.length) {
+      content.append(emptyState('Keine Fallen', 'In deinem Repertoire stehen noch keine Fallen.', button({ label: 'Zur Übersicht', onClick: () => go('uebersicht') })));
       return cleanup;
     }
-    const wrap = h('div');
-    content.append(wrap);
-    setSub(createDrill(wrap, {
-      model, items, title: params.keys ? 'Partie-Check' : 'Weichen',
-      actions: () => [
-        { label: 'Noch eine Runde ⏎', primary: true, onClick: () => { location.hash = hashFor('weichen', { chapter: params.chapter, side: params.side }); } },
-        { label: 'Baum ansehen', onClick: () => go('baum', { chapter: items[0]?.chapterId }) },
-      ],
-    }));
+    const session = { lines: 0, clean: 0 };
+    const play = () => {
+      clear(content);
+      const line = traps[Math.floor(Math.random() * traps.length)];
+      const wrap = h('div');
+      content.append(wrap);
+      setSub(createLineTrainer(wrap, {
+        model, line, mode: 'review', practice: true,
+        onFinish: r => { session.lines++; if (!r.mistakes.length) session.clean++; },
+        actions: () => [{ label: `Nächste Falle (${session.clean}/${session.lines} sauber) ⏎`, primary: true, onClick: play }],
+      }));
+    };
+    play();
     return cleanup;
   }
 
@@ -212,7 +202,7 @@ export async function mount(el, params = {}) {
       .sort((a, b) => String(b.date).localeCompare(String(a.date)));
     renderGameCheck(content, {
       model, games,
-      onDrill: keys => go('weichen', { keys: keys.join(',') }),
+      onDrill: keys => go('stellungen', { keys: keys.join(',') }),
       onEngine: async fen => {
         try {
           const r = await analyse(fen, { depth: 16, multipv: 1 });
@@ -224,7 +214,7 @@ export async function mount(el, params = {}) {
     return cleanup;
   }
 
-  // ----- Wiederholen einer einzelnen Linie -----
+  // ----- Wiederholen: fällige Linien auf ihrer Stufe -----
   if (tab === 'wiederholen') {
     const filter = { chapterId: params.chapter, side: params.side };
     const session = { lines: 0, total: 0, correct: 0 };
@@ -236,7 +226,7 @@ export async function mount(el, params = {}) {
           session.lines ? 'Alles wiederholt!' : 'Nichts fällig',
           session.lines
             ? `${session.lines} Linie${session.lines === 1 ? '' : 'n'}, ${session.correct} von ${session.total} Zügen auf Anhieb richtig.`
-            : 'Gerade ist keine Karte fällig. Lerne eine neue Linie.',
+            : 'Gerade ist keine Linie fällig. Lerne eine neue.',
           h('div.row',
             next ? button({ label: 'Neue Linie lernen', primary: true, onClick: () => go('lernen') }) : null,
             button({ label: 'Übersicht', onClick: () => go('uebersicht') }))));
@@ -246,7 +236,7 @@ export async function mount(el, params = {}) {
       const wrap = h('div');
       content.append(wrap);
       setSub(createLineTrainer(wrap, {
-        model, line, mode: 'review',
+        model, line, mode: 'review', stage: lineStage(line, progress()),
         onExit: () => go('uebersicht'),
         onFinish: r => { session.lines++; session.total += r.total; session.correct += r.correct; },
         actions: () => {
@@ -349,8 +339,7 @@ export function runBlock(el, { minutes = 10, mode = 'review', onDone } = {}) {
   loadCss('css/openings.css');
   const started = Date.now();
   const stats = { lines: 0, newLines: 0, newCards: 0, moves: 0, correct: 0 };
-  const doneKeys = new Set();   // in diesem Block schon geübte Stellungen
-  let lastWasDrill = false;
+  const doneLines = new Set();   // in diesem Block schon geübte Linien
   let finished = false;
   let alive = true;
   let timeUp = false;
@@ -398,45 +387,25 @@ export function runBlock(el, { minutes = 10, mode = 'review', onDone } = {}) {
     model ||= await loadModel();
     if (!alive || finished) return;
     const prog = progress();
-    const notDone = list => list.filter(i => !doneKeys.has(i.key));
-    const due = notDone(drillQueue(model, prog, { mode: 'due' }));
-    if (due.length) return runDrill(due.slice(0, 6), `Eröffnungen · Wiederholen (${due.length} fällig)`);
+    // Fällige Linien in zufälliger Reihenfolge, damit du nicht weißt, welche Abzweigung kommt
+    const due = dueLines(model, prog).filter(x => !doneLines.has(x.line.id));
+    if (due.length) {
+      const pick = due[Math.floor(Math.random() * Math.min(5, due.length))].line;
+      return runLine(pick, 'review', `Eröffnungen · Wiederholen (${due.length} ${due.length === 1 ? 'Linie' : 'Linien'} fällig)`);
+    }
     const fresh = pickNewLine(model, prog);
     if (fresh) return runLine(fresh, 'learn');
-    // Tageslimit erreicht: abwechselnd Weichen üben und weitere neue Linien
-    const branches = () => notDone(drillQueue(model, prog, { mode: 'branches', limit: 6 }));
-    if (!lastWasDrill && branches().length) return runDrill(branches(), 'Eröffnungen · Weichen');
+    // Tageslimit erreicht: weitere neue Linien, danach Gelerntes üben
     const more = newLineQueue(model, prog)[0];
     if (more) return runLine(more, 'learn', 'Eröffnungen · Weitere neue Linie');
-    if (branches().length) return runDrill(branches(), 'Eröffnungen · Weichen');
     const old = practiceLine();
     if (old) return runLine(old, 'review', 'Eröffnungen · Gelernte Linie üben');
     clear(stage).append(h('div.feedback.warn', 'Keine Eröffnungslinien gefunden. Der Block endet gleich.'));
     setTimeout(finish, 3000);
   }
 
-  // Stellungstraining (fällige Stellungen oder Weichen) als Teil des Blocks
-  function runDrill(items, label) {
-    lastWasDrill = true;
-    phaseEl.textContent = label;
-    busy = true;
-    clear(stage);
-    const wrap = h('div');
-    stage.append(wrap);
-    setSub(createDrill(wrap, {
-      model, items, title: label.includes('Weichen') ? 'Weichen' : 'Wiederholen',
-      onFinish: st => {
-        busy = false;
-        for (const it of items) doneKeys.add(it.key);
-        stats.moves += st.total;
-        stats.correct += st.correct;
-      },
-      actions: () => [{ label: timeUp ? 'Block abschließen ⏎' : 'Weiter ⏎', primary: true, onClick: step }],
-    }));
-  }
-
   function runLine(line, lineMode, label) {
-    lastWasDrill = false;
+    doneLines.add(line.id);
     const t = totals(model, progress());
     phaseEl.textContent = label || (lineMode === 'review'
       ? `Eröffnungen · Wiederholen (${t.due} fällig)`
@@ -446,7 +415,7 @@ export function runBlock(el, { minutes = 10, mode = 'review', onDone } = {}) {
     const wrap = h('div');
     stage.append(wrap);
     setSub(createLineTrainer(wrap, {
-      model, line, mode: lineMode,
+      model, line, mode: lineMode, stage: lineMode === 'learn' ? 1 : lineStage(line, progress()),
       onFinish: r => {
         busy = false;
         stats.lines++;

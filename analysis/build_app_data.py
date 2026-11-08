@@ -244,8 +244,37 @@ def recent_games(games, raw_moves, mistakes=(), n=60, plies=30):
         out.append({"date": iso(g["date"]), "tc": g["tc"], "color": g["color"], "opponent": g.get("opponent"),
                     "result": g["result"], "myElo": g.get("myElo"), "opening": g.get("opening"),
                     "moves": sans[:plies], "accuracy": g.get("accuracy"),
-                    "errors": [{"cls": m["cls"], "tags": m.get("tags") or [], "phase": m.get("phase")} for m in by_game[g["game"]]]})
+                    "errors": [error_entry(m, g["tc"] == "rapid") for m in by_game[g["game"]]]})
     return out
+
+
+def error_entry(m, detail):
+    """Fehler einer Partie. Bei Rapid mit Stellung und besserem Zug (für die Partie-Besprechung)."""
+    e = {"cls": m["cls"], "tags": m.get("tags") or [], "phase": m.get("phase")}
+    if detail:
+        e.update({"ply": m["ply"], "fen": m["fen"], "played": m["played"], "best": m.get("best"), "bestUci": m.get("bestUci"),
+                  "pv": m.get("pv") or "", "drop": m.get("drop")})
+    return e
+
+
+def playouts(games, mistakes, n=30):
+    """Stellungen zum Zu-Ende-Spielen: gewonnene zum Verwerten, schlechte zum Retten (neueste zuerst, Rapid bevorzugt)."""
+    tc_of = {g["game"]: g["tc"] for g in games}
+    date_of = {g["game"]: iso(g["date"]) for g in games}
+    win, save = [], []
+    for m in sorted(mistakes, key=lambda x: (tc_of.get(x["game"]) != "rapid", -x["game"])):
+        if m.get("cls") != "blunder" or not m.get("playedUci") or not (16 <= m["ply"] <= 70):
+            continue
+        entry = {"id": "%d_%d" % (m["game"], m["ply"]), "date": date_of.get(m["game"]), "tc": tc_of.get(m["game"])}
+        if m["winBefore"] >= 80 and len(win) < n:
+            win.append({**entry, "kind": "win", "fen": m["fen"], "win": m["winBefore"]})
+        if m["winAfter"] <= 25 and len(save) < n:
+            b = chess.Board(m["fen"])
+            b.push_uci(m["playedUci"])
+            save.append({**entry, "kind": "save", "fen": b.fen(), "win": m["winAfter"]})
+        if len(win) >= n and len(save) >= n:
+            break
+    return {"win": win, "save": save}
 
 
 def recent_focus(games, mistakes, days=30):
@@ -643,6 +672,7 @@ def build(args):
     summary["repertoire"] = repertoire_coverage(games, raw_moves, reps)
     summary["recentGames"] = recent_games(games, raw_moves, mistakes)
     summary["recentFocus"] = recent_focus(games, mistakes)
+    summary["playouts"] = playouts(games, mistakes)
     summary["insights"] = insights(summary)
     clean = clean_puzzles(puzzles)
     summary["ownPuzzles"] = len(clean)

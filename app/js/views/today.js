@@ -5,6 +5,8 @@
 
 import { h, clear, loadCss, progressBar, formatTime, loadPlayerData } from '../ui.js';
 import { trainingFocus } from '../tactics/focus.js';
+import { openReviews } from './review.js';
+import { goalPace } from '../report/weekly.js';
 import * as store from '../store.js';
 import { todayStr, addDays } from '../srs.js';
 import { tipOfTheDay, themeName } from '../coach.js';
@@ -14,15 +16,16 @@ import { tipOfTheDay, themeName } from '../coach.js';
 
 // Grundplan in Minuten bei 30 Minuten am Tag; MIN_UNITS = Untergrenze beim Umschichten.
 // Mittelspiel vor Eröffnung: Die meisten Punkte gehen durch Fehler im Mittelspiel verloren, nicht in der Eröffnung.
-export const DEFAULT_PLAN = { warmup: 4, openings: 8, tactics: 10, vision: 6, finish: 2 };
-const MIN_UNITS = { warmup: 2, openings: 4, tactics: 3, vision: 2, finish: 1 };
-const ORDER = ['warmup', 'openings', 'tactics', 'vision', 'finish'];
+export const DEFAULT_PLAN = { warmup: 4, openings: 8, tactics: 10, vision: 6, review: 3, finish: 2 };
+const MIN_UNITS = { warmup: 2, openings: 4, tactics: 3, vision: 2, review: 1, finish: 1 };
+const ORDER = ['warmup', 'openings', 'tactics', 'vision', 'review', 'finish'];
 
 export const BLOCK_DEFS = {
   warmup: { label: 'Aufwärmen: Taktik', module: 'tactics', mode: 'warmup', icon: '⚡' },
   openings: { label: 'Eröffnungen', module: 'openings', mode: 'review', icon: '📖' },
   tactics: { label: 'Taktik (Schwächen)', module: 'tactics', mode: 'main', icon: '🎯' },
   vision: { label: 'Vorausdenken', module: 'vision', mode: 'mix', icon: '🧠' },
+  review: { label: 'Partie-Besprechung', module: 'review', mode: 'review', icon: '🔍' },
   finish: { label: 'Abschluss', module: 'tactics', mode: 'own', icon: '🏁' },
 };
 
@@ -89,6 +92,8 @@ export function computePlan(args = {}) {
   const base = { ...DEFAULT_PLAN, ...(args.base || {}) };
   const w = {};
   for (const k of ORDER) w[k] = Math.max(0, Number(base[k]) || 0);
+  // Die Besprechung gibt es nur, wenn eine Partie offen ist; sonst verteilt sich ihre Zeit auf die anderen Blöcke
+  if (!args.reviewGames) w.review = 0;
   const notes = [];
   const focus = args.focus || {};
   const ph = focus.phases || {};
@@ -133,9 +138,10 @@ export function computePlan(args = {}) {
     .sort((a, b) => b[1] - a[1]).slice(0, 2).map(([t]) => themeName(t));
   const why = {
     warmup: 'Leichte Aufgaben, um in Schwung zu kommen.',
-    openings: due ? `${due} fällige Karten, danach neue Züge aus deinem Repertoire.` : 'Neue Linien aus deinem Repertoire, Zug für Zug.',
+    openings: due ? `Fällige Linien auf deiner Stufe, danach neue. ${due} Züge sind fällig.` : 'Neue Linien: erst selber finden, dann aus dem Kopf.',
     tactics: topThemes.length ? `Gewertet, mit Schwerpunkt ${topThemes.join(' und ')}.` : 'Gewertete Aufgaben, gemischt nach deinen Schwächen.',
     vision: 'Blind rechnen, Drohungen erkennen, Schach–Schlagen–Drohen.',
+    review: `${args.reviewGames || 0} ${args.reviewGames === 1 ? 'Partie wartet' : 'Partien warten'}: die wichtigsten Momente selbst lösen.`,
     finish: finishModule === 'own' ? 'Stellungen aus deinen eigenen Partien.' : 'Grundtechnik im Endspiel.',
   };
   const blocks = ORDER.filter(k => minutes[k] > 0).map(k => {
@@ -209,6 +215,14 @@ function settings() {
   return s;
 }
 
+// Zielverfolgung auf der Startseite
+function paceLine(now, goal, date) {
+  const p = goalPace(now, goal, date);
+  if (!p || p.left <= 0) return null;
+  if (p.over) return h('div.small.muted', 'Dein Zieldatum ist vorbei. Setz unter „Plan anpassen“ ein neues.');
+  return h('div.small', `Bis ${germanDay(date)}: ${p.perWeek} Punkte pro Woche nötig`);
+}
+
 export async function mount(el) {
   loadCss('css/today.css');
   let summary = null;
@@ -235,6 +249,7 @@ export async function mount(el) {
       dailyMinutes: s.dailyMinutes, base: s.plan, adaptive: s.adaptive !== false,
       dueCards: countDueCards(store.get('openings')).due, focus,
       ownPuzzles: summary?.ownPuzzles ?? 0,
+      reviewGames: openReviews(summary, store.get('play').games || [], store.get('review').done || {}).length,
     });
   }
 
@@ -254,6 +269,7 @@ export async function mount(el) {
       progressBar(frac),
       h('div.small.muted', rapidNow >= goal ? 'Ziel erreicht! Setz dir unter „Plan anpassen“ ein neues.'
         : `Noch ${goal - rapidNow} Punkte${diff ? ` · ${diff > 0 ? '+' : ''}${diff} seit Trainingsbeginn` : ''}`),
+      paceLine(rapidNow, goal, s.goalDate),
       summary?.range?.to ? h('div.small.muted', `Stand: letzte Partie am ${germanDay(summary.range.to)}`) : null);
   }
 
@@ -338,13 +354,14 @@ export async function mount(el) {
       h('h2', 'Plan anpassen'),
       h('div.td-settings-grid',
         h('label', h('span', 'Trainingszeit pro Tag'), minutesSel),
-        h('label', h('span', 'Rapid-Ziel'), goalIn)),
+        h('label', h('span', 'Rapid-Ziel'), goalIn),
+        h('label', h('span', 'Bis wann? (optional)'), h('input', { type: 'date', value: s.goalDate || '', onchange: e => save(x => { if (e.target.value) x.goalDate = e.target.value; else delete x.goalDate; }) }))),
       h('label.td-check', adaptiveIn, h('span', 'Plan automatisch anpassen (fällige Karten, Schwächen aus deinen Partien)')),
       h('div.small.muted', 'Anteile der Blöcke, bezogen auf 30 Minuten. Sie werden auf deine Trainingszeit umgerechnet, 0 schaltet einen Block ab.'),
       h('div.td-weights', weightRows),
       h('div.row',
         h('button', { onclick: () => save(x => { delete x.plan; }) }, 'Standard wiederherstellen'),
-        h('span.small.muted', 'Aufwärmen 4 · Eröffnungen 8 · Taktik 10 · Vorausdenken 6 · Abschluss 2')));
+        h('span.small.muted', 'Aufwärmen 4 · Eröffnungen 8 · Taktik 10 · Vorausdenken 6 · Besprechung 3 · Abschluss 2')));
   }
 
   // Letzte 7 Tage als kleine Balken
@@ -371,7 +388,8 @@ export async function mount(el) {
       ['#/taktik', 'Taktik', 'Aufgaben, Rush, eigene Fehler'],
       ['#/rechnen', 'Vorausdenken', 'Blind rechnen, Drohungen, CCT'],
       ['#/endspiele', 'Endspiele', 'Grundstellungen gegen die Engine'],
-      ['#/spielen', 'Spielen', 'Gegen Bots auf deinem Niveau, mit Analyse'],
+      ['#/spielen', 'Spielen', 'Bots mit deinen Eröffnungen, Stellungen zu Ende spielen'],
+      ['#/besprechung', 'Partie-Besprechung', 'Die wichtigsten Momente deiner Partien'],
       ['#/bericht', 'Bericht', 'Deine Partien und dein Fortschritt'],
     ];
     return h('div.td-free', h('h3', 'Frei trainieren'),

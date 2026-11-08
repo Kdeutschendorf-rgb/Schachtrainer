@@ -70,6 +70,18 @@ export function ratingFilter(lo, hi) {
 
 // ---------- Blind rechnen ----------
 
+// Stufen beim Blind rechnen: n = angesagte Halbzüge, boost = schwerere Aufgaben (Wertung),
+// ms = Zeit pro angesagtem Zug, hide = Züge verschwinden, bevor du antwortest.
+export const CALC_LEVELS = [null,
+  ...[1, 2, 3, 4, 5, 6, 7, 8].map(n => ({ n, boost: 0, ms: 1300, hide: false })),
+  { n: 4, boost: 150, ms: 1100, hide: true }, { n: 5, boost: 150, ms: 1100, hide: true },
+  { n: 6, boost: 150, ms: 1000, hide: true }, { n: 7, boost: 200, ms: 1000, hide: true },
+  { n: 8, boost: 200, ms: 900, hide: true }, { n: 9, boost: 200, ms: 900, hide: true },
+  { n: 10, boost: 200, ms: 900, hide: true }, { n: 8, boost: 400, ms: 800, hide: true },
+  { n: 9, boost: 400, ms: 800, hide: true }, { n: 10, boost: 400, ms: 700, hide: true },
+  { n: 11, boost: 400, ms: 700, hide: true }, { n: 12, boost: 400, ms: 600, hide: true },
+];
+
 // Bei N angesagten Halbzügen: N ungerade → Brett zeigt die Aufgabenstellung (vor dem Gegnerzug),
 // N gerade → Brett zeigt die Stellung nach moves[0]. Gesucht ist immer ein eigener Zug.
 // Länge der Zugliste, bei der der gesuchte Zug genau der Schlusszug ist:
@@ -142,7 +154,7 @@ export function checksAndCaptures(fen) {
 }
 
 // Zielbereich (Anzahl Schachs+Schlagzüge) je Stufe 1–5
-export const CCT_RANGES = [null, [2, 4], [4, 6], [6, 8], [8, 11], [10, 18]];
+export const CCT_RANGES = [null, [2, 4], [4, 6], [6, 8], [8, 11], [10, 18], [12, 20], [14, 26]];
 
 // ---------- Ungedeckte Figuren ----------
 
@@ -193,7 +205,7 @@ export function loosePieces(fen) {
   return out;
 }
 
-export const LOOSE_RANGES = [null, [1, 2], [2, 3], [3, 4], [4, 6], [5, 9]];
+export const LOOSE_RANGES = [null, [1, 2], [2, 3], [3, 4], [4, 6], [5, 9], [6, 10], [7, 13]];
 
 // Auswertung der Auswahl: richtig markiert, übersehen, zu viel markiert
 export function gradeSelection(targets, selected) {
@@ -230,7 +242,7 @@ export const THREAT_THEMES = ['defensiveMove', 'hangingPiece', 'fork', 'pin', 's
   'mateIn1', 'mateIn2', 'backRankMate', 'trappedPiece', 'kingsideAttack', 'attraction', 'deflection'];
 
 // Wertungsfenster je Stufe 1–6
-export const THREAT_RATINGS = [null, [600, 1050], [900, 1300], [1100, 1500], [1300, 1700], [1500, 1900], [1700, 2200]];
+export const THREAT_RATINGS = [null, [600, 1050], [900, 1300], [1100, 1500], [1300, 1700], [1500, 1900], [1700, 2200], [1900, 2400], [2100, 2700], [2300, 3000]];
 
 // Gewinnchance 0–100 (Lichess-Formel) aus Sicht von color, score = {cp}|{mate} aus Sicht von Weiß
 export function winChance(score, color) {
@@ -322,4 +334,18 @@ export function threatFromLastMove(lastUci, threatUci) {
   const lastFrom = lastUci.slice(0, 2), lastTo = lastUci.slice(2, 4);
   const from = threatUci.slice(0, 2), to = threatUci.slice(2, 4);
   return from === lastTo || between(from, to).includes(lastFrom);
+}
+
+// ---------- Kandidatenzüge ----------
+
+// Wertungsfenster je Stufe; ab Stufe 3 sind drei Kandidaten gefragt
+export const CAND_RATINGS = [null, [800, 1200], [1000, 1400], [1200, 1600], [1400, 1800], [1600, 2100], [1800, 2400]];
+export const candNeeded = level => (level >= 3 ? 3 : 2);
+
+// Einstufung über den Verlust an Gewinnchance gegenüber dem besten Zug
+export function candLabel(loss) {
+  if (loss <= 3) return { text: 'bester Zug', kind: 'good' };
+  if (loss <= 8) return { text: 'gut', kind: 'good' };
+  if (loss <= 20) return { text: 'schwächer', kind: 'warn' };
+  return { text: 'Patzer', kind: 'bad' };
 }

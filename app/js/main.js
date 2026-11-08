@@ -10,6 +10,7 @@ const ROUTES = {
   endspiele: 'endgames',
   bericht: 'report',
   spielen: 'play',
+  besprechung: 'review',
 };
 
 const view = document.getElementById('view');

@@ -3,7 +3,7 @@
 // renderOverview(el, { model, go(tab, params), openChapter })
 
 import { h, clear, progressBar, formatLine } from '../ui.js';
-import { chapterStats, lineStatus, totals, pickNewLine, newLineQueue, canLearn } from './logic.js';
+import { chapterStats, lineStatus, totals, pickNewLine, newLineQueue, canLearn, lineStage, STAGES } from './logic.js';
 import { progress, setSetting, learnDepth } from './data.js';
 import { priorityBadge, freqBadge, repertoireNotice, sideName, button, emptyState, put } from './widgets.js';
 
@@ -42,7 +42,7 @@ export function renderOverview(el, { model, go, openChapter }) {
     h('div.row.op-actions',
       button({ label: t.due ? `Wiederholen (${t.due})` : 'Nichts fällig', primary: !!t.due, disabled: !t.due, onClick: () => go('wiederholen') }),
       button({ label: 'Neue Linie lernen', primary: !t.due && !!next, disabled: !model.lines.length, onClick: () => go('lernen') }),
-      button({ label: 'Weichen üben', onClick: () => go('weichen') }),
+      button({ label: 'Fallen üben', onClick: () => go('fallen') }),
       button({ label: 'Partie-Check', onClick: () => go('partien') })),
     nextInfo,
     h('label.row.small.muted.op-setting', 'Neue Züge pro Tag:', limitInput, h('span', '(Standard 12, weniger = entspannter)')),
@@ -122,7 +122,7 @@ export function renderOverview(el, { model, go, openChapter }) {
         h('div.muted.small.op-linemoves', formatLine(l.moves))),
       freqBadge(l.frequency),
       st.learned
-        ? h('span.pill' + (st.due ? '.bad' : '.good'), st.due ? `${st.due} fällig` : `sitzt ${Math.round(st.strength * 100)} %`)
+        ? h('span.pill' + (st.due ? '.bad' : '.good'), { title: STAGES[lineStage(l, prog)] }, `Stufe ${lineStage(l, prog)}/5${st.due ? ', fällig' : ''}`)
         : h('span.pill', st.newCards ? `${st.newCards} neu` : 'bekannt'),
       st.learned
         ? button({ label: 'Üben', onClick: () => go('wiederholen', { line: l.id }) })

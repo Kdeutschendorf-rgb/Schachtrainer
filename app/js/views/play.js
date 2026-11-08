@@ -9,14 +9,16 @@ import { h, clear, loadCss, toast, figurine, formatLine, loadPlayerData, progres
 import * as store from '../store.js';
 import { createBoard } from '../board.js';
 import { Chess } from '../../vendor/chess.js';
-import { START_RATING, TIME_CONTROLS, newRating, CLASS_DE } from '../play/logic.js';
+import { START_RATING, TIME_CONTROLS, newRating, CLASS_DE, MIN_BOT_ELO } from '../play/logic.js';
+import { bookMove } from '../play/book.js';
+import { createPlayout } from '../play/playout.js';
 import { botMove, analyseGame } from '../play/engine.js';
 import { loadModel } from '../openings/data.js';
 import { followGame, cardKey } from '../openings/logic.js';
 import { todayStr } from '../srs.js';
 
 const RESULT_DE = { W: 'Gewonnen', L: 'Verloren', D: 'Remis' };
-const DIFFS = [[-200, 'Leichter (−200)'], [0, 'Passend zu deiner Wertung'], [150, 'Stärker (+150)']];
+const DIFFS = [[-100, "Etwas leichter"], [0, "Passend zu deiner Wertung"], [150, "Stärker (+150)"]];
 const MAX_PUZZLES = 300;
 
 function area() {
@@ -45,10 +47,37 @@ export async function mount(el) {
     const start = summary?.elo?.current?.rapid || START_RATING;
     store.update('play', d => { d.rating = start; });
   }
+  const model = await loadModel().catch(() => null);
+  if (!alive) return () => {};
+
+  const summary = await loadPlayerData('analysis_summary.json').catch(() => null);
   if (!alive) return () => {};
 
   if (area().current) startGame(area().current);
   else renderSetup();
+
+  // Stellungen aus eigenen Partien ausspielen: noch nicht gespielte zuerst
+  function startPlayout(kind) {
+    const list = summary?.playouts?.[kind] || [];
+    const done = area().playouts || {};
+    const pos = list.find(p => done[p.id] == null) || list[Math.floor(Math.random() * list.length)];
+    if (!pos) return toast('Noch keine passenden Stellungen aus deinen Partien.');
+    game?.destroy(); game = null;
+    clear(root);
+    const host = h('div');
+    root.append(host);
+    const destroy = createPlayout(host, {
+      pos, elo: area().rating,
+      onEnd: ({ ok, controls }) => {
+        store.update('play', d => { (d.playouts ||= {})[pos.id] = ok ? 1 : 0; });
+        store.logActivity({ playouts: 1, playoutsWon: ok ? 1 : 0 });
+        controls.replaceChildren(
+          h('button.primary', { onclick: () => startPlayout(kind) }, 'Nächste Stellung'),
+          h('button', { onclick: () => renderSetup() }, 'Übersicht'));
+      },
+    });
+    game = { destroy };
+  }
 
   function renderSetup() {
     game?.destroy();
@@ -62,12 +91,21 @@ export async function mount(el) {
     root.append(
       h('div.card.pl-setup',
         h('div.row', h('h1', 'Spielen'), h('span.spacer'), h('div.pl-rating', h('div.stat', String(a.rating)), h('div.small.muted', 'deine Bot-Wertung'))),
-        h('p.muted', 'Der Bot spielt auf deiner Wertung: meist vernünftig, ab und zu ein Fehler, wie ein Mensch. Gewinnst du, steigt deine Wertung und der nächste Bot wird stärker. Nach jeder Partie analysiert die Engine deine Züge: Fehler werden zu Taktikaufgaben, Abweichungen vom Repertoire kommen in die Eröffnungs-Wiederholung.'),
+        h('p.muted', 'Gewinnst du, steigt deine Wertung und der nächste Bot wird stärker. Nach jeder Partie analysiert die Engine deine Züge: Fehler werden zu Taktikaufgaben, Abweichungen vom Repertoire kommen in die Eröffnungs-Wiederholung.'),
         h('div.pl-settings',
           h('label', h('span', 'Bedenkzeit'), sel('tc', TIME_CONTROLS.map(t => [t.id, t.label]))),
           h('label', h('span', 'Farbe'), sel('color', [['zufall', 'Zufall'], ['w', 'Weiß'], ['b', 'Schwarz']])),
-          h('label', h('span', 'Gegner'), sel('diff', DIFFS))),
+          h('label', h('span', 'Gegner'), sel('diff', DIFFS)),
+          h('label', h('span', 'Eröffnung'), sel('opening', openingOptions()))),
+        h('div.small.muted', `Der Bot spielt die gewählte Eröffnung, danach entwickelt sich die Partie frei. Bots beginnen bei ${MIN_BOT_ELO}.`),
         h('div.row', h('button.primary.pl-start', { onclick: () => newGame() }, 'Partie starten'))),
+      h('div.card.pl-extra',
+        h('h3', 'Stellungen zu Ende spielen'),
+        h('p.small.muted', 'Stellungen aus deinen eigenen Partien. Verwerten: gewonnen halten. Retten: nicht aufgeben, auch schlechte Stellungen drehen sich noch.'),
+        h('div.row',
+          h('button', { onclick: () => startPlayout('win'), disabled: !summary?.playouts?.win?.length }, 'Verwerten'),
+          h('button', { onclick: () => startPlayout('save'), disabled: !summary?.playouts?.save?.length }, 'Retten'),
+          h('a.btn', { href: '#/besprechung' }, 'Partie-Besprechung'))),
       last.length ? h('div.card',
         h('div.row', h('h3', 'Letzte Partien'), h('span.spacer'), h('a.small', { href: '#/eroeffnungen?tab=partien' }, 'Partie-Check der Eröffnungen')),
         h('table.pl-games', last.map(g => h('tr',
@@ -77,13 +115,21 @@ export async function mount(el) {
           h('td.muted', `${g.ratingAfter - g.ratingBefore >= 0 ? '+' : ''}${g.ratingAfter - g.ratingBefore}`))))) : null);
   }
 
+  // Eröffnungen zur Auswahl: gemischt, ohne Buch oder ein Kapitel des Repertoires (legt deine Farbe fest)
+  function openingOptions() {
+    const chapters = model ? [...model.chapters].sort((x, y) => (x.side === y.side ? x.order - y.order : x.side === 'w' ? -1 : 1)) : [];
+    return [['', 'Gemischt aus meinem Repertoire'], ['frei', 'Keine feste Eröffnung'],
+      ...chapters.map(c => [c.id, `${c.side === 'w' ? 'Du Weiß' : 'Du Schwarz'}: ${c.title}`])];
+  }
+
   function newGame() {
     const a = area();
     const s = a.settings;
     const tc = TIME_CONTROLS.find(t => t.id === s.tc) || TIME_CONTROLS[0];
-    const color = s.color === 'w' || s.color === 'b' ? s.color : (Math.random() < 0.5 ? 'w' : 'b');
+    const chapter = model?.chapterById.get(s.opening);
+    const color = chapter ? chapter.side : s.color === 'w' || s.color === 'b' ? s.color : (Math.random() < 0.5 ? 'w' : 'b');
     const cur = {
-      id: Date.now(), date: todayStr(), color, botElo: Math.max(400, a.rating + (s.diff || 0)), ratingBefore: a.rating,
+      id: Date.now(), date: todayStr(), color, botElo: Math.max(MIN_BOT_ELO, a.rating + (s.diff || 0)), ratingBefore: a.rating, opening: s.opening || '',
       tc: { base: tc.base, inc: tc.inc }, clocks: { w: tc.base * 1000, b: tc.base * 1000 }, moves: [], startedAt: Date.now(),
     };
     store.update('play', d => { d.current = cur; });
@@ -108,6 +154,7 @@ export async function mount(el) {
     const boardEl = h('div');
     const side = h('div.side',
       h('div.card.tight.pl-bar', h('span', `🤖 Bot ${cur.botElo}`), h('span.spacer'), timed ? botClock : null),
+      model?.chapterById.get(cur.opening) ? h('div.small.muted', `Eröffnung: ${model.chapterById.get(cur.opening).title}`) : null,
       statusEl, movesEl, controls,
       h('div.card.tight.pl-bar.me', h('span', `Du (${cur.ratingBefore})`), h('span.spacer'), timed ? myClock : null));
     root.append(h('div.trainer.pl-game', boardEl, side));
@@ -172,7 +219,8 @@ export async function mount(el) {
       const t0 = Date.now();
       let uci;
       try {
-        uci = await botMove(chess.fen(), cur.botElo);
+        const book = model && cur.opening !== 'frei' ? bookMove(model, cur.color, chess.fen(), { chapterId: cur.opening || null }) : null;
+        uci = book || await botMove(chess.fen(), cur.botElo);
       } catch {
         statusEl.textContent = 'Die Engine antwortet nicht. Lade die Seite neu, die Partie bleibt gespeichert.';
         return;
@@ -230,7 +278,13 @@ export async function mount(el) {
       // Speichern: Genauigkeit, Aufgaben für die Taktik, Eröffnungs-Abweichung als fällige Karte
       store.update('play', d => {
         const g = d.games.find(x => x.id === record.id);
-        if (g) { g.accuracy = res.accuracy; g.counts = res.counts; g.errors = res.errors; }
+        if (g) {
+          g.accuracy = res.accuracy; g.counts = res.counts; g.errors = res.errors;
+          // Die drei teuersten Fehler für die Partie-Besprechung
+          g.moments = res.moves.filter(m => m.cls === 'blunder' || m.cls === 'mistake').sort((x, y) => y.loss - x.loss).slice(0, 3)
+            .sort((x, y) => x.ply - y.ply)
+            .map(m => ({ ply: m.ply, fen: m.fen, played: m.san, best: m.bestSan, bestUci: m.best, drop: m.loss, tags: m.tags, pv: '' }));
+        }
         const ids = new Set(d.puzzles.map(p => p.id));
         d.puzzles.push(...res.puzzles.filter(p => !ids.has(p.id)));
         d.puzzles = d.puzzles.slice(-MAX_PUZZLES);

@@ -8,24 +8,32 @@ import * as L from './logic.js';
 
 export const EXERCISES = {
   calc: {
-    key: 'blind', title: 'Blind rechnen', maxLevel: 8,
+    key: 'blind', title: 'Blind rechnen', maxLevel: 20,
     short: 'Züge im Kopf weiterspielen, ohne dass sich das Brett bewegt.',
-    levelText: n => `${n} ${n === 1 ? 'Halbzug' : 'Halbzüge'} im Kopf`,
+    levelText: lv => {
+      const c = L.CALC_LEVELS[lv];
+      return `${c.n} ${c.n === 1 ? 'Halbzug' : 'Halbzüge'} im Kopf${c.hide ? ', Züge verschwinden' : ''}${c.boost ? ', schwerere Aufgaben' : ''}`;
+    },
   },
   threats: {
-    key: 'threats', title: 'Drohung erkennen', maxLevel: 6,
+    key: 'threats', title: 'Drohung erkennen', maxLevel: 9,
     short: 'Erst sehen, was der Gegner will, dann die beste Antwort finden.',
     levelText: n => `Aufgaben um ${Math.round((L.THREAT_RATINGS[n][0] + L.THREAT_RATINGS[n][1]) / 2)}`,
   },
   cct: {
-    key: 'cct', title: 'Schach & Schlagen', maxLevel: 5,
+    key: 'cct', title: 'Schach & Schlagen', maxLevel: 7,
     short: 'Alle Schachgebote und Schlagzüge finden. Die Gewohnheit vor jedem Zug.',
     levelText: n => `${L.CCT_RANGES[n][0]}–${L.CCT_RANGES[n][1]} Züge zu finden`,
   },
   loose: {
-    key: 'loose', title: 'Ungedeckte Figuren', maxLevel: 5,
+    key: 'loose', title: 'Ungedeckte Figuren', maxLevel: 7,
     short: 'Alle ungedeckten und hängenden Steine beider Seiten markieren.',
     levelText: n => `${L.LOOSE_RANGES[n][0]}–${L.LOOSE_RANGES[n][1]} Steine`,
+  },
+  cand: {
+    key: 'cand', title: 'Kandidatenzüge', maxLevel: 6,
+    short: 'Erst mehrere Züge nennen, dann vergleichen. Die Engine bewertet deine Auswahl.',
+    levelText: n => `${L.candNeeded(n)} Kandidaten, Aufgaben um ${Math.round((L.CAND_RATINGS[n][0] + L.CAND_RATINGS[n][1]) / 2)}`,
   },
 };
 
@@ -71,10 +79,16 @@ function baseWindow(ctx, below = 350, above = 100) {
 // 1. Blind rechnen
 // ---------------------------------------------------------------------------
 export async function runCalc(ctx, level) {
-  const n = level;
-  const len = L.blindLength(n);
-  let row = pickPuzzle(ctx, r => moveCount(r) === len, baseWindow(ctx));
-  row ||= pickPuzzle(ctx, r => moveCount(r) >= len, baseWindow(ctx));
+  const cfg = L.CALC_LEVELS[level];
+  const [lo, hi] = baseWindow(ctx);
+  const win = [lo + cfg.boost, hi + cfg.boost];
+  // Sehr lange Aufgaben sind selten: Findet sich keine, wird die Zugfolge etwas kürzer
+  let n = cfg.n, row = null;
+  for (; n >= 1 && !row; n--) {
+    const len = L.blindLength(n);
+    row = pickPuzzle(ctx, r => moveCount(r) === len, win) || pickPuzzle(ctx, r => moveCount(r) >= len, win);
+    if (row) break;
+  }
   if (!row) throw new Error('Keine passende Aufgabe gefunden.');
   const task = L.makeBlindTask(L.parsePuzzle(row), n);
   const { board } = ctx;
@@ -106,12 +120,17 @@ export async function runCalc(ctx, level) {
     const step = () => {
       if (shown >= spans.length) return resolve();
       spans[shown++].classList.add('on');
-      ctx.timeout(step, shown === 1 ? 300 : 1300);
+      ctx.timeout(step, shown === 1 ? 300 : cfg.ms);
     };
     ctx.controls.replaceChildren(h('button', { onclick: () => { revealAll(); resolve(); } }, 'Alle Züge zeigen'));
     step();
   });
   revealAll();
+  // Ab Stufe 9 verschwinden die Züge: Du musst sie im Kopf behalten
+  if (cfg.hide) {
+    await ctx.sleep(cfg.ms);
+    lineEl.replaceChildren(h('span.muted', 'Die Züge sind ausgeblendet. Behalte sie im Kopf.'));
+  }
 
   // Jetzt den Zug in der vorgestellten Stellung finden
   after.textContent = `Jetzt ist ${COLOR_DE[task.color]} am Zug. Finde den besten Zug und zieh ihn auf dem Brett, `
@@ -144,6 +163,7 @@ export async function runCalc(ctx, level) {
 
   const res = answer ? L.checkBlindAnswer(task, answer) : { ok: false };
   const sec = Math.round((Date.now() - t0) / 1000);
+  if (cfg.hide) lineEl.replaceChildren(formatLine(sans, task.startPly));
   ctx.feedback(res.ok
     ? (res.altMate ? `Richtig: ${figurine(res.san)} ist auch Matt.` : `Richtig: ${figurine(task.targetSan)}!`)
     : `${answer ? (res.legal === false ? 'Dieser Zug geht in der vorgestellten Stellung nicht.' : `${figurine(res.san)} ist nicht die Lösung.`) + ' ' : ''}Gesucht war ${figurine(task.targetSan)}.`,
@@ -164,7 +184,7 @@ export async function runCalc(ctx, level) {
   };
   ctx.controls.replaceChildren(h('button', { onclick: () => replay() }, 'Nochmal abspielen'));
   await replay();
-  return { ok: res.ok, hint, id: task.id, level: n, seconds: sec, details: { target: task.targetSan } };
+  return { ok: res.ok, hint, id: task.id, level, seconds: sec, details: { target: task.targetSan } };
 }
 
 // ---------------------------------------------------------------------------
@@ -457,10 +477,75 @@ export async function runLoose(ctx, level) {
   return { ok: g.ok, hint, id: pos.id, level, seconds: sec, details: { hit: g.hit.length, missed: g.missed.length, extra: g.extra.length } };
 }
 
-export const RUNNERS = { calc: runCalc, threats: runThreats, cct: runCct, loose: runLoose };
+export const RUNNERS = { calc: runCalc, threats: runThreats, cct: runCct, loose: runLoose, cand: runCand };
 
 // Kleiner Helfer für die Seitenleiste: Feedback-Box ersetzen
 export function setFeedback(el, text, kind) {
   clear(el);
   if (text) el.append(h('div.feedback.' + kind, text));
+}
+
+// ---------------------------------------------------------------------------
+// 5. Kandidatenzüge
+// ---------------------------------------------------------------------------
+export async function runCand(ctx, level) {
+  const { board } = ctx;
+  ctx.prompt.replaceChildren(h('div.muted', 'Suche eine Stellung …'));
+  ctx.body.replaceChildren();
+  ctx.controls.replaceChildren();
+  board.setMovable('none');
+  const row = pickPuzzle(ctx, () => true, L.CAND_RATINGS[level]);
+  if (!row) throw new Error('Keine passende Stellung gefunden.');
+  const after = L.afterFirstMove(L.parsePuzzle(row));
+  const user = L.turnOf(after.fen);
+  const need = L.candNeeded(level);
+  const t0 = Date.now();
+  board.setPosition(after.fen, { orientation: orient(user) });
+  board.setMovable('turn');
+  ctx.prompt.replaceChildren(
+    h('div', h('strong', `Nenne ${need} Kandidatenzüge. `), `${COLOR_DE[user]} ist am Zug.`),
+    h('div.small.muted', 'Zieh jeden Zug, den du ernsthaft erwägst. Er wird notiert und das Brett springt zurück.'),
+  );
+  const list = h('div.moves');
+  ctx.body.replaceChildren(list);
+  const cands = [];
+  const go = h('button.primary', { disabled: true }, 'Bewerten');
+  await new Promise(resolve => {
+    go.onclick = () => resolve();
+    ctx.controls.replaceChildren(go);
+    board.setOnMove(m => {
+      if (!cands.some(c => c.uci === m.uci) && cands.length < 3) cands.push(m);
+      list.textContent = cands.map(c => figurine(c.san)).join('   ');
+      go.disabled = cands.length < need;
+      board.setShapes(cands.map(c => ({ orig: c.uci.slice(0, 2), dest: c.uci.slice(2, 4), brush: 'yellow' })));
+      return false;
+    });
+  });
+  if (ctx.stopped()) return null;
+  board.setOnMove(null);
+  board.setMovable('none');
+  ctx.controls.replaceChildren();
+  ctx.feedback('Die Engine vergleicht deine Züge …', 'info');
+  const base = await engine.analyse(after.fen, { movetime: 1000, multipv: 3 });
+  if (ctx.stopped()) return null;
+  const bestLine = base.lines[0];
+  const bestWin = L.winChance(bestLine.score, user);
+  const rated = [];
+  for (const c of cands) {
+    const r = await engine.analyse(c.fen, { movetime: 500 });
+    if (ctx.stopped()) return null;
+    const win = r.lines.length ? L.winChance(r.lines[0].score, user)
+      : new Chess(c.fen).isCheckmate() ? 100 : 50;
+    const loss = Math.max(0, bestWin - win);
+    rated.push({ ...c, loss, label: L.candLabel(loss) });
+  }
+  rated.sort((a, b) => a.loss - b.loss);
+  const ok = rated[0].loss <= 8;   // Entscheidend: War der beste Zug dabei? Schwache Kandidaten sind nur Ideen
+  const wild = rated.some(c => c.loss > 20);
+  ctx.body.replaceChildren(...[h('ul', rated.map(c => h('li', h('strong', figurine(c.san)), ' ', h('span.small', c.label.text)))),
+    rated[0].loss > 3 ? h('div.small', 'Der beste Zug war ', h('strong', figurine(bestLine.san[0])), '.') : null].filter(Boolean));
+  ctx.feedback(ok ? `Gute Auswahl: Der beste oder ein gleichwertiger Zug war dabei.${wild ? ' Prüf bei den anderen auch die Antwort des Gegners.' : ''}` : 'Der beste Zug war nicht unter deinen Kandidaten.', ok ? 'good' : 'bad');
+  board.flash(ok ? 'good' : 'bad');
+  board.setShapes([{ orig: bestLine.pv[0].slice(0, 2), dest: bestLine.pv[0].slice(2, 4), brush: 'green' }]);
+  return { ok, hint: false, id: row[0], level, seconds: Math.round((Date.now() - t0) / 1000), details: { cands: rated.map(c => c.san) } };
 }

@@ -139,3 +139,9 @@
 .op-gc-game { display: flex; flex-direction: column; gap: 6px; }
 .op-gc-game .feedback { margin: 0; }
 .op-gc-filter { margin-bottom: 8px; }
+
+/* Lernstufen */
+.op-tempo { height: 4px; background: var(--panel-2); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+.op-tempo span { display: block; height: 100%; background: var(--warn); animation: op-tempo linear forwards; }
+@keyframes op-tempo { from { width: 100%; } to { width: 0; } }
+.op-branch-cur { color: var(--accent); }

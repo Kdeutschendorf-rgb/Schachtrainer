@@ -262,7 +262,7 @@ function renderHeader(summary, onSync) {
 }
 
 function renderSync() {
-  return h('div.small.muted.rp-sync-status', 'Neue Partien von chess.com werden jeden Montag automatisch ausgewertet.');
+  return h('div.small.muted.rp-sync-status', 'Neue Partien von chess.com werden jeden Morgen automatisch ausgewertet.');
 }
 
 // Wochenbericht (automatisch aus Partien und Training der letzten 7 Tage)
@@ -686,7 +686,8 @@ export async function mount(el) {
     if (games.length) deviations = { games: games.length, mine: games.filter(g => followGame(model, g.color, g.moves || []).kind === 'ich').length };
   } catch { /* ohne Repertoire kein Eröffnungsteil */ }
   if (!alive) return () => {};
-  const week = renderWeek(weeklyReport({ summary, playGames: prog.play?.games || [], activity: prog.activity || {}, deviations }));
+  const goal = prog.settings?.goalRapid && prog.settings?.goalDate ? { rapid: prog.settings.goalRapid, date: prog.settings.goalDate } : null;
+  const week = renderWeek(weeklyReport({ summary, playGames: prog.play?.games || [], activity: prog.activity || {}, deviations, goal }));
   const parts = [
     renderHeader(summary, sync),
     week,

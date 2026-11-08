@@ -539,3 +539,47 @@ export function chapterTrie(chapter) {
   }
   return root;
 }
+
+// ---------- Lernstufen pro Linie ----------
+
+export const STAGES = { 1: 'Selber finden', 2: 'Was will der Gegner?', 3: 'Aus dem Kopf', 4: 'Mit Tempo', 5: 'Weiterspielen' };
+
+// Aktuelle Stufe: gespeichert, sonst gelernte Linien ab Stufe 3, neue ab Stufe 1
+export function lineStage(line, prog) {
+  return prog.stages?.[line.id] || (prog.learnedLines?.[line.id] ? 3 : 1);
+}
+
+// Neue Stufe nach einem gewerteten Durchgang
+export function nextStage(stage, { mistakes = 0, hinted = false, sparOk } = {}) {
+  const clean = !mistakes && !hinted;
+  if (stage === 5) return clean && sparOk !== false ? 5 : mistakes >= 2 ? 4 : 5;
+  if (clean) return stage + 1;
+  if (stage >= 3 && mistakes >= 2) return stage - 1;
+  return stage;
+}
+
+// Welche eigenen Steine greift die gerade gezogene Gegnerfigur an? (König ausgenommen, Bauern nur wenn ungedeckt)
+export function attackedBy(fen, ply) {
+  const c = new Chess(fen);
+  const VALUE = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
+  const moverValue = VALUE[c.get(ply.to)?.type] ?? 0;
+  const out = [];
+  for (const row of c.board()) for (const pc of row) {
+    if (!pc || pc.color === ply.color || pc.type === 'k') continue;
+    if (!c.attackers(pc.square, ply.color).includes(ply.to)) continue;
+    const defended = c.isAttacked(pc.square, pc.color);
+    if (!defended || VALUE[pc.type] > moverValue) out.push(pc.square);
+  }
+  return out;
+}
+
+// Stellen einer Linie, an denen der Gegner im Repertoire mehrere Züge hat, mit deiner jeweiligen Antwort
+export function lineBranches(model, line) {
+  const out = [];
+  for (const p of line.plies) {
+    if (p.own) continue;
+    const rows = branchTable(model, line.side, p.fenBefore);
+    if (rows.length > 1) out.push({ ply: p.i, before: line.moves.slice(0, p.i), rows: rows.map(r => ({ ...r, current: r.opp === p.san })) });
+  }
+  return out;
+}
