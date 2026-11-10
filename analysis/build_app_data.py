@@ -683,6 +683,14 @@ def build(args):
         with open(tmp, "w", encoding="utf-8") as fh:
             json.dump(data, fh, ensure_ascii=False, separators=(",", ":"))
         os.replace(tmp, os.path.join(args.out, name))   # atomar, damit die App nie eine halbe Datei liest
+    # Schwächenprofil mit Übungssätzen (eigenes Modul; ein Fehler dort hält die Auswertung nicht auf)
+    try:
+        import weakness_profile
+        profile = weakness_profile.build_profile(games, mistakes, clean)
+        weakness_profile.write(profile, args.out)
+        summary["_profile"] = "%d Befunde, %d Übungssätze" % (len(profile["findings"]), len(profile["sets"])) if profile else "zu wenige Rapid-Partien"
+    except Exception as exc:     # noqa: BLE001
+        summary["_profile"] = "nicht erstellt (%s)" % exc
     return summary
 
 
@@ -697,6 +705,7 @@ def main():
     print("analysis_summary.json: %d Partien, %d Fehler, %d eigene Aufgaben, Repertoire %s" % (
         s["totals"]["all"]["games"], s["totals"]["mistakes"], s["ownPuzzles"],
         "ja" if rep["available"] else "fehlt"))
+    print("weakness_profile.json: %s" % s.get("_profile"))
 
 
 if __name__ == "__main__":

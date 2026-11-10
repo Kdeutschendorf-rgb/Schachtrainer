@@ -16,6 +16,11 @@ export function addDays(day, days) {
   return dateStr(new Date(d.getTime() + days * DAY));
 }
 
+// Fortlaufende Tagesnummer (für alles, was täglich wechseln soll)
+export function dayNumber(day = todayStr()) {
+  return Math.round(Date.parse(day + 'T12:00:00Z') / 86400000);
+}
+
 export function todayStr() {
   return dateStr();
 }

@@ -6,7 +6,7 @@ import { trainingFocus } from './focus.js';
 
 let cache = null;
 
-// → {index, own: [eigene Aufgaben], focus: {lichessTheme: Gewicht}}
+// → {index, own: [eigene Aufgaben], focus: {lichessTheme: Gewicht}, profile: Schwächenprofil | null}
 // Eigene Aufgaben = Fehler aus chess.com-Partien plus Fehler aus Bot-Partien; der Schwerpunkt mischt neue Partien
 // als Ergänzung dazu (focus.js). Beides kommt laufend dazu, darum bei jedem Aufruf frisch aus dem Fortschritt.
 export function loadTacticsData() {
@@ -16,6 +16,7 @@ export function loadTacticsData() {
       index: d.index,
       own: [...normalizeOwn(play.puzzles || []).reverse(), ...d.own],
       focus: trainingFocus(d.summary, play.games).themes,
+      profile: d.profile,       // Schwächenprofil mit Übungssätzen (sets.js)
     };
   });
 }
@@ -26,10 +27,12 @@ function loadBase() {
       loadData('puzzles.json').then(buildIndex),
       loadPlayerData('my_puzzles.json').catch(() => []),          // darf fehlen
       loadPlayerData('analysis_summary.json').catch(() => null),  // darf fehlen
-    ]).then(([index, own, summary]) => ({
+      loadPlayerData('weakness_profile.json').catch(() => null),  // darf fehlen
+    ]).then(([index, own, summary, profile]) => ({
       index,
       own: normalizeOwn(own),
       summary,
+      profile,
     }));
     cache.catch(() => { cache = null; });   // nach einem Fehler beim nächsten Mal neu versuchen
   }

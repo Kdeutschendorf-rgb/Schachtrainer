@@ -4,6 +4,7 @@ import { h, clear, loadCss, countdown, toast, TOUCH } from '../ui.js';
 import * as store from '../store.js';
 import { todayStr } from '../srs.js';
 import { loadTacticsData } from '../tactics/data.js';
+import { profileSets, setById, setOfDay, setOpenCount, setContext } from '../tactics/sets.js';
 import { createTrainer } from '../tactics/trainer.js';
 import { renderStats } from '../tactics/stats.js';
 import { themeLabel, themeTip } from '../tactics/labels.js';
@@ -94,7 +95,23 @@ export async function mount(el, params = {}) {
         body.append(emptyCard('Noch keine eigenen Aufgaben. Sie entstehen aus der Analyse deiner chess.com-Partien und erscheinen hier automatisch, sobald die Analyse fertig ist.'));
         break;
       }
-      startTrainer({ mode: 'own' }, { title: 'Eigene Fehler' }, () => emptyCard('Für heute sind alle eigenen Fehler erledigt. Neue kommen mit den nächsten Partien dazu.', nextDueText()));
+      {
+        // Übungssätze aus dem Schwächenprofil: ein Satz = ein Fehlermuster mit Merksatz (#/taktik?modus=eigene&set=…)
+        const sets = profileSets(data.profile);
+        const set = setById(data.profile, params.set);
+        if (sets.length) {
+          body.append(h('div.tk-sets',
+            h('a' + (set ? '' : '.on'), { href: '#/taktik?modus=eigene' }, 'Alle'),
+            sets.map(x => h('a' + (x.id === set?.id ? '.on' : ''), { href: `#/taktik?modus=eigene&set=${encodeURIComponent(x.id)}`, title: x.why || '' },
+              `${x.title} (${setOpenCount(x, area(), data.own, todayStr())})`))));
+        }
+        if (set) {
+          startTrainer({ mode: 'own', ...setContext(set, { setAgain: true }) }, { title: set.title },
+            () => emptyCard('Diesen Übungssatz hast du für heute durch.', nextDueText()));
+        } else {
+          startTrainer({ mode: 'own' }, { title: 'Eigene Fehler' }, () => emptyCard('Für heute sind alle eigenen Fehler erledigt. Neue kommen mit den nächsten Partien dazu.', nextDueText()));
+        }
+      }
       break;
     case 'wiederholen':
       if (!dueCards(area()).length) { body.append(emptyCard('Heute ist nichts fällig.', nextDueText())); break; }
@@ -252,6 +269,7 @@ function rushMode(body, data, onChange) {
 // modes: 'warmup' (leicht, schnell) · 'main' (gewertet, Schwächen-Mix) · 'own' (eigene Fehler, sonst main)
 
 const BLOCK_TITLES = { warmup: 'Aufwärmen', main: 'Taktik: Schwächen', own: 'Eigene Fehler' };
+const SET_PUZZLES_IN_MAIN = 2;   // so viele Stellungen aus dem Übungssatz des Tages eröffnen den Hauptblock
 
 export function runBlock(el, { minutes = 5, mode = 'main', onDone } = {}) {
   loadCss('css/tactics.css');
@@ -290,15 +308,25 @@ export function runBlock(el, { minutes = 5, mode = 'main', onDone } = {}) {
     store.update('tactics', ensureArea);
     ratingStart = Math.round(area().rating);
     clear(holder);
-    const pick = m => {
-      const p = selectNext({ index: data.index, own: data.own, focus: data.focus, area: area(), session, day: todayStr(), mode: m, counter: done });
+    const pick = (m, extra = {}) => {
+      const p = selectNext({ index: data.index, own: data.own, focus: data.focus, area: area(), session, day: todayStr(), mode: m, counter: done, ...extra });
       if (p) session.add(p.key);
+      return p;
+    };
+    // Übungssatz des Tages aus dem Schwächenprofil: im Abschluss durchgehend, im Hauptblock die ersten zwei Aufgaben
+    const daySet = setOfDay(data.profile, area(), data.own, todayStr());
+    const fromSet = () => (daySet ? pick('own', setContext(daySet)) : null);
+    let setShown = 0;
+    const setFirst = () => {
+      if (setShown >= SET_PUZZLES_IN_MAIN) return null;
+      const p = fromSet();
+      if (p) setShown++;
       return p;
     };
     trainer = createTrainer(holder, {
       title: BLOCK_TITLES[mode], header,
       autoNext: mode === 'warmup' ? 900 : 0,
-      next: () => (mode === 'own' ? pick('own') || pick('main') : pick(mode)),
+      next: () => (mode === 'own' ? fromSet() || pick('own') || pick('main') : mode === 'main' ? setFirst() || pick('main') : pick(mode)),
       onResult: (p, res) => {
         done++;
         if (res.ok) correct++;

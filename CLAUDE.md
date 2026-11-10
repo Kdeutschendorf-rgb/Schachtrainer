@@ -37,7 +37,9 @@ in JSON-Zügen englische SAN.
 | Supabase `progress` | Gesamter Trainingsfortschritt (Aufbau siehe unten) |
 | `app/data/players/keanu098/analysis_summary.json` | Auswertung aller chess.com-Partien (Elo-Verlauf, Eröffnungen, Fehler, Zeit, `focus`, `insights`) |
 | `app/data/players/keanu098/my_puzzles.json` | Aufgaben aus eigenen Fehlern (für die Taktik) |
+| `app/data/players/keanu098/weakness_profile.json` | Schwächenprofil: Befunde mit Zahlen (`findings`), Übungssätze (`sets`), Tabellen zu Bedenkzeit, Fehler-Mechanik, Stellungstypen |
 | `app/data/players/keanu098/coach_report.json` | Deine Wochenauswertung, erscheint oben im Bericht (optional) |
+| `data/analysis/clocks.json` | Uhrstände pro Halbzug der älteren Rapid- und Blitzpartien (`analysis/fetch_clocks.py`, einmalig; neue Partien bringen `%clk` im PGN mit) |
 | `data/analysis/games.json`, `mistakes.json`, `my_puzzles.json` | Rohdaten der Engine-Analyse jeder Partie bzw. jedes Fehlers |
 | `data/raw/*.pgn` | Partien (Download und `chesscom_sync.pgn` aus dem Sync) |
 | `app/data/repertoire_white.json`, `repertoire_black.json` | Eröffnungsrepertoire |
@@ -84,6 +86,25 @@ und schreibt `analysis_summary.json` und `my_puzzles.json` nach `app/data/player
 Nötig nach Änderungen am Repertoire (für die Repertoire-Abdeckung) oder an der Analyse.
 Die volle Neuanalyse aller Partien (`analysis/analyze_games.py <pgn>`) dauert lange und nutzt viele Kerne: nur auf Wunsch.
 
+## Schwächenprofil
+
+`analysis/weakness_profile.py` (läuft in `build_app_data.py` mit, also bei jedem Sync und in der täglichen Action, ohne Engine)
+baut aus allen Rapid-Partien einen Datensatz pro eigenem Zug: Stellungsmerkmale, Bedenkzeit, Einstufung. Daraus entstehen
+`findings` (Sätze mit Zahlen und Merksatz) und `sets` (Übungssätze aus `my_puzzles.json`, nach Fehlermuster gruppiert).
+Lesbar ausgeben: `.venv/bin/python -I analysis/weakness_profile.py --print`.
+
+- Stellungstypen werden nur in offenen Partien verglichen (Material höchstens 2 Punkte auseinander, ab Zug 8), jede Gruppe
+  gegen den Rest desselben Merkmals, gemeldet ab z ≥ 2,5. In entschiedenen Stellungen gibt es kaum „grobe Fehler“, ohne
+  diese Einschränkung sähe alles mit vielen Endspielen künstlich sicher aus.
+- Mechanik (`mechanism()`): nach dem ersten Zug der Stockfish-Widerlegung. `zielfeld` (gezogene Figur wird mit Gewinn
+  geschlagen), `schlagfehler`, `drohung` (Figur hing schon), `deckung` (Zug hat sie schutzlos gemacht), `taktik`, `chance`.
+- Mehr Bedenkzeit pro Zug heißt in den Daten nicht weniger Fehler (lange überlegt Keanu nur in schweren Stellungen).
+  Die Aussage ist deshalb: Er nutzt die Uhr nicht, nicht: schnelle Züge sind die Fehler.
+- In der App: Abschnitt „Schwächenprofil“ im Bericht (`report/profile.js`), Übungssätze unter Taktik → Eigene Fehler
+  (`#/taktik?modus=eigene&set=<id>`, `tactics/sets.js`). Im Tagesplan beginnt der Taktik-Hauptblock mit zwei Stellungen
+  aus dem Satz des Tages (`setOfDay`, wechselt täglich), der Abschluss „eigene Fehler“ nimmt ihn zuerst.
+- Tests: `data/test/test_profile.mjs` (jsc) und `.venv/bin/python -I data/test/test_weakness_profile.py`.
+
 ## Repertoire erweitern
 
 - Dateien: `app/data/repertoire_white.json` (1.e4) und `app/data/repertoire_black.json` (1…e5 gegen 1.e4, 1…d5 gegen 1.d4).
@@ -124,3 +145,6 @@ Die volle Neuanalyse aller Partien (`analysis/analyze_games.py <pgn>`) dauert la
 - Tests ohne Browser mit JavaScriptCore:
   `/System/Library/Frameworks/JavaScriptCore.framework/Versions/Current/Helpers/jsc -m data/test/test_today_report.mjs`
   (weitere Tests in `data/test/` und `app/js/*/logic.test.mjs`).
+- Im eingebauten Browser von Claude: Der Vorschau-Server darf nicht in den iCloud-Ordner lesen. `app/` in einen
+  Arbeitsordner kopieren und von dort ausliefern. Chessground nimmt simulierte Klicks nur mit `trustAllEvents: true` an
+  (nur in der Testkopie setzen).

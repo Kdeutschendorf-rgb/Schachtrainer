@@ -19,6 +19,10 @@
 .tk-turn.b::before { background: #111; }
 .tk-context { margin-bottom: 8px; }
 .tk-own { padding: 8px 10px; border-radius: 8px; background: var(--panel-2); border-left: 4px solid var(--warn); }
+.tk-rule { margin-top: 6px; padding: 8px 10px; border-radius: 8px; background: var(--panel-2); border-left: 4px solid var(--info); font-size: .92rem; }
+.tk-sets { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+.tk-sets a { padding: 5px 10px; border-radius: 999px; border: 1px solid var(--line); font-size: .85rem; text-decoration: none; color: inherit; }
+.tk-sets a.on { border-color: var(--info); color: var(--info); }
 .tk-feedback { min-height: 44px; }
 .tk-feedback .feedback { animation: tk-pop .18s ease-out; }
 .tk-controls { margin-top: 10px; }
@@ -86,3 +90,8 @@
 .tk-bar.bad > span { background: var(--bad); }
 .tk-all { margin-top: 12px; }
 .tk-all summary { cursor: pointer; color: var(--muted); margin-bottom: 6px; }
+/* Handy: Übungssätze in einer Zeile zum Wischen, damit das Brett oben bleibt */
+@media (max-width: 700px) {
+  .tk-sets { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .tk-sets a { flex: none; white-space: nowrap; }
+}

@@ -8,8 +8,11 @@ import { trainingFocus } from '../tactics/focus.js';
 import { openReviews } from './review.js';
 import { goalPace } from '../report/weekly.js';
 import * as store from '../store.js';
-import { todayStr, addDays } from '../srs.js';
+import { todayStr, addDays, dayNumber } from '../srs.js';
+import { setOfDay } from '../tactics/sets.js';
 import { tipOfTheDay, themeName } from '../coach.js';
+
+export { dayNumber };   // früher hier definiert, Tests und Bericht importieren es von hier
 
 // ---------------------------------------------------------------------------
 // Plan (reine Logik)
@@ -29,9 +32,6 @@ export const BLOCK_DEFS = {
   finish: { label: 'Abschluss', module: 'tactics', mode: 'own', icon: '🏁' },
 };
 
-export function dayNumber(day) {
-  return Math.round(Date.parse(day + 'T12:00:00Z') / 86400000);
-}
 
 // Eröffnungskarten aus dem Fortschritt (openings.cards: {key: srsCard}) → {due, learned, total}
 export function countDueCards(openings, day = todayStr()) {
@@ -84,7 +84,8 @@ export function distribute(weights, total) {
   return out;
 }
 
-// args: {dailyMinutes, base, adaptive, dueCards, focus (aus analysis_summary.json), day, ownPuzzles}
+// args: {dailyMinutes, base, adaptive, dueCards, focus (aus analysis_summary.json), day, ownPuzzles, reviewGames,
+//        ownSet (Titel des Übungssatzes des Tages aus dem Schwächenprofil)}
 // → {blocks: [{id, label, module, mode, minutes, why, icon}], notes: [Sätze], total}
 export function computePlan(args = {}) {
   const day = args.day || todayStr();
@@ -139,10 +140,11 @@ export function computePlan(args = {}) {
   const why = {
     warmup: 'Leichte Aufgaben, um in Schwung zu kommen.',
     openings: due ? `Fällige Linien auf deiner Stufe, danach neue. ${due} Züge sind fällig.` : 'Neue Linien: erst selber finden, dann aus dem Kopf.',
-    tactics: topThemes.length ? `Gewertet, mit Schwerpunkt ${topThemes.join(' und ')}.` : 'Gewertete Aufgaben, gemischt nach deinen Schwächen.',
+    tactics: (args.ownSet ? `Zuerst zwei Stellungen aus deinen Partien („${args.ownSet}“). Dann gewertet` : 'Gewertet')
+      + (topThemes.length ? `, mit Schwerpunkt ${topThemes.join(' und ')}.` : ', gemischt nach deinen Schwächen.'),
     vision: 'Blind rechnen, Drohungen erkennen, Schach–Schlagen–Drohen.',
     review: `${args.reviewGames || 0} ${args.reviewGames === 1 ? 'Partie wartet' : 'Partien warten'}: die wichtigsten Momente selbst lösen.`,
-    finish: finishModule === 'own' ? 'Stellungen aus deinen eigenen Partien.' : 'Grundtechnik im Endspiel.',
+    finish: finishModule === 'own' ? (args.ownSet ? `Aus deinem Schwächenprofil: „${args.ownSet}“.` : 'Stellungen aus deinen eigenen Partien.') : 'Grundtechnik im Endspiel.',
   };
   const blocks = ORDER.filter(k => minutes[k] > 0).map(k => {
     const def = { ...BLOCK_DEFS[k] };
@@ -228,6 +230,8 @@ export async function mount(el) {
   loadCss('css/today.css');
   let summary = null;
   try { summary = await loadPlayerData('analysis_summary.json'); } catch { summary = null; }
+  // Schwächenprofil: Der Übungssatz des Tages steht im Plan (Taktik und Abschluss nutzen ihn)
+  const profile = await loadPlayerData('weakness_profile.json').catch(() => null);
   // Schwerpunkt: alle Partien als Basis, neue Partien (auch gegen Bots) als Ergänzung
   const focus = summary?.focus || store.get('play').games?.length
     ? { ...(summary?.focus || {}), themes: trainingFocus(summary, store.get('play').games).themes } : null;
@@ -251,6 +255,7 @@ export async function mount(el) {
       dueCards: countDueCards(store.get('openings')).due, focus,
       ownPuzzles: summary?.ownPuzzles ?? 0,
       reviewGames: openReviews(summary, store.get('play').games || [], store.get('review').done || {}).length,
+      ownSet: setOfDay(profile, store.get('tactics'), null, todayStr())?.title || null,
     });
   }
 

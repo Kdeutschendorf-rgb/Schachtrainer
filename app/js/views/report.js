@@ -10,6 +10,7 @@ import { followGame } from '../openings/logic.js';
 import { todayStr, addDays } from '../srs.js';
 import { themeName, MISTAKE_TAGS_DE, sanDe } from '../coach.js';
 import { countDueCards } from './today.js';
+import { renderProfile } from '../report/profile.js';
 
 // ---------------------------------------------------------------------------
 // Formatierung
@@ -640,7 +641,7 @@ function renderTime(summary) {
         h('table.rp-table', h('thead', h('tr', h('th', 'Modus'), h('th.num', 'Niederlagen'), h('th.num', 'auf Zeit'), h('th.num', 'verlassen'))),
           h('tbody', TC_ORDER.filter(tc => t.byTc?.[tc]).map(tc => h('tr', h('td', TC[tc].label), h('td.num', String(t.byTc[tc].losses)),
             h('td.num', String(t.byTc[tc].zeit)), h('td.num', String(t.byTc[tc].verlassen)))))),
-        h('p.small.muted', 'Im 10-Minuten-Rapid ist Zeit selten das Problem. Verlassene Partien zählen dagegen voll als Niederlage.'))));
+        h('p.small.muted', 'Im 10-Minuten-Rapid ist Zeitnot selten das Problem, eher das Gegenteil: Du lässt Bedenkzeit liegen (siehe Schwächenprofil). Verlassene Partien zählen voll als Niederlage.'))));
 }
 
 // Entwicklung: erstes gegen letztes Drittel
@@ -669,9 +670,10 @@ export async function mount(el) {
   const root = h('div.rp-root', h('div.card.muted', 'Lade Bericht …'));
   el.append(root);
 
-  const [summary, coachReport] = await Promise.all([
+  const [summary, coachReport, profile] = await Promise.all([
     loadPlayerData('analysis_summary.json').catch(() => null),
     loadPlayerData('coach_report.json').catch(() => null),   // optional, schreibt Claude bei der Wochenauswertung
+    loadPlayerData('weakness_profile.json').catch(() => null),   // optional, analysis/weakness_profile.py
   ]);
   if (!alive) return () => {};
 
@@ -681,7 +683,7 @@ export async function mount(el) {
   let deviations = null;
   try {
     const model = await loadModel();
-    const from = new Date(Date.now() - 6 * 864e5).toISOString().slice(0, 10);
+    const from = addDays(todayStr(), -6);
     const games = [...(summary?.recentGames || []).filter(g => g.tc === 'rapid'), ...(prog.play?.games || [])].filter(g => g.date >= from);
     if (games.length) deviations = { games: games.length, mine: games.filter(g => followGame(model, g.color, g.moves || []).kind === 'ich').length };
   } catch { /* ohne Repertoire kein Eröffnungsteil */ }
@@ -701,7 +703,7 @@ export async function mount(el) {
   }
   parts.push(renderTraining(prog));
   if (summary) {
-    parts.push(renderInsights(summary.insights), renderOpenings(summary), renderRepertoire(summary),
+    parts.push(renderInsights(summary.insights), renderProfile(profile, section), renderOpenings(summary), renderRepertoire(summary),
       renderMistakes(summary), renderAccuracy(summary), renderTime(summary), renderTrend(summary));
   }
 

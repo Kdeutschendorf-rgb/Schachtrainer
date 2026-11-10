@@ -152,3 +152,9 @@ button.rp-leg.on { color: var(--text); border-color: var(--muted); }
   .rp-heat .rp-cell { width: 11px; height: 11px; }
 }
 .rp-week-stats { margin: 6px 0 10px; }
+
+/* Schwächenprofil */
+.rp-findings { display: flex; flex-direction: column; gap: 10px; margin: 10px 0; }
+.rp-finding { padding: 10px 12px; background: var(--panel-2); border-radius: 8px; border-left: 4px solid var(--warn); display: flex; flex-direction: column; gap: 6px; }
+.rp-finding .row { flex-wrap: wrap; gap: 8px; }
+.rp-rule { color: var(--info); }

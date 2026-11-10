@@ -321,14 +321,27 @@ export function nextRepeat(ctx, filter = () => true) {
 }
 
 // eigene Fehler: zuerst fällige, dann neue (Rapid zuerst, dann Patzer, dann neueste)
+// Mit ctx.setIds (Übungssatz aus dem Schwächenprofil) nur Aufgaben dieses Satzes; ctx.setInfo {title, rule} wandert
+// an die Aufgabe, damit der Trainer den Merksatz zeigt. ctx.setAgain: Ist im Satz nichts mehr offen, kommen die
+// schon gelösten noch einmal (am längsten nicht geübte zuerst), ohne die Wiederholungs-Abstände zu ändern.
 export function nextOwn(ctx) {
-  const due = nextRepeat(ctx, k => k.startsWith('my:'));
-  if (due) return due;
+  const inSet = id => !ctx.setIds || ctx.setIds.has(id);
+  const flags = { rated: false, countThemes: false, ...(ctx.setInfo ? { set: ctx.setInfo } : {}) };
+  const due = nextRepeat(ctx, k => k.startsWith('my:') && inSet(k.slice(3)));
+  if (due) return { ...due, ...flags };
   const seen = ctx.area.ownSeen || {};
   const rank = p => (p.tc === 'rapid' ? 0 : p.tc === 'blitz' ? 1 : 2) * 10 + (p.cls === 'blunder' ? 0 : 1);
-  const fresh = (ctx.own || []).filter(p => !seen[p.id] && !ctx.area.cards?.[p.key] && !ctx.session?.has(p.key))
+  const fresh = (ctx.own || []).filter(p => inSet(p.id) && !seen[p.id] && !ctx.area.cards?.[p.key] && !ctx.session?.has(p.key))
     .sort((a, b) => rank(a) - rank(b) || String(b.date).localeCompare(String(a.date)));
-  return fresh.length ? { ...fresh[0], rated: false, repeat: false, countThemes: false } : null;
+  if (fresh.length) return { ...fresh[0], repeat: false, ...flags };
+  if (ctx.setIds && ctx.setAgain) {
+    const lastSeen = new Map();
+    (ctx.area.history || []).forEach((e, i) => lastSeen.set(e[0], i));
+    const again = (ctx.own || []).filter(p => inSet(p.id) && !ctx.session?.has(p.key) && !ctx.area.cards?.[p.key])
+      .sort((a, b) => (lastSeen.get(a.key) ?? -1) - (lastSeen.get(b.key) ?? -1));
+    if (again.length) return { ...again[0], repeat: false, again: true, ...flags };
+  }
+  return null;
 }
 
 export function ownOpenCount(area, own, day = todayStr()) {

@@ -100,6 +100,8 @@ export function createTrainer(el, opts = {}) {
       const tc = TC_DE[puzzle.tc] ? ` (${TC_DE[puzzle.tc]})` : '';
       contextEl.append(h('div.tk-own',
         `Aus deiner Partie vom ${germanDate(puzzle.date)}${tc}: Du hast hier `, h('strong', played), ` gespielt${cls}. Finde den besseren Zug.`));
+      // Übungssatz aus dem Schwächenprofil: der Merksatz, um den es bei dieser Stellung geht
+      if (puzzle.set?.rule) contextEl.append(h('div.tk-rule', h('strong', `${puzzle.set.title}: `), puzzle.set.rule));
     } else if (puzzle.repeat) {
       contextEl.append(h('span.muted', 'Wiederholung: Diese Aufgabe hast du schon einmal nicht gelöst.'));
     } else if (opts.showTheme && opts.showTheme(puzzle)) {
