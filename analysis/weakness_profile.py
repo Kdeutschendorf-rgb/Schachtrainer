@@ -623,8 +623,8 @@ def build_profile(games, mistakes, puzzles, raw=None, clocks=None, today=None):
                           "%d grobe Fehler in unter %d Sekunden, obwohl noch über %d Minuten auf der Uhr waren." % (t["fastCalm"], FAST_S, CALM_CLOCK_S // 60),
                           lambda p, r: r.get("spent", 99) < FAST_S and r.get("clock", 0) > CALM_CLOCK_S)
             finding("zeit", "Rapid im Blitztempo",
-                    "Du brauchst im Mittel %s Sekunden pro Zug (ab Zug 6), die Hälfte deiner Züge fällt in unter 5 Sekunden. "
-                    "In %d von %d verlorenen Rapid-Partien hattest du am Ende noch mehr als die halbe Bedenkzeit übrig, im Mittel %d:%02d von %d:00 Minuten. "
+                    "Bei der Hälfte deiner Züge (ab Zug 6) überlegst du weniger als %s Sekunden. "
+                    "In %d von %d verlorenen Rapid-Partien hattest du am Ende noch mehr als die halbe Bedenkzeit übrig, typischerweise %d:%02d von %d:00 Minuten. "
                     "Bei %s %% deiner groben Fehler hast du weniger als 10 Sekunden überlegt, nur %s %% passieren mit unter einer Minute auf der Uhr."
                     % (de(t["medianAll"]), t["lossesHalfClock"], t["losses"], t["leftLossMedian"] // 60, t["leftLossMedian"] % 60,
                        round((used[0]["tc"] or (600, 0))[0] / 60) if used else 10, de(t["under10Share"]), de(t["lowClockShare"])),
@@ -687,7 +687,7 @@ def build_profile(games, mistakes, puzzles, raw=None, clocks=None, today=None):
         early = w["11–15"] + w["16–20"]
         finding("uebergang", "Der Eröffnungsvorteil hält nicht",
                 "Stehst du nach Zug 10 klar besser (%d Partien, im Mittel %d %% Gewinnchance), sind es fünf Züge später nur noch %s %%, und am Ende holst du %s %% der Punkte. "
-                "Von %d Partien mit guter Eröffnung (ab 60 %%) hast du %d verloren. Sie kippen meist früh: %d-mal in den Zügen 11 bis 20, im Mittel bei Zug %d."
+                "Von %d Partien mit guter Eröffnung (ab 60 %%) hast du %d verloren. Sie kippen meist früh: %d-mal in den Zügen 11 bis 20, typischerweise um Zug %d."
                 % (top["games"], top["win10"], top["win15"] if top["win15"] is not None else "?", de(top["score"]),
                    trans["good"], trans["lost"], early, round(trans["turnMedian"] or 0)),
                 trans["lost"] * 1.2, sid,
