@@ -216,6 +216,35 @@ store.flush();
   t1 = createLineTrainer(el, { model, line, mode: 'review', stage: 4 });
   ok(el.querySelector?.('.op-tempo') || el.textContent !== undefined, 'Stufe 4 startet');
   t1.destroy(); el.remove();
+  // Stufe 5: Nach der Linie geht es gegen die Engine weiter. Endet die Linie mit dem eigenen Zug (fast alle Linien),
+  // muss zuerst die Engine ziehen. Früher blieb das Brett dann stehen und der Durchgang endete nie.
+  // In jsc gibt es keine Engine: Das Weiterspielen endet dann beim ersten Engine-Zug, gewertet wird trotzdem.
+  const playLine = async (t, l) => {
+    for (const p of l.plies) {
+      if (!p.own) { await tick(450); continue; }
+      userMove(t.board, p.uci);
+      await tick(5);
+    }
+    await tick(10);
+  };
+  const ownEnd = model.lines.filter(x => x.plies.at(-1).own);
+  const oppEnd = model.lines.find(x => !x.plies.at(-1).own);
+  ok(ownEnd.some(x => x.side === 'b') && oppEnd, 'Testlinien für Stufe 5 vorhanden');
+  for (const l of [ownEnd[0], ownEnd.find(x => x.side === 'b'), oppEnd]) {
+    el = container();
+    res = null;
+    t1 = createLineTrainer(el, { model, line: l, mode: 'review', stage: 5, onFinish: r => (res = r) });
+    await playLine(t1, l);
+    if (!l.plies.at(-1).own) {
+      // Linie endet mit dem Gegnerzug: Du bist dran, danach wäre die Engine am Zug
+      ok(el.textContent.includes('Dein Zug (1/8)'), 'Weiterspielen: du beginnst: ' + l.id);
+      const m = t1.board.chess.moves({ verbose: true })[0];
+      userMove(t1.board, m.from + m.to);
+    }
+    await tick(50);
+    ok(res && res.stageAfter === 5, `Stufe 5 wird gewertet (${l.id}, endet mit ${l.plies.at(-1).own ? 'eigenem Zug' : 'Gegnerzug'}): ` + el.textContent.slice(16, 140));
+    t1.destroy(); el.remove();
+  }
 }
 
 print(`${passes} bestanden, ${fails} fehlgeschlagen`);

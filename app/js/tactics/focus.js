@@ -2,6 +2,8 @@
 // Neue Partien (chess.com der letzten 30 Tage und Bot-Partien) kommen als Ergänzung dazu: Ihr Anteil wächst mit
 // der Zahl der Fehler, ist aber auf 40 % begrenzt. Eine einzelne Partie verschiebt den Schwerpunkt also nur wenig.
 
+import { dateStr } from '../srs.js';
+
 // Gleiche Gewichte wie analysis/build_app_data.py (TAG_THEMES, CLS_WEIGHT, PHASE_THEMES)
 export const TAG_THEMES = {
   gabel: { fork: 1.0 },
@@ -39,7 +41,7 @@ const normalize = m => {
 
 // Bot-Partien der letzten `days` Tage als Fehler-Rohgewichte (wie Rapid gewichtet: Bot-Partien sind langsam gespielt)
 export function botRecent(games, days = 30, today = new Date()) {
-  const since = new Date(today.getTime() - days * 864e5).toISOString().slice(0, 10);
+  const since = dateStr(new Date(today.getTime() - days * 864e5));
   return themesFromErrors((games || []).filter(g => g.date >= since).flatMap(g => g.errors || []), 1.5);
 }
 

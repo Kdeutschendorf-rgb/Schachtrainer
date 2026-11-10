@@ -70,6 +70,7 @@ export function createLineTrainer(el, { model, line, mode = 'review', onFinish, 
   let hintedAny = false;
   let tempoTimer = null;
   let sparEnded = false;
+  let gone = false;        // Trainer geschlossen (destroy)
 
   // ---------- Anzeige ----------
 
@@ -349,40 +350,47 @@ export function createLineTrainer(el, { model, line, mode = 'review', onFinish, 
   let sparStart = null;
   let sparCount = 0;
   let sparFinish = null;
+  let sparElo = 1320;
+  let sparToken = 0;
   function startSpar(finish) {
     phase = 'spar';
     sparCount = 0;
     sparFinish = finish;
     sparStart = board.fen();
-    const elo = Math.max(1320, Math.round(store.get('play').rating || 1320));
-    sparElo = elo;
-    setStatus(`Weiterspielen: ${SPAR_MOVES} Züge gegen die Engine (${elo}). Setz deinen Plan um.`);
+    sparElo = Math.max(1320, Math.round(store.get('play').rating || 1320));
     setCoach(line.plan ? h('div.op-note.plan', h('div.op-note-head', h('b', 'Dein Plan')), h('div', line.plan)) : null);
     setControls([]);
-    board.setMovable(orient);
+    board.setShapes([]);
     board.setOnMove(onUserMove);
+    // Die meisten Linien enden mit deinem Zug: Dann zieht zuerst die Engine
+    if (board.turn() === side) sparMyTurn(); else sparEngineMove();
   }
-  let sparElo = 1320;
+
+  function sparMyTurn() {
+    setStatus(`Weiterspielen: ${SPAR_MOVES} Züge gegen die Engine (${sparElo}). Dein Zug (${sparCount + 1}/${SPAR_MOVES}), setz deinen Plan um.`);
+    board.setMovable(orient);
+  }
+
+  function sparEngineMove() {
+    board.setMovable('none');
+    const my = ++sparToken;
+    later(async () => {
+      if (board.chess.isGameOver() || sparCount >= SPAR_MOVES) return endSpar();
+      setStatus(`Weiterspielen gegen die Engine (${sparElo}): Engine zieht …`);
+      let uci = null;
+      try { uci = await bestMove(board.fen(), { elo: sparElo, movetime: 400 }); } catch { /* unten */ }
+      if (my !== sparToken || phase !== 'spar' || gone) return;
+      if (!uci || !board.move(uci)) return endSpar();
+      if (board.chess.isGameOver()) return endSpar();
+      sparMyTurn();
+    }, 0);
+  }
 
   function onSparMove() {
     sparCount++;
-    board.setMovable('none');
-    const my = sparToken = sparToken + 1;
-    later(async () => {
-      if (board.chess.isGameOver() || sparCount >= SPAR_MOVES) return endSpar();
-      setStatus('Engine zieht …');
-      let uci = null;
-      try { uci = await bestMove(board.fen(), { elo: sparElo, movetime: 400 }); } catch { /* unten */ }
-      if (my !== sparToken || phase !== 'spar') return;
-      if (!uci) return endSpar();
-      board.move(uci);
-      if (board.chess.isGameOver()) return endSpar();
-      setStatus(`Dein Zug (${sparCount + 1}/${SPAR_MOVES})`);
-      board.setMovable(orient);
-    }, 0);
+    sparEngineMove();
     return true;
   }
-  let sparToken = 0;
 
   async function endSpar() {
     if (sparEnded) return;
@@ -401,6 +409,7 @@ export function createLineTrainer(el, { model, line, mode = 'review', onFinish, 
         ok = drop <= SPAR_MAX_DROP;
       }
     } catch { ok = true; }
+    if (gone) return;      // Trainer wurde inzwischen geschlossen: nichts mehr melden
     sparFinish?.(ok, drop);
   }
 
@@ -486,6 +495,7 @@ export function createLineTrainer(el, { model, line, mode = 'review', onFinish, 
   return {
     board,   // für Tests und Fehlersuche
     destroy() {
+      gone = true;
       stopAuto();
       stopTimers();
       stopTempo();

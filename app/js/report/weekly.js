@@ -4,6 +4,8 @@
 // weeklyReport({ summary, playGames, activity, deviations, today }) →
 //   { from, to, stats, good: [Sätze], todo: [Sätze], plan: [Sätze], headline }
 
+import { dateStr } from '../srs.js';
+
 export const TAG_DE = {
   figur_eingestellt: 'Figur eingestellt', materialverlust: 'Material verloren', gabel: 'Gabel übersehen',
   schach: 'Schach übersehen', matt_zugelassen: 'Matt zugelassen', matt_verpasst: 'Matt verpasst', chance_verpasst: 'Chance verpasst',
@@ -18,7 +20,8 @@ const TAG_PLAN = {
   chance_verpasst: 'Macht der Gegner einen Fehler, kurz innehalten: Was hat sich geändert, was kann ich jetzt gewinnen?',
 };
 
-const dayStr = d => d.toISOString().slice(0, 10);
+// Lokales Datum wie überall im Fortschritt (toISOString wäre UTC: nach Mitternacht fehlte sonst der heutige Tag)
+const dayStr = d => dateStr(d);
 export const de1 = x => x.toFixed(1).replace('.', ',');
 
 // Zielverfolgung: Wie viele Punkte pro Woche braucht es bis zum Zieldatum? null, wenn Ziel oder Datum fehlen.

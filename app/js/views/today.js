@@ -168,6 +168,7 @@ const COUNTERS = {
   openings: [['openingReviews', 'openingQuiz'], ['openingCorrect', 'openingQuizRight']],
   vision: [['visionTasks'], ['visionSolved']],
   endgames: [['endgames'], ['endgamesSolved']],
+  review: [['reviewMoments'], ['reviewCorrect']],
 };
 
 export function countersFor(module, activity = {}) {
@@ -634,7 +635,7 @@ function createRunner(root, plan, { focus, onExit }) {
           h('div', h('div.stat', `🔥 ${store.streak()}`), h('div.small.muted', 'Tage in Folge'))),
         results.length ? h('table.td-sum-table', h('tbody', results.map(r => {
           const b = blocks.find(x => x.id === r.id) || {};
-          return h('tr', h('td', `${b.icon || ''} ${b.label || r.type}`), h('td.muted', `${r.minutes} min`), h('td', describeResult(r)));
+          return h('tr', h('td', `${b.icon || ''} ${b.label || r.type}`), h('td.muted', `${String(r.minutes).replace('.', ',')} min`), h('td', describeResult(r)));
         }))) : null),
       h('div.card.td-tip', h('div.small.muted', 'Coach-Tipp'), h('div', tipOfTheDay({ date: todayStr(), focus, salt: 'abschluss' }))),
       h('div.row',

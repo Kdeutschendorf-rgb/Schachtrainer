@@ -23,8 +23,8 @@ let state = null;
 let saveTimer = null;
 let pushTimer = null;
 let dirty = false;            // lokale Änderungen, die noch nicht in Supabase sind
-let user = null;
-let stale = false;            // ein anderes Gerät hat einen neueren Stand gespeichert              // eingeloggter Supabase-Nutzer oder null (Gast)
+let user = null;              // eingeloggter Supabase-Nutzer oder null (Gast)
+let stale = false;            // ein anderes Gerät hat einen neueren Stand gespeichert
 const client = window.supabase?.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const DEFAULTS = () => ({
@@ -39,7 +39,20 @@ const DEFAULTS = () => ({
   _updatedAt: 0,
 });
 
-const localKey = () => `schachtrainer:progress:${user ? user.id : 'gast'}`;
+const GUEST_KEY = 'schachtrainer:progress:gast';
+const localKey = () => (user ? `schachtrainer:progress:${user.id}` : GUEST_KEY);
+
+// Erst als Gast trainiert, dann ein Konto angelegt: Der Gast-Fortschritt zieht ins Konto um (nur wenn das Konto
+// auf diesem Gerät und in Supabase noch leer ist). Er gilt als lokale Änderung und wird beim Hochladen mit einem
+// doch vorhandenen Stand zusammengeführt, überschreibt also nichts.
+function takeGuestProgress() {
+  try {
+    const g = JSON.parse(localStorage.getItem(GUEST_KEY) || 'null');
+    if (!g || !(g._updatedAt > 0)) return null;
+    localStorage.removeItem(GUEST_KEY);
+    return { ...g, _syncedAt: 0, _updatedAt: Date.now() };
+  } catch { return null; }
+}
 
 function readLocal() {
   try { return JSON.parse(localStorage.getItem(localKey()) || 'null'); } catch { return null; }
@@ -109,9 +122,10 @@ export const isStale = () => stale;
 
 export async function init() {
   if (state) return state;
-  const local = readLocal();
+  let local = readLocal();
   let remote = null;
   try { remote = await readRemote(); } catch (e) { console.warn('Abgleich fehlgeschlagen', e); }
+  if (user && !local && !remote) local = takeGuestProgress();
   const pending = !!local && (local._updatedAt || 0) > (local._syncedAt || 0);
   if (!remote) {
     state = { ...DEFAULTS(), ...(local || {}) };

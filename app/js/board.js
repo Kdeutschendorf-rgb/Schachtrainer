@@ -105,6 +105,12 @@ export function createBoard(el, opts = {}) {
     movable: { free: false, color: movableColor(), dests: dests(), showDests: true, events: { after: userMove } },
   });
 
+  // Chessground merkt sich die Lage des Bretts und erfährt nur von Größenänderungen und vom Scrollen. Rutscht das
+  // Brett, weil darüber Text dazukommt (z. B. „Zeit um“ im Tagesplan), träfe der nächste Klick das falsche Feld.
+  // Deshalb vor jedem Antippen die Lage neu messen lassen.
+  const fresh = () => cg.state.dom.bounds.clear();
+  for (const ev of ['pointerdown', 'touchstart', 'mousedown']) el.addEventListener(ev, fresh, { capture: true, passive: true });
+
   const api = {
     chess,
     cg,

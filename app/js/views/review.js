@@ -134,8 +134,8 @@ export async function mount(el) {
     clear(el);
     const host = h('div');
     el.append(host);
-    cleanup = createReview(host, g, () => {
-      store.logActivity({ reviews: 1 });
+    cleanup = createReview(host, g, r => {
+      store.logActivity({ reviews: 1, reviewMoments: r.moments, reviewCorrect: r.correct });
       list();
     });
   }
@@ -169,7 +169,7 @@ export function runBlock(el, { minutes = 3, mode = 'review', onDone } = {}) {
       if (!g) return end();
       cleanup = createReview(host, g, r => {
         stats.games++; stats.moments += r.moments; stats.correct += r.correct;
-        store.logActivity({ reviews: 1 });
+        store.logActivity({ reviews: 1, reviewMoments: r.moments, reviewCorrect: r.correct });
         next();
       });
     };

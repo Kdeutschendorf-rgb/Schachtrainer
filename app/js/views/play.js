@@ -40,6 +40,8 @@ export async function mount(el) {
   el.append(root);
   let alive = true;
   let game = null;   // laufende Partie (Objekt mit destroy)
+  let round = 0;     // zählt gestartete Partien: Eine neue Partie bricht die Analyse der alten ab (die Engine gehört dann dem Bot)
+  const analysing = new Set();
 
   // Startwertung einmalig aus der chess.com-Rapid-Elo, sonst 1000
   if (area().rating == null) {
@@ -55,6 +57,37 @@ export async function mount(el) {
 
   if (area().current) startGame(area().current);
   else renderSetup();
+
+  // Ergebnis der Analyse speichern: Genauigkeit, Aufgaben für die Taktik, Momente für die Besprechung
+  function saveAnalysis(id, res) {
+    store.update('play', d => {
+      const g = d.games.find(x => x.id === id);
+      if (g) {
+        g.accuracy = res.accuracy; g.counts = res.counts; g.errors = res.errors;
+        // Die drei teuersten Fehler für die Partie-Besprechung
+        g.moments = res.moves.filter(m => m.cls === 'blunder' || m.cls === 'mistake').sort((x, y) => y.loss - x.loss).slice(0, 3)
+          .sort((x, y) => x.ply - y.ply)
+          .map(m => ({ ply: m.ply, fen: m.fen, played: m.san, best: m.bestSan, bestUci: m.best, drop: m.loss, tags: m.tags, pv: '' }));
+      }
+      const ids = new Set(d.puzzles.map(p => p.id));
+      d.puzzles.push(...res.puzzles.filter(p => !ids.has(p.id)));
+      d.puzzles = d.puzzles.slice(-MAX_PUZZLES);
+    });
+  }
+
+  // Partien, deren Analyse abgebrochen wurde (Seite verlassen, gleich die nächste Partie gestartet), in Ruhe nachholen
+  async function analysePending() {
+    for (const g of area().games.slice(-5).reverse()) {
+      if (!alive || game) return;
+      if (g.accuracy != null || g.moves.length < 4 || analysing.has(g.id)) continue;
+      analysing.add(g.id);
+      const res = await analyseGame({ sans: g.moves, color: g.color, id: g.id, date: g.date }, { alive: () => alive && !game }).catch(() => null);
+      analysing.delete(g.id);
+      if (!res) return;
+      saveAnalysis(g.id, res);
+      if (alive && !game) renderSetup();
+    }
+  }
 
   // Stellungen aus eigenen Partien ausspielen: noch nicht gespielte zuerst
   function startPlayout(kind) {
@@ -111,8 +144,9 @@ export async function mount(el) {
         h('table.pl-games', last.map(g => h('tr',
           h('td', h('span.pill' + (g.result === 'W' ? '.good' : g.result === 'L' ? '.bad' : ''), RESULT_DE[g.result])),
           h('td', `${g.color === 'w' ? 'Weiß' : 'Schwarz'} gegen Bot ${g.botElo}`),
-          h('td.muted', g.accuracy != null ? `${g.accuracy} % Genauigkeit` : ''),
+          h('td.muted', g.accuracy != null ? `${String(g.accuracy).replace('.', ',')} % Genauigkeit` : g.moves.length >= 4 ? 'Analyse läuft …' : ''),
           h('td.muted', `${g.ratingAfter - g.ratingBefore >= 0 ? '+' : ''}${g.ratingAfter - g.ratingBefore}`))))) : null);
+    analysePending();
   }
 
   // Eröffnungen zur Auswahl: gemischt, ohne Buch oder ein Kapitel des Repertoires (legt deine Farbe fest)
@@ -142,7 +176,9 @@ export async function mount(el) {
 
   // ---------- Partie ----------
   function startGame(cur) {
+    game?.destroy();
     clear(root);
+    const mine = ++round;
     let over = false;
     let gen = 0;
     const timed = cur.tc.base > 0;
@@ -241,6 +277,15 @@ export async function mount(el) {
       gen++;
       clearInterval(interval);
       board.setMovable('none');
+      // Noch kein Zug von beiden Seiten: abgebrochen, zählt nicht für die Wertung
+      if (cur.moves.length < 2) {
+        store.update('play', d => { d.current = null; });
+        statusEl.replaceChildren(h('div.pl-result.draw', h('b', 'Partie abgebrochen'), ` (${reason}, nicht gewertet)`));
+        clear(controls).append(
+          h('button.primary', { onclick: () => newGame() }, 'Neue Partie'),
+          h('button', { onclick: () => renderSetup() }, 'Übersicht'));
+        return;
+      }
       const a = area();
       const played = a.games.length;
       const score = result === 'W' ? 1 : result === 'D' ? 0.5 : 0;
@@ -269,26 +314,16 @@ export async function mount(el) {
       side.insertBefore(report, controls.nextSibling);
       if (record.moves.length < 4) { report.replaceChildren(h('div.muted', 'Zu kurz für eine Analyse.')); return; }
 
+      analysing.add(record.id);
       const res = await analyseGame({ sans: record.moves, color: record.color, id: record.id, date: record.date }, {
-        alive: () => root.isConnected,
+        alive: () => root.isConnected && round === mine,
         onProgress: f => bar.set(f),
       }).catch(() => null);
-      if (!res || !root.isConnected) return;
-
-      // Speichern: Genauigkeit, Aufgaben für die Taktik, Eröffnungs-Abweichung als fällige Karte
-      store.update('play', d => {
-        const g = d.games.find(x => x.id === record.id);
-        if (g) {
-          g.accuracy = res.accuracy; g.counts = res.counts; g.errors = res.errors;
-          // Die drei teuersten Fehler für die Partie-Besprechung
-          g.moments = res.moves.filter(m => m.cls === 'blunder' || m.cls === 'mistake').sort((x, y) => y.loss - x.loss).slice(0, 3)
-            .sort((x, y) => x.ply - y.ply)
-            .map(m => ({ ply: m.ply, fen: m.fen, played: m.san, best: m.bestSan, bestUci: m.best, drop: m.loss, tags: m.tags, pv: '' }));
-        }
-        const ids = new Set(d.puzzles.map(p => p.id));
-        d.puzzles.push(...res.puzzles.filter(p => !ids.has(p.id)));
-        d.puzzles = d.puzzles.slice(-MAX_PUZZLES);
-      });
+      analysing.delete(record.id);
+      if (!res) return;
+      saveAnalysis(record.id, res);
+      if (!root.isConnected || round !== mine) return;
+      if (!game) { renderSetup(); return; }     // inzwischen zur Übersicht gewechselt: dort die Genauigkeit nachtragen
       let opening = null;
       try {
         const model = await loadModel();
@@ -296,17 +331,18 @@ export async function mount(el) {
         opening = { c, upTo: c.plies ? `Nach ${formatLine(record.moves.slice(0, c.plies))} ` : 'Gleich im ersten Zug ' };
         if (c.kind === 'ich' && c.expected[0]) {
           const key = cardKey(c.fen, c.expected[0]);
-          if (model.keys.has(key)) store.update('openings', d => { if (d.cards?.[key]) d.cards[key].due = todayStr(); });
+          opening.known = model.keys.has(key) && !!store.get('openings').cards?.[key];
+          if (opening.known) store.update('openings', d => { d.cards[key].due = todayStr(); });
           opening.key = key;
         }
       } catch { /* Repertoire fehlt */ }
 
       const bad = res.moves.filter(m => m.cls);
       report.replaceChildren(...[
-        h('div.row.pl-acc', h('div', h('div.stat', res.accuracy != null ? `${res.accuracy} %` : '–'), h('div.small.muted', 'Genauigkeit')),
+        h('div.row.pl-acc', h('div', h('div.stat', res.accuracy != null ? `${String(res.accuracy).replace('.', ',')} %` : '–'), h('div.small.muted', 'Genauigkeit')),
           ...['blunder', 'mistake', 'inaccuracy'].map(k => h('div', h('div.stat.pl-' + k, String(res.counts[k])), h('div.small.muted', CLASS_DE[k] + (res.counts[k] === 1 ? '' : k === 'inaccuracy' ? 'en' : '')))) ),
         opening ? h('div.small', opening.c.kind === 'ich'
-          ? h('span', `Eröffnung: ${opening.upTo}hast du ${formatLine([opening.c.played], opening.c.plies)} gespielt, dein Repertoire sagt ${figurine(opening.c.expected[0])}. Die Stellung kommt heute in die Wiederholung.`)
+          ? h('span', `Eröffnung: ${opening.upTo}hast du ${formatLine([opening.c.played], opening.c.plies)} gespielt, dein Repertoire sagt ${figurine(opening.c.expected[0])}. ${opening.known ? 'Die Stellung kommt heute in die Wiederholung.' : 'Diese Stellung hast du noch nicht gelernt, sie kommt mit ihrer Linie im Tagesplan.'}`)
           : opening.c.kind === 'gegner'
             ? `Eröffnung: ${opening.upTo}wich der Bot mit ${formatLine([opening.c.played], opening.c.plies)} ab.`
             : `Eröffnung: ${opening.upTo}war alles Repertoire.`) : null,

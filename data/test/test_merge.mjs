@@ -46,4 +46,34 @@ const x = { openings: { cards: { a: { due: '2026-11-09', reps: 3, lapses: 0, las
 mergeProgress(x, { openings: { cards: { a: { due: '2026-11-02', reps: 1, lapses: 0, last: '2026-10-28' } } }, _updatedAt: 900 });
 ok(x.openings.cards.a.reps === 3, 'neuere Karte bleibt, auch wenn der andere Stand jünger ist');
 
+// Laufende Bot-Partie: wird nie gemischt (gleiche Züge wie „Nf3“ kommen in einer Partie mehrfach vor)
+const game = moves => ({ id: 7, color: 'w', moves, clocks: { w: 1, b: 2 } });
+let a = { play: { current: game(['Nf3', 'Nf6', 'Ng1', 'Ng8', 'Nf3']), games: [] }, _updatedAt: 900 };
+mergeProgress(a, { play: { current: game(['Nf3', 'Nf6', 'Ng1']), games: [] }, _updatedAt: 500 });
+ok(a.play.current.moves.join(' ') === 'Nf3 Nf6 Ng1 Ng8 Nf3', 'laufende Partie: neuerer Stand bleibt unverändert');
+a = { play: { current: game(['Nf3', 'Nf6', 'Ng1']), games: [] }, _updatedAt: 500 };
+mergeProgress(a, { play: { current: game(['Nf3', 'Nf6', 'Ng1', 'Ng8', 'Nf3']), games: [] }, _updatedAt: 900 });
+ok(a.play.current.moves.length === 5 && a.play.current.moves[4] === 'Nf3', 'laufende Partie: neuerer Stand ersetzt den älteren ganz');
+// Auf dem neueren Gerät beendet: Die Partie darf vom älteren Stand nicht wieder auftauchen
+a = { play: { current: null, games: [{ id: 7, result: 'W', moves: ['e4'] }] }, _updatedAt: 900 };
+mergeProgress(a, { play: { current: game(['e4']), games: [] }, _updatedAt: 500 });
+ok(a.play.current === null, 'beendete Partie taucht nicht wieder als laufend auf');
+// Auf dem älteren Gerät beendet, auf dem neueren noch als laufend gespeichert
+a = { play: { current: game(['e4']), games: [] }, _updatedAt: 900 };
+mergeProgress(a, { play: { current: null, games: [{ id: 7, result: 'W', moves: ['e4'] }] }, _updatedAt: 500 });
+ok(a.play.current === null && a.play.games.length === 1, 'anderswo beendete Partie läuft nicht weiter');
+// Gerät ohne Bot-Partien übernimmt die laufende Partie des anderen
+a = { play: {}, _updatedAt: 900 };
+mergeProgress(a, { play: { current: game(['e4']), games: [] }, _updatedAt: 500 });
+ok(a.play.current?.id === 7, 'laufende Partie kommt auf ein Gerät ohne eigene');
+// Dieselbe Partie einmal ohne und einmal mit Analyse: ein Eintrag, der vollständige
+a = { play: { games: [{ id: 1, result: 'W', moves: ['e4'] }, { id: 2, result: 'L', moves: ['d4'] }] }, _updatedAt: 900 };
+mergeProgress(a, { play: { games: [{ id: 1, result: 'W', moves: ['e4'], accuracy: 88, moments: [{ ply: 4 }] }, { id: 3, result: 'D', moves: ['c4'] }] }, _updatedAt: 500 });
+ok(a.play.games.length === 3 && a.play.games.find(g => g.id === 1).accuracy === 88, 'Partien nach id vereinigt, Analyse bleibt: ' + JSON.stringify(a.play.games.map(g => g.id)));
+
+// Verlauf beim Vorausdenken: [id, ok, stufe, datum, sekunden] wird nach Datum sortiert
+a = { vision: { cand: { history: [['x', 1, 2, '2026-11-09', 12]] } }, _updatedAt: 900 };
+mergeProgress(a, { vision: { cand: { history: [['y', 0, 1, '2026-11-07', 9]] } }, _updatedAt: 500 });
+ok(a.vision.cand.history.map(h => h[0]).join('') === 'yx', 'Vorausdenken-Verlauf nach Datum sortiert');
+
 print(`${pass} bestanden, ${fail} fehlgeschlagen`);

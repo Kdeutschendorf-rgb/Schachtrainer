@@ -429,7 +429,9 @@ function createPlayer(el, { queue, seconds = 0, standalone = false, onEnd }) {
     setStep(base.id, stepAfter);
     store.update('endgames', d => {
       d.cards ||= {}; d.stats ||= {}; d.history ||= [];
-      d.cards[pos.id] = srs.review(d.cards[pos.id], step === 2 ? Math.min(grade, 2) : grade);
+      // Schon geübt und noch nicht wieder fällig („Nochmal“): Ein weiterer Erfolg schiebt die Wiederholung nicht hinaus
+      const prev = d.cards[pos.id];
+      if (!prev || srs.isDue(prev) || !ok) d.cards[pos.id] = srs.review(prev, step === 2 ? Math.min(grade, 2) : grade);
       const s = d.stats[pos.id] || [0, 0];
       d.stats[pos.id] = [s[0] + (ok ? 1 : 0), s[1] + 1];
       d.history.push([pos.id, ok ? 1 : 0, today(), hintsUsed, userMoves]);
