@@ -53,7 +53,7 @@
 .td-free-link:hover { border-color: var(--muted); }
 
 /* Laufendes Training */
-.td-run-head { display: flex; flex-direction: column; gap: 10px; position: sticky; top: 52px; z-index: 5; }
+.td-run-head { display: flex; flex-direction: column; gap: 10px; position: sticky; top: calc(52px + env(safe-area-inset-top)); z-index: 5; }
 .td-run-title { margin: 0; }
 .td-time { font-variant-numeric: tabular-nums; }
 .td-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }

@@ -128,7 +128,8 @@ body.logged-out #nav, body.logged-out #streak { display: none; }
   button, .btn { padding: 9px 12px; }
   #toasts { bottom: calc(72px + env(safe-area-inset-bottom)); }
 }
-html, body { overflow-x: hidden; }
+/* Kein seitliches Scrollen. „clip“ statt „hidden“: hidden würde die mitlaufende obere Leiste (sticky) abschalten */
+body { overflow-x: hidden; overflow-x: clip; }
 body { -webkit-text-size-adjust: 100%; }
 select { max-width: 100%; }
 @media (max-width: 700px) {
@@ -138,3 +139,16 @@ select { max-width: 100%; }
   main .op-tabs > *, main .tk-modes > *, main .rp-nav > * { flex: 0 0 auto; white-space: nowrap; }
 }
 .touch .kbd-hint { display: none; }
+
+/* Als App vom Home-Bildschirm (iPhone/iPad) reicht die Seite unter Statusleiste und Kamera-Aussparung:
+   Abstände dafür auf allen Größen, nicht nur auf dem Handy hochkant */
+.topbar { padding-top: calc(10px + env(safe-area-inset-top)); padding-left: max(20px, env(safe-area-inset-left)); padding-right: max(20px, env(safe-area-inset-right)); }
+main { padding-left: max(20px, env(safe-area-inset-left)); padding-right: max(20px, env(safe-area-inset-right)); }
+@media (max-width: 1000px) {
+  .topbar { padding-top: calc(8px + env(safe-area-inset-top)); padding-left: max(14px, env(safe-area-inset-left)); padding-right: max(14px, env(safe-area-inset-right)); }
+  main { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
+}
+@media (max-width: 700px) {
+  main { padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right)); }
+  #nav { padding-left: max(2px, env(safe-area-inset-left)); padding-right: max(2px, env(safe-area-inset-right)); }
+}

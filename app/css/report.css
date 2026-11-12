@@ -16,7 +16,7 @@
 @media (max-width: 700px) { .rp-sync { align-items: flex-start; } .rp-sync-status { text-align: left; } }
 
 /* Sprungleiste */
-.rp-nav { display: flex; flex-wrap: wrap; gap: 6px; position: sticky; top: 52px; z-index: 4; padding: 6px 0; background: var(--bg); }
+.rp-nav { display: flex; flex-wrap: wrap; gap: 6px; position: sticky; top: calc(52px + env(safe-area-inset-top)); z-index: 4; padding: 6px 0; background: var(--bg); }
 .rp-navbtn { font-size: .82rem; padding: 4px 10px; border-radius: 999px; }
 
 /* Coach-Auswertung (coach_report.json) */
